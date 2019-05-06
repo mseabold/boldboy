@@ -26,17 +26,16 @@ Cpu::Cpu()
 
 Cpu::~Cpu()
 {
-    for(int i=0;i<NUM_R16;i++)
-        delete mReg16s[i];
 
     for(int i=0;i<NUM_R8;i++)
         delete mReg8s[i];
 
     delete mReg16s[rPC]->getLow();
     delete mReg16s[rPC]->getHigh();
-    delete mReg16s[rPC];
 
     delete mReg16s[rSP]->getLow();
     delete mReg16s[rSP]->getHigh();
-    delete mReg16s[rSP];
+
+    for(int i=0;i<NUM_R16;i++)
+        delete mReg16s[i];
 }
