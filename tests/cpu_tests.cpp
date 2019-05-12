@@ -152,3 +152,106 @@ TEST_CASE("16 bit write/8 bit read", "[cpu]") {
 
     delete cpu;
 }
+
+TEST_CASE("8 bit register increment/decrement", "[cpu]") {
+    Cpu *cpu = new Cpu();
+
+    REQUIRE(cpu != NULL);
+
+    SECTION("A Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rA);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("F Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rF);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("B Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rB);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("C Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rC);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("D Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rD);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("E Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rE);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("H Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rH);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+    SECTION("L Inc/Dec") {
+        Reg8 *r = cpu->getReg8(Cpu::rL);
+        r->write(TEST_VAL_8);
+        REQUIRE(r->increment() == TEST_VAL_8 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_8);
+    }
+
+    delete cpu;
+}
+
+TEST_CASE("16 bit increment/decrement", "[cpu]") {
+    Cpu *cpu = new Cpu();
+
+    REQUIRE(cpu != NULL);
+
+    SECTION("AF Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rAF);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+
+    }
+    SECTION("BC Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rBC);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+    }
+    SECTION("DE Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rDE);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+    }
+    SECTION("HL Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rHL);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+    }
+    SECTION("SP Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rSP);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+    }
+    SECTION("PC Inc/Dec") {
+        Reg16 *r = cpu->getReg16(Cpu::rPC);
+        r->write(TEST_VAL_16);
+        REQUIRE(r->increment() == TEST_VAL_16 + 1);
+        REQUIRE(r->decrement() == TEST_VAL_16);
+    }
+
+    delete cpu;
+}

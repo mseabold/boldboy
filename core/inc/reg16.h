@@ -19,6 +19,8 @@ public:
     uint16_t read(void);
     Reg8 *getLow(void);
     Reg8 *getHigh(void);
+    uint16_t increment(void);
+    uint16_t decrement(void);
 };
 
 #endif /* REG16_H */

@@ -14,6 +14,8 @@ public:
 
     void write(uint8_t val);
     uint8_t read(void);
+    uint8_t increment(void);
+    uint8_t decrement(void);
 };
 
 #endif /* REG8_H */

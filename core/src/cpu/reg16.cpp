@@ -26,3 +26,19 @@ Reg8 *Reg16::getLow(void) {
 Reg8 *Reg16::getHigh() {
     return mHigh;
 }
+
+uint16_t Reg16::increment(void) {
+    uint16_t val = (mHigh->read() << 8) | mLow->read();
+    ++val;
+    mLow->write(val & 0xFF);
+    mHigh->write(val >> 8);
+    return val;
+}
+
+uint16_t Reg16::decrement(void) {
+    uint16_t val = (mHigh->read() << 8) | mLow->read();
+    --val;
+    mLow->write(val & 0xFF);
+    mHigh->write(val >> 8);
+    return val;
+}
