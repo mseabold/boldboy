@@ -1,5 +1,6 @@
 set (SRCS
     src/cpu/cpu.cpp
+    src/cpu/cpu_opcodes.cpp
     src/cpu/reg8.cpp
     src/cpu/reg16.cpp
     src/mmu/mmu.cpp
