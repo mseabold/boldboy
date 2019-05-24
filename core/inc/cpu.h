@@ -3,6 +3,10 @@
 
 #include "reg16.h"
 #include "reg8.h"
+
+#define NUM_R8  8
+#define NUM_R16 6
+
 class Cpu
 {
 public:
@@ -15,7 +19,6 @@ public:
         rE,
         rH,
         rL,
-        NUM_R8
     };
     enum reg16_name {
         rAF,
@@ -24,7 +27,6 @@ public:
         rHL,
         rSP,
         rPC,
-        NUM_R16
     };
 
     Cpu();
