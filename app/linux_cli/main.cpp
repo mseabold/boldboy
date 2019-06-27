@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    Cpu *cpu = new Cpu();
+    Cpu *cpu = new Cpu(NULL);
 
     //Test 8 bit writes/16 bit read
     cpu->getReg8(Cpu::rA)->write((uint8_t)0xaa);

@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-Cpu::Cpu()
+Cpu::Cpu(Mmu *mmu) : mMmu(mmu)
 {
     for(int i=0;i<NUM_R8;i++) {
         // Create a new R8 for every 8 bit register
@@ -22,11 +22,15 @@ Cpu::Cpu()
     r2 = new Reg8();
 
     mReg16s[rPC] = new Reg16(r1, r2);
+    mrA = mReg8s[rA];
+    mrF = mReg8s[rF];
+    mrPC = mReg16s[rPC];
+
+    initOps();
 }
 
 Cpu::~Cpu()
 {
-
     for(int i=0;i<NUM_R8;i++)
         delete mReg8s[i];
 
