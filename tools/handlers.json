@@ -1,0 +1,89 @@
+[
+    {
+        "name": "Nop",
+        "params": 0,
+        "ops": [ 0 ]
+    },
+    {
+        "name": "Stop",
+        "params": 0,
+        "ops": [ 16 ]
+    },
+    {
+        "name": "Halt",
+        "params": 0,
+        "ops": [ 118 ]
+    },
+    {
+        "name": "Prefix",
+        "params": 0,
+        "ops": [ 203 ]
+    },
+    {
+        "name": "EI",
+        "params": 0,
+        "ops": [ 243 ]
+    },
+    {
+        "name": "DI",
+        "params": 0,
+        "ops": [ 251 ]
+    },
+
+    {
+        "name": "LD_r16_d16",
+        "params": 1,
+        "ops": [ 1, 17, 33, 49 ]
+    },
+    {
+        "name": "LD_ar16_A",
+        "params": 1,
+        "ops": [ 2, 18, 34, 50 ]
+    },
+    {
+        "name": "Inc_r16",
+        "params": 1,
+        "ops": [ 3, 19, 35, 51 ]
+    },
+    {
+        "name": "Inc_r8",
+        "params": 1,
+        "ops": [ 4, 12, 20, 28, 36, 44, 60 ]
+    },
+    {
+        "name": "Dec_r8",
+        "params": 1,
+        "ops": [ 5, 13, 21, 29, 37, 45, 61 ]
+    },
+    {
+        "name": "Inc_arHL",
+        "params": 0,
+        "ops": [ 52 ]
+    },
+    {
+        "name": "Dec_arHL",
+        "params": 0,
+        "ops": [ 53 ]
+    },
+    {
+        "name": "LD_r8_d8",
+        "params": 1,
+        "ops": [ 6, 14, 22, 30, 38, 46, 62 ]
+    },
+    {
+        "name": "LD_a16_SP",
+        "params": 0,
+        "ops": [ 8 ]
+    },
+    {
+        "name": "ADD_HL_r16",
+        "params": 1,
+        "ops": [ 9, 25, 41, 57 ]
+    },
+    {
+        "name": "RLC",
+        "params": 1,
+        "ops": [ 7 ],
+        "ext_ops": [ 0, 1, 2, 3, 4, 5, 7 ]
+    }
+]

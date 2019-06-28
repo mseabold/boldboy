@@ -61,19 +61,25 @@ private:
     Reg8 *mrA;
     Reg8 *mrF;
     Reg16 *mrPC;
+    Reg16 *mrSP;
+    Reg16 *mrHL;
+    bool mBranchTaken;
 
 #define FLAG_Z 0x80
 #define FLAG_N 0x40
 #define FLAG_H 0x20
 #define FLAG_C 0x10
 
-#define SET_FLAG(f) mrF->write(mrF->read() | f)
+#define SET_FLAG(f)   mrF->write(mrF->read() | f)
 #define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
+#define TEST_FLAG(f)  (mrF->read() & f)
+
+#define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
 
     Mmu *mMmu;
 
     Opcode mOpTable[256];
-    Opcode mCbOpTable[256];
+    Opcode mExtOpTable[256];
 
     void initOps(void);
 
@@ -89,6 +95,14 @@ private:
     void oph_LD_ar16_A(uint16_t p1, uint16_t p2);
     void oph_Inc_r16(uint16_t p1, uint16_t p2);
     void oph_Inc_r8(uint16_t p1, uint16_t p2);
+    void oph_Dec_r8(uint16_t p1, uint16_t p2);
+    void oph_Inc_arHL(uint16_t p1, uint16_t p2);
+    void oph_Dec_arHL(uint16_t p1, uint16_t p2);
+    void oph_LD_r8_d8(uint16_t p1, uint16_t p2);
+    void oph_LD_arHL_d8(uint16_t p1, uint16_t p2);
+    void oph_RLC(uint16_t p1, uint16_t p2);
+    void oph_LD_a16_SP(uint16_t p1, uint16_t p2);
+    void oph_ADD_HL_r16(uint16_t p1, uint16_t p2);
 
 };
 

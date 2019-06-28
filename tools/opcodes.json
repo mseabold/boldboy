@@ -53,7 +53,8 @@
          "addr": 7,
          "cycles": 4,
          "length": 1,
-         "mnemonic": "RLCA"
+         "mnemonic": "RLCA",
+         "p1": "rA"
       },
       {
          "addr": 8,
@@ -67,8 +68,7 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "ADD HL,BC",
-         "p1": "rHL",
-         "p2": "rBC"
+         "p1": "rBC"
       },
       {
          "addr": 10,
@@ -178,8 +178,7 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "ADD HL,DE",
-         "p1": "rHL",
-         "p2": "rDE"
+         "p1": "rDE"
       },
       {
          "addr": 26,
@@ -290,8 +289,7 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "ADD HL,HL",
-         "p1": "rHL",
-         "p2": "rHL"
+         "p1": "rHL"
       },
       {
          "addr": 42,
@@ -400,8 +398,7 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "ADD HL,SP",
-         "p1": "rHL",
-         "p2": "rSP"
+         "p1": "rSP"
       },
       {
          "addr": 58,

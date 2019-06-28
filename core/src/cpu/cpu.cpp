@@ -25,6 +25,9 @@ Cpu::Cpu(Mmu *mmu) : mMmu(mmu)
     mrA = mReg8s[rA];
     mrF = mReg8s[rF];
     mrPC = mReg16s[rPC];
+    mrSP = mReg16s[rSP];
+    mrHL = mReg16s[rHL];
+    mBranchTaken = false;
 
     initOps();
 }

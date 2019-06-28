@@ -77,5 +77,92 @@ void Cpu::oph_Inc_r16(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_Inc_r8(uint16_t p1, uint16_t p2) {
-    mReg8s[p1]->increment();
+
+    uint16_t newVal = mReg8s[p1]->increment();
+
+    (newVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    ((newVal & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+
+    CLEAR_FLAG(FLAG_N);
+}
+
+void Cpu::oph_Dec_r8(uint16_t p1, uint16_t p2) {
+    uint16_t newVal = mReg8s[p1]->decrement();
+
+    (newVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    ((newVal & 0xf) == 0xf)?CLEAR_FLAG(FLAG_H):SET_FLAG(FLAG_H);
+
+    SET_FLAG(FLAG_N);
+}
+
+void Cpu::oph_Inc_arHL(uint16_t p1, uint16_t p2) {
+    uint8_t memVal = mMmu->readAddr(mrHL->read());
+    ++memVal;
+    mMmu->writeAddr(mrHL->read(), memVal);
+
+    (memVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    ((memVal & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+
+    CLEAR_FLAG(FLAG_N);
+}
+
+void Cpu::oph_Dec_arHL(uint16_t p1, uint16_t p2) {
+    uint8_t memVal = mMmu->readAddr(mrHL->read());
+    --memVal;
+    mMmu->writeAddr(mrHL->read(), memVal);
+
+    (memVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    ((memVal & 0xf) == 0xf)?CLEAR_FLAG(FLAG_H):SET_FLAG(FLAG_H);
+
+    SET_FLAG(FLAG_N);
+}
+
+void Cpu::oph_LD_r8_d8(uint16_t p1, uint16_t p2) {
+    mrPC->increment();
+    mReg8s[p1]->write(mMmu->readAddr(mrPC->read()));
+}
+
+void Cpu::oph_LD_arHL_d8(uint16_t p1, uint16_t p2) {
+    mrPC->increment();
+    mMmu->writeAddr(mrHL->read(), mMmu->readAddr(mrPC->read()));
+}
+
+void Cpu::oph_RLC(uint16_t p1, uint16_t p2) {
+    uint16_t val = mReg8s[p1]->read();
+    val = val << 1;
+
+    // If carry, shift it to bit 0 and C flag
+    if(val & 0x100)
+    {
+        val |= 1;
+        SET_FLAG(FLAG_C);
+    }
+    else
+        CLEAR_FLAG(FLAG_C);
+
+    mReg8s[p1]->write((uint8_t)val);
+}
+
+void Cpu::oph_LD_a16_SP(uint16_t p1, uint16_t p2) {
+    uint16_t addr;
+
+    // Read in the 2 address bytes in LE
+    addr = mMmu->readAddr(mrPC->increment());
+    addr += mMmu->readAddr(mrPC->increment()) << 8;
+
+    // Now write out SP into 2 bytes in LE
+    mMmu->writeAddr(addr, mrSP->getLow()->read());
+    mMmu->writeAddr(addr+1, mrSP->getHigh()->read());
+}
+
+void Cpu::oph_ADD_HL_r16(uint16_t p1, uint16_t p2) {
+    uint32_t hlVal = mrHL->read();
+    uint32_t pVal = mReg16s[p1]->read();
+    uint32_t result = hlVal + pVal;
+
+    (result & 0x10000)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    (CARRY_BITS(hlVal, pVal, (result & 0xffff)) & 0x1000)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    mrHL->write((uint16_t)result);
 }
