@@ -94,6 +94,7 @@ private:
     void oph_LD_r16_d16(uint16_t p1, uint16_t p2);
     void oph_LD_ar16_A(uint16_t p1, uint16_t p2);
     void oph_Inc_r16(uint16_t p1, uint16_t p2);
+    void oph_Dec_r16(uint16_t p1, uint16_t p2);
     void oph_Inc_r8(uint16_t p1, uint16_t p2);
     void oph_Dec_r8(uint16_t p1, uint16_t p2);
     void oph_Inc_arHL(uint16_t p1, uint16_t p2);
@@ -103,6 +104,8 @@ private:
     void oph_RLC(uint16_t p1, uint16_t p2);
     void oph_LD_a16_SP(uint16_t p1, uint16_t p2);
     void oph_ADD_HL_r16(uint16_t p1, uint16_t p2);
+    void oph_LD_A_ar16(uint16_t p1, uint16_t p2);
+    void oph_JR(uint16_t p1, uint16_t p2);
 
 };
 

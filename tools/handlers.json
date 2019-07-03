@@ -37,13 +37,18 @@
     },
     {
         "name": "LD_ar16_A",
-        "params": 1,
+        "params": 2,
         "ops": [ 2, 18, 34, 50 ]
     },
     {
         "name": "Inc_r16",
         "params": 1,
         "ops": [ 3, 19, 35, 51 ]
+    },
+    {
+        "name": "Dec_r16",
+        "params": 1,
+        "ops": [ 11, 27, 43, 59 ]
     },
     {
         "name": "Inc_r8",
@@ -79,6 +84,16 @@
         "name": "ADD_HL_r16",
         "params": 1,
         "ops": [ 9, 25, 41, 57 ]
+    },
+    {
+        "name": "LD_A_ar16",
+        "params": 2,
+        "ops": [ 10, 26, 42, 58 ]
+    },
+    {
+        "name": "JR",
+        "params": 0,
+        "ops": [ 24 ]
     },
     {
         "name": "RLC",

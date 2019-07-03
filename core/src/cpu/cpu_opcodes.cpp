@@ -76,6 +76,10 @@ void Cpu::oph_Inc_r16(uint16_t p1, uint16_t p2) {
     mReg16s[p1]->increment();
 }
 
+void Cpu::oph_Dec_r16(uint16_t p1, uint16_t p2) {
+    mReg16s[p1]->decrement();
+}
+
 void Cpu::oph_Inc_r8(uint16_t p1, uint16_t p2) {
 
     uint16_t newVal = mReg8s[p1]->increment();
@@ -165,4 +169,24 @@ void Cpu::oph_ADD_HL_r16(uint16_t p1, uint16_t p2) {
     (CARRY_BITS(hlVal, pVal, (result & 0xffff)) & 0x1000)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
 
     mrHL->write((uint16_t)result);
+}
+
+void Cpu::oph_LD_A_ar16(uint16_t p1, uint16_t p2) {
+    int16_t s_p2 = (int16_t)p2;
+
+    mrA->write(mMmu->readAddr(mReg16s[p1]->read()));
+
+    if(s_p2 > 0)
+        mReg16s[p1]->increment();
+    else if(s_p2 < 0)
+        mReg16s[p1]->decrement();
+}
+
+void Cpu::oph_JR(uint16_t p1, uint16_t p2) {
+    // Note the r8 value in the code accounts for
+    // the PC being incremented.
+    uint16_t pcVal = mrPC->increment();
+    int8_t rVal = (int8_t)mMmu->readAddr(pcVal);
+
+    mrPC->write(pcVal + rVal);
 }
