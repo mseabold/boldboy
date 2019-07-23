@@ -52,6 +52,7 @@ public:
             void init(OpHandler _handler, uint8_t _cycles, uint8_t _branchCycles, const char *_mnemonic);
             void init(OpHandler _handler, uint8_t _cycles, const char *_mnemonic, uint16_t _p1);
             void init(OpHandler _handler, uint8_t _cycles, const char *_mnemonic, uint16_t _p1, uint16_t _p2);
+            void init(OpHandler _handler, uint8_t _cycles, uint8_t _branchCycles, const char *_mnemonic, uint16_t _p1);
             void init(OpHandler _handler, uint8_t _cycles, uint8_t _branchCycles, const char *_mnemonic, uint16_t _p1, uint16_t _p2);
     };
 
@@ -72,6 +73,7 @@ private:
 
 #define SET_FLAG(f)   mrF->write(mrF->read() | f)
 #define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
+#define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ f)
 #define TEST_FLAG(f)  (mrF->read() & f)
 
 #define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
@@ -106,6 +108,19 @@ private:
     void oph_ADD_HL_r16(uint16_t p1, uint16_t p2);
     void oph_LD_A_ar16(uint16_t p1, uint16_t p2);
     void oph_JR(uint16_t p1, uint16_t p2);
+    void oph_JR_Z_NZ(uint16_t p1, uint16_t p2);
+    void oph_JR_C_NC(uint16_t p1, uint16_t p2);
+    void oph_DAA(uint16_t p1, uint16_t p2);
+    void oph_CPL(uint16_t p1, uint16_t p2);
+    void oph_SCF(uint16_t p1, uint16_t p2);
+    void oph_CCF(uint16_t p1, uint16_t p2);
+    void oph_LD_r8_r8(uint16_t p1, uint16_t p2);
+    void oph_LD_r8_arHL(uint16_t p1, uint16_t p2);
+    void oph_LD_arHL_r8(uint16_t p1, uint16_t p2);
+    void oph_ADD_A_r8(uint16_t p1, uint16_t p2);
+    void oph_ADD_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_ADC_A_r8(uint16_t p1, uint16_t p2);
+    void oph_ADC_A_arHL(uint16_t p1, uint16_t p2);
 
 };
 

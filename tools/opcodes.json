@@ -227,7 +227,8 @@
          "branch_cycles": 12,
          "cycles": 8,
          "length": 2,
-         "mnemonic": "JR NZ,r8"
+         "mnemonic": "JR NZ,r8",
+         "p1": 0
       },
       {
          "addr": 33,
@@ -283,7 +284,8 @@
          "branch_cycles": 12,
          "cycles": 8,
          "length": 2,
-         "mnemonic": "JR Z,r8"
+         "mnemonic": "JR Z,r8",
+         "p1": 1
       },
       {
          "addr": 41,
@@ -339,7 +341,8 @@
          "branch_cycles": 12,
          "cycles": 8,
          "length": 2,
-         "mnemonic": "JR NC,r8"
+         "mnemonic": "JR NC,r8",
+         "p1": 0
       },
       {
          "addr": 49,
@@ -395,7 +398,8 @@
          "branch_cycles": 12,
          "cycles": 8,
          "length": 2,
-         "mnemonic": "JR C,r8"
+         "mnemonic": "JR C,r8",
+         "p1": 1
       },
       {
          "addr": 57,
@@ -835,48 +839,42 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),B",
-         "p1": "rHL",
-         "p2": "rB"
+         "p1": "rB"
       },
       {
          "addr": 113,
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),C",
-         "p1": "rHL",
-         "p2": "rC"
+         "p1": "rC"
       },
       {
          "addr": 114,
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),D",
-         "p1": "rHL",
-         "p2": "rD"
+         "p1": "rD"
       },
       {
          "addr": 115,
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),E",
-         "p1": "rHL",
-         "p2": "rE"
+         "p1": "rE"
       },
       {
          "addr": 116,
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),H",
-         "p1": "rHL",
-         "p2": "rH"
+         "p1": "rH"
       },
       {
          "addr": 117,
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),L",
-         "p1": "rHL",
-         "p2": "rL"
+         "p1": "rL"
       },
       {
          "addr": 118,
@@ -889,8 +887,7 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "LD (HL),A",
-         "p1": "rHL",
-         "p2": "rA"
+         "p1": "rA"
       },
       {
          "addr": 120,
@@ -961,128 +958,110 @@
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,B",
-         "p1": "rA",
-         "p2": "rB"
+         "p1": "rB"
       },
       {
          "addr": 129,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,C",
-         "p1": "rA",
-         "p2": "rC"
+         "p1": "rC"
       },
       {
          "addr": 130,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,D",
-         "p1": "rA",
-         "p2": "rD"
+         "p1": "rD"
       },
       {
          "addr": 131,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,E",
-         "p1": "rA",
-         "p2": "rE"
+         "p1": "rE"
       },
       {
          "addr": 132,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,H",
-         "p1": "rA",
-         "p2": "rH"
+         "p1": "rH"
       },
       {
          "addr": 133,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,L",
-         "p1": "rA",
-         "p2": "rL"
+         "p1": "rL"
       },
       {
          "addr": 134,
          "cycles": 8,
          "length": 1,
-         "mnemonic": "ADD A,(HL)",
-         "p1": "rA",
-         "p2": "rHL"
+         "mnemonic": "ADD A,(HL)"
       },
       {
          "addr": 135,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADD A,A",
-         "p1": "rA",
-         "p2": "rA"
+         "p1": "rA"
       },
       {
          "addr": 136,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,B",
-         "p1": "rA",
-         "p2": "rB"
+         "p1": "rB"
       },
       {
          "addr": 137,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,C",
-         "p1": "rA",
-         "p2": "rC"
+         "p1": "rC"
       },
       {
          "addr": 138,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,D",
-         "p1": "rA",
-         "p2": "rD"
+         "p1": "rD"
       },
       {
          "addr": 139,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,E",
-         "p1": "rA",
-         "p2": "rE"
+         "p1": "rE"
       },
       {
          "addr": 140,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,H",
-         "p1": "rA",
-         "p2": "rH"
+         "p1": "rH"
       },
       {
          "addr": 141,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,L",
-         "p1": "rA",
-         "p2": "rL"
+         "p1": "rL"
       },
       {
          "addr": 142,
          "cycles": 8,
          "length": 1,
-         "mnemonic": "ADC A,(HL)",
-         "p1": "rA",
-         "p2": "rHL"
+         "mnemonic": "ADC A,(HL)"
       },
       {
          "addr": 143,
          "cycles": 4,
          "length": 1,
          "mnemonic": "ADC A,A",
-         "p1": "rA",
-         "p2": "rA"
+         "p1": "rA"
       },
       {
          "addr": 144,
