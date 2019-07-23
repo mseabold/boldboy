@@ -86,13 +86,22 @@ if __name__ == "__main__":
     parser = ArgumentParser("Generate GB OP Table based on json configuration")
     parser.add_argument("handlers_file")
     parser.add_argument("opcodes_file")
+    parser.add_argument("-f", "--output-file", help="Output C++ table file")
 
     args = parser.parse_args()
 
-    with open(args.handlers_file, "r") as hfile, open(args.opcodes_file, "r") as ofile, open("table.c", "w") as outfile:
+    if args.output_file:
+        outfile = open(args.output_file, "w")
+    else:
+        outfile = sys.stdout
+
+    with open(args.handlers_file, "r") as hfile, open(args.opcodes_file, "r") as ofile:
         handlers = json.load(hfile)
         opcodes = json.load(ofile)
 
         gen = OptableGenerator(handlers, opcodes)
-        gen.write_file(sys.stdout)
+        gen.write_file(outfile)
+
+    if args.output_file:
+        outfile.close()
 
