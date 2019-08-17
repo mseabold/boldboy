@@ -1124,64 +1124,56 @@
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,B",
-         "p1": "rA",
-         "p2": "rB"
+         "p1": "rB"
       },
       {
          "addr": 153,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,C",
-         "p1": "rA",
-         "p2": "rC"
+         "p1": "rC"
       },
       {
          "addr": 154,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,D",
-         "p1": "rA",
-         "p2": "rD"
+         "p1": "rD"
       },
       {
          "addr": 155,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,E",
-         "p1": "rA",
-         "p2": "rE"
+         "p1": "rE"
       },
       {
          "addr": 156,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,H",
-         "p1": "rA",
-         "p2": "rH"
+         "p1": "rH"
       },
       {
          "addr": 157,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,L",
-         "p1": "rA",
-         "p2": "rL"
+         "p1": "rL"
       },
       {
          "addr": 158,
          "cycles": 8,
          "length": 1,
          "mnemonic": "SBC A,(HL)",
-         "p1": "rA",
-         "p2": "rHL"
+         "p1": "rHL"
       },
       {
          "addr": 159,
          "cycles": 4,
          "length": 1,
          "mnemonic": "SBC A,A",
-         "p1": "rA",
-         "p2": "rA"
+         "p1": "rA"
       },
       {
          "addr": 160,

@@ -77,6 +77,7 @@ private:
 #define TEST_FLAG(f)  (mrF->read() & f)
 
 #define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
+#define CARRY_BITS_3(_a1, _a2, _a3, _r) (_a1 ^ _a2 ^ _a3 ^ _r)
 
     Mmu *mMmu;
 
@@ -84,6 +85,10 @@ private:
     Opcode mExtOpTable[256];
 
     void initOps(void);
+
+    /* Helpers. */
+    uint8_t add_3u8(uint8_t p1, uint8_t p2, uint8_t p3);
+    void ret(bool enable_interrupts);
 
     /* Opcode Handlers */
     void oph_Nop(uint16_t p1, uint16_t p2);
@@ -121,6 +126,24 @@ private:
     void oph_ADD_A_arHL(uint16_t p1, uint16_t p2);
     void oph_ADC_A_r8(uint16_t p1, uint16_t p2);
     void oph_ADC_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_SUB_A_r8(uint16_t p1, uint16_t p2);
+    void oph_SUB_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_SBC_A_r8(uint16_t p1, uint16_t p2);
+    void oph_SBC_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_AND_r8(uint16_t p1, uint16_t p2);
+    void oph_AND_arHL(uint16_t p1, uint16_t p2);
+    void oph_XOR_r8(uint16_t p1, uint16_t p2);
+    void oph_XOR_arHL(uint16_t p1, uint16_t p2);
+    void oph_OR_r8(uint16_t p1, uint16_t p2);
+    void oph_OR_arHL(uint16_t p1, uint16_t p2);
+    void oph_CP_r8(uint16_t p1, uint16_t p2);
+    void oph_CP_arHL(uint16_t p1, uint16_t p2);
+    void oph_RET_NZ(uint16_t p1, uint16_t p2);
+    void oph_RET_NC(uint16_t p1, uint16_t p2);
+    void oph_RET_Z(uint16_t p1, uint16_t p2);
+    void oph_RET_C(uint16_t p1, uint16_t p2);
+    void oph_RET(uint16_t p1, uint16_t p2);
+    void oph_RETI(uint16_t p1, uint16_t p2);
 
 };
 

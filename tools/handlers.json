@@ -166,6 +166,96 @@
         "ops": [ 142 ]
     },
     {
+        "name": "SUB_A_r8",
+        "params": 1,
+        "ops": [ 144, 145, 146, 147, 148, 149, 151]
+    },
+    {
+        "name": "SUB_A_arHL",
+        "params": 0,
+        "ops": [ 150 ]
+    },
+    {
+        "name": "SBC_A_r8",
+        "params": 1,
+        "ops": [ 152, 153, 154, 155, 156, 157, 159]
+    },
+    {
+        "name": "SBC_A_arHL",
+        "params": 0,
+        "ops": [ 158 ]
+    },
+    {
+        "name": "AND_r8",
+        "params": 1,
+        "ops": [ 160, 161, 162, 163, 164, 165, 167 ]
+    },
+    {
+        "name": "AND_arHL",
+        "params": 0,
+        "ops": [ 166 ]
+    },
+    {
+        "name": "XOR_r8",
+        "params": 1,
+        "ops": [ 168, 169, 170, 171, 172, 173, 175 ]
+    },
+    {
+        "name": "XOR_arHL",
+        "params": 0,
+        "ops": [ 174 ]
+    },
+    {
+        "name": "OR_r8",
+        "params": 1,
+        "ops": [ 176, 177, 178, 179, 180, 181, 183 ]
+    },
+    {
+        "name": "OR_arHL",
+        "params": 0,
+        "ops": [ 182 ]
+    },
+    {
+        "name": "CP_r8",
+        "params": 1,
+        "ops": [ 184, 185, 186, 187, 188, 189, 191 ]
+    },
+    {
+        "name": "CP_arHL",
+        "params": 0,
+        "ops": [ 190 ]
+    },
+    {
+        "name": "RET_NZ",
+        "params": 0,
+        "ops": [ 192 ]
+    },
+    {
+        "name": "RET_NC",
+        "params": 0,
+        "ops": [ 208 ]
+    },
+    {
+        "name": "RET_Z",
+        "params": 0,
+        "ops": [ 200 ]
+    },
+    {
+        "name": "RET_C",
+        "params": 0,
+        "ops": [ 216 ]
+    },
+    {
+        "name": "RET",
+        "params": 0,
+        "ops": [ 201 ]
+    },
+    {
+        "name": "RETI",
+        "params": 0,
+        "ops": [ 217 ]
+    },
+    {
         "name": "RLC",
         "params": 1,
         "ops": [ 7 ],
