@@ -40,6 +40,8 @@ class OptableGenerator(object):
         self._base_ops = opcodes[KEY_OPS_BASE]
         self._ext_ops = opcodes[KEY_OPS_EXT]
         self._indent = " " * indent
+        self._ops_used = [False]*256
+        self._ext_ops_used = [False]*256
 
     def _process_op(self, output, handler, op, fmt):
         name = handler[KEY_HANDLER_NAME]
@@ -67,10 +69,18 @@ class OptableGenerator(object):
     def _process_handler(self, output, handler):
         output.write("\n{}// {}\n".format(self._indent, handler[KEY_HANDLER_NAME]))
         for op in handler[KEY_HANDLER_OPS]:
+            if self._ops_used[op]:
+                raise ValueError("Opcode 0x{:02x} is duplicated".format(op))
+
+            self._ops_used[op] = True
             self._process_op(output, handler, self._base_ops[op], OP_FMT)
 
         if KEY_HANDLER_EXT_OPS in handler:
             for op in handler[KEY_HANDLER_EXT_OPS]:
+                if self._ext_ops_used[op]:
+                    raise ValueError("Opcode 0x{:02x} is duplicated".format(op))
+
+                self._ext_ops_used[op] = True
                 self._process_op(output, handler, self._ext_ops[op], EXT_OP_FMT)
 
     def write_file(self, output):
@@ -78,6 +88,25 @@ class OptableGenerator(object):
         for h in self._handlers:
             self._process_handler(output, h)
         output.write(FILE_FOOTER)
+
+    def gen_report(self):
+        unused = 256
+        used = 0
+        for h in self._handlers:
+            for op in h[KEY_HANDLER_OPS]:
+                if self._ops_used[op]:
+                    raise ValueError("Opcode 0x{:02x} is duplicated".format(op))
+
+                unused -= 1
+                used += 1
+
+                self._ops_used[op] = True
+
+        print("{} opcodes used. {} opcodes unused".format(used, unused))
+
+        for i in range(256):
+            if not self._ops_used[i]:
+                print("Unused op 0x{:02x}: {}".format(i, self._base_ops[i][KEY_OP_MNEMONIC]))
 
 
 
@@ -87,6 +116,7 @@ if __name__ == "__main__":
     parser.add_argument("handlers_file")
     parser.add_argument("opcodes_file")
     parser.add_argument("-f", "--output-file", help="Output C++ table file")
+    parser.add_argument("-r", "--report", help="Generate a report on unused opcodes", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -100,7 +130,11 @@ if __name__ == "__main__":
         opcodes = json.load(ofile)
 
         gen = OptableGenerator(handlers, opcodes)
-        gen.write_file(outfile)
+
+        if args.report:
+            gen.gen_report()
+        else:
+            gen.write_file(outfile)
 
     if args.output_file:
         outfile.close()
