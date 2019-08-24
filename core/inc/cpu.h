@@ -88,7 +88,8 @@ private:
 
     /* Helpers. */
     uint8_t add_3u8(uint8_t p1, uint8_t p2, uint8_t p3);
-    void ret(bool enable_interrupts);
+    uint16_t popStack_16(void);
+    void pushStack_16(uint16_t val);
 
     /* Opcode Handlers */
     void oph_Nop(uint16_t p1, uint16_t p2);
@@ -124,26 +125,48 @@ private:
     void oph_LD_arHL_r8(uint16_t p1, uint16_t p2);
     void oph_ADD_A_r8(uint16_t p1, uint16_t p2);
     void oph_ADD_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_ADD_A_d8(uint16_t p1, uint16_t p2);
     void oph_ADC_A_r8(uint16_t p1, uint16_t p2);
     void oph_ADC_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_ADC_A_d8(uint16_t p1, uint16_t p2);
     void oph_SUB_A_r8(uint16_t p1, uint16_t p2);
     void oph_SUB_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_SUB_A_d8(uint16_t p1, uint16_t p2);
     void oph_SBC_A_r8(uint16_t p1, uint16_t p2);
     void oph_SBC_A_arHL(uint16_t p1, uint16_t p2);
+    void oph_SBC_A_d8(uint16_t p1, uint16_t p2);
     void oph_AND_r8(uint16_t p1, uint16_t p2);
     void oph_AND_arHL(uint16_t p1, uint16_t p2);
+    void oph_AND_d8(uint16_t p1, uint16_t p2);
     void oph_XOR_r8(uint16_t p1, uint16_t p2);
     void oph_XOR_arHL(uint16_t p1, uint16_t p2);
+    void oph_XOR_d8(uint16_t p1, uint16_t p2);
     void oph_OR_r8(uint16_t p1, uint16_t p2);
     void oph_OR_arHL(uint16_t p1, uint16_t p2);
+    void oph_OR_d8(uint16_t p1, uint16_t p2);
     void oph_CP_r8(uint16_t p1, uint16_t p2);
     void oph_CP_arHL(uint16_t p1, uint16_t p2);
-    void oph_RET_NZ(uint16_t p1, uint16_t p2);
-    void oph_RET_NC(uint16_t p1, uint16_t p2);
-    void oph_RET_Z(uint16_t p1, uint16_t p2);
-    void oph_RET_C(uint16_t p1, uint16_t p2);
+    void oph_CP_d8(uint16_t p1, uint16_t p2);
+    void oph_RET_flag(uint16_t p1, uint16_t p2);
     void oph_RET(uint16_t p1, uint16_t p2);
     void oph_RETI(uint16_t p1, uint16_t p2);
+    void oph_POP_r16(uint16_t p1, uint16_t p2);
+    void oph_PUSH_r16(uint16_t p1, uint16_t p2);
+    void oph_JP_flag_a16(uint16_t p1, uint16_t p2);
+    void oph_JP_a16(uint16_t p1, uint16_t p2);
+    void oph_JP_arHL(uint16_t p1, uint16_t p2);
+    void oph_CALL_flag_a16(uint16_t p1, uint16_t p2);
+    void oph_CALL_a16(uint16_t p1, uint16_t p2);
+    void oph_RST_n(uint16_t p1, uint16_t p2);
+    void oph_LDH_a8_A(uint16_t p1, uint16_t p2);
+    void oph_LDH_A_a8(uint16_t p1, uint16_t p2);
+    void oph_LD_arC_A(uint16_t p1, uint16_t p2);
+    void oph_LD_A_arC(uint16_t p1, uint16_t p2);
+    void oph_ADD_SP_r8(uint16_t p1, uint16_t p2);
+    void oph_LD_a16_A(uint16_t p1, uint16_t p2);
+    void oph_LD_A_a16(uint16_t p1, uint16_t p2);
+    void oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2);
+    void oph_LD_SP_HL(uint16_t p1, uint16_t p2);
 
 };
 

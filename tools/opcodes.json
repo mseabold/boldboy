@@ -1404,7 +1404,9 @@
          "branch_cycles": 20,
          "cycles": 8,
          "length": 1,
-         "mnemonic": "RET NZ"
+         "mnemonic": "RET NZ",
+         "p1": "FLAG_Z",
+         "p2": "false"
       },
       {
          "addr": 193,
@@ -1418,7 +1420,9 @@
          "branch_cycles": 16,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "JP NZ,a16"
+         "mnemonic": "JP NZ,a16",
+         "p1": "FLAG_Z",
+         "p2": "false"
       },
       {
          "addr": 195,
@@ -1431,7 +1435,9 @@
          "branch_cycles": 24,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "CALL NZ,a16"
+         "mnemonic": "CALL NZ,a16",
+         "p1": "FLAG_Z",
+         "p2": "false"
       },
       {
          "addr": 197,
@@ -1451,14 +1457,17 @@
          "addr": 199,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 00H"
+         "mnemonic": "RST 00H",
+         "p1": "0x00"
       },
       {
          "addr": 200,
          "branch_cycles": 20,
          "cycles": 8,
          "length": 1,
-         "mnemonic": "RET Z"
+         "mnemonic": "RET Z",
+         "p1": "FLAG_Z",
+         "p2": "true"
       },
       {
          "addr": 201,
@@ -1471,7 +1480,9 @@
          "branch_cycles": 16,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "JP Z,a16"
+         "mnemonic": "JP Z,a16",
+         "p1": "FLAG_Z",
+         "p2": "true"
       },
       {
          "addr": 203,
@@ -1484,7 +1495,9 @@
          "branch_cycles": 24,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "CALL Z,a16"
+         "mnemonic": "CALL Z,a16",
+         "p1": "FLAG_Z",
+         "p2": "true"
       },
       {
          "addr": 205,
@@ -1503,14 +1516,17 @@
          "addr": 207,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 08H"
+         "mnemonic": "RST 08H",
+         "p1": "0x08"
       },
       {
          "addr": 208,
          "branch_cycles": 20,
          "cycles": 8,
          "length": 1,
-         "mnemonic": "RET NC"
+         "mnemonic": "RET NC",
+         "p1": "FLAG_C",
+         "p2": "false"
       },
       {
          "addr": 209,
@@ -1524,7 +1540,9 @@
          "branch_cycles": 16,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "JP NC,a16"
+         "mnemonic": "JP NC,a16",
+         "p1": "FLAG_C",
+         "p2": "false"
       },
       {
          "addr": 211,
@@ -1536,7 +1554,9 @@
          "branch_cycles": 24,
          "cycles": 12,
          "length": 3,
-         "mnemonic": "CALL NC,a16"
+         "mnemonic": "CALL NC,a16",
+         "p1": "FLAG_C",
+         "p2": "false"
       },
       {
          "addr": 213,
@@ -1555,7 +1575,8 @@
          "addr": 215,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 10H"
+         "mnemonic": "RST 10H",
+         "p1": "0x10"
       },
       {
          "addr": 216,
@@ -1563,7 +1584,8 @@
          "cycles": 8,
          "length": 1,
          "mnemonic": "RET C",
-         "p1": "rC"
+         "p1": "FLAG_C",
+         "p2": "true"
       },
       {
          "addr": 217,
@@ -1577,7 +1599,8 @@
          "cycles": 12,
          "length": 3,
          "mnemonic": "JP C,a16",
-         "p1": "rC"
+         "p1": "FLAG_C",
+         "p2": "true"
       },
       {
          "addr": 219,
@@ -1590,7 +1613,8 @@
          "cycles": 12,
          "length": 3,
          "mnemonic": "CALL C,a16",
-         "p1": "rC"
+         "p1": "FLAG_C",
+         "p2": "true"
       },
       {
          "addr": 221,
@@ -1608,7 +1632,8 @@
          "addr": 223,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 18H"
+         "mnemonic": "RST 18H",
+         "p1": "0x18"
       },
       {
          "addr": 224,
@@ -1659,7 +1684,8 @@
          "addr": 231,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 20H"
+         "mnemonic": "RST 20H",
+         "p1": "0x20"
       },
       {
          "addr": 232,
@@ -1707,7 +1733,8 @@
          "addr": 239,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 28H"
+         "mnemonic": "RST 28H",
+         "p1": "0x28"
       },
       {
          "addr": 240,
@@ -1759,7 +1786,8 @@
          "addr": 247,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 30H"
+         "mnemonic": "RST 30H",
+         "p1": "0x30"
       },
       {
          "addr": 248,
@@ -1809,7 +1837,8 @@
          "addr": 255,
          "cycles": 16,
          "length": 1,
-         "mnemonic": "RST 38H"
+         "mnemonic": "RST 38H",
+         "p1": "0x38"
       }
    ],
    "ext": [

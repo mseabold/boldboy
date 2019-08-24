@@ -245,17 +245,6 @@ void Cpu::oph_LD_arHL_r8(uint16_t p1, uint16_t p2) {
     mMmu->writeAddr(mrHL->read(), mReg8s[p1]->read());
 }
 
-uint8_t Cpu::add_3u8(uint8_t p1, uint8_t p2, uint8_t p3) {
-    uint16_t result = p1 + p2 + p3;
-    uint16_t carry = CARRY_BITS_3(p1, p2, p3, result);
-
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    (carry & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
-    (carry & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
-
-    return result;
-}
-
 void Cpu::oph_ADD_A_r8(uint16_t p1, uint16_t p2) {
     uint8_t aVal = mrA->read();
     uint8_t rVal = mReg8s[p1]->read();
@@ -273,6 +262,14 @@ void Cpu::oph_ADD_A_arHL(uint16_t p1, uint16_t p2) {
     mrA->write(add_3u8(aVal, rVal, 0));
 }
 
+void Cpu::oph_ADD_A_d8(uint16_t p1, uint16_t p2) {
+    uint8_t dVal = mMmu->readAddr(mrPC->increment());
+    uint8_t aVal = mrA->read();
+
+    CLEAR_FLAG(FLAG_N);
+    mrA->write(add_3u8(dVal, aVal, 0));
+}
+
 void Cpu::oph_ADC_A_r8(uint16_t p1, uint16_t p2) {
     uint8_t aVal = mrA->read();
     uint8_t rVal = mReg8s[p1]->read();
@@ -285,10 +282,16 @@ void Cpu::oph_ADC_A_arHL(uint16_t p1, uint16_t p2) {
     uint8_t aVal = mrA->read();
     uint8_t rVal = mMmu->readAddr(mrHL->read());
 
-    uint16_t result = (uint16_t)aVal + (uint16_t)rVal + TEST_FLAG(FLAG_C)?1:0;
-
     CLEAR_FLAG(FLAG_N);
     mrA->write(add_3u8(aVal, rVal, TEST_FLAG(FLAG_C)?1:0));
+}
+
+void Cpu::oph_ADC_A_d8(uint16_t p1, uint16_t p2) {
+    uint8_t dVal = mMmu->readAddr(mrPC->increment());
+    uint8_t aVal = mrA->read();
+
+    CLEAR_FLAG(FLAG_N);
+    mrA->write(add_3u8(dVal, aVal, TEST_FLAG(FLAG_C)?1:0));
 }
 
 void Cpu::oph_SUB_A_r8(uint16_t p1, uint16_t p2) {
@@ -307,6 +310,14 @@ void Cpu::oph_SUB_A_arHL(uint16_t p1, uint16_t p2) {
     mrA->write(add_3u8(aVal, ~rVal+1, 0));
 }
 
+void Cpu::oph_SUB_A_d8(uint16_t p1, uint16_t p2) {
+    uint8_t aVal = mrA->read();
+    uint8_t dVal = mMmu->readAddr(mrPC->increment());
+
+    SET_FLAG(FLAG_N);
+    mrA->write(add_3u8(aVal, ~dVal+1, 0));
+}
+
 void Cpu::oph_SBC_A_r8(uint16_t p1, uint16_t p2) {
     uint8_t aVal = mrA->read();
     uint8_t rVal = mReg8s[p1]->read();
@@ -323,6 +334,14 @@ void Cpu::oph_SBC_A_arHL(uint16_t p1, uint16_t p2) {
     mrA->write(add_3u8(aVal, ~rVal+1, TEST_FLAG(FLAG_C)?-1:0));
 }
 
+void Cpu::oph_SBC_A_d8(uint16_t p1, uint16_t p2) {
+    uint8_t aVal = mrA->read();
+    uint8_t dVal = mMmu->readAddr(mrPC->increment());
+
+    SET_FLAG(FLAG_N);
+    mrA->write(add_3u8(aVal, ~dVal+1, TEST_FLAG(FLAG_C)?-1:0));
+}
+
 void Cpu::oph_AND_r8(uint16_t p1, uint16_t p2) {
     uint8_t result = mrA->read() & mReg8s[p1]->read();
 
@@ -334,6 +353,15 @@ void Cpu::oph_AND_r8(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_AND_arHL(uint16_t p1, uint16_t p2) {
     uint8_t result = mrA->read() & mMmu->readAddr(mrHL->read());
+
+    CLEAR_FLAG(FLAG_N|FLAG_C);
+    SET_FLAG(FLAG_H);
+    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    mrA->write(result);
+}
+
+void Cpu::oph_AND_d8(uint16_t p1, uint16_t p2) {
+    uint8_t result = mrA->read() & mMmu->readAddr(mrPC->increment());
 
     CLEAR_FLAG(FLAG_N|FLAG_C);
     SET_FLAG(FLAG_H);
@@ -357,6 +385,14 @@ void Cpu::oph_XOR_arHL(uint16_t p1, uint16_t p2) {
     mrA->write(result);
 }
 
+void Cpu::oph_XOR_d8(uint16_t p1, uint16_t p2) {
+    uint8_t result = mrA->read() ^ mMmu->readAddr(mrPC->increment());
+
+    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
+    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    mrA->write(result);
+}
+
 void Cpu::oph_OR_r8(uint16_t p1, uint16_t p2) {
     uint8_t result = mrA->read() | mReg8s[p1]->read();
 
@@ -367,6 +403,14 @@ void Cpu::oph_OR_r8(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_OR_arHL(uint16_t p1, uint16_t p2) {
     uint8_t result = mrA->read() | mMmu->readAddr(mrHL->read());
+
+    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
+    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    mrA->write(result);
+}
+
+void Cpu::oph_OR_d8(uint16_t p1, uint16_t p2) {
+    uint8_t result = mrA->read() | mMmu->readAddr(mrPC->increment());
 
     CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
     (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
@@ -395,51 +439,137 @@ void Cpu::oph_CP_arHL(uint16_t p1, uint16_t p2) {
     add_3u8(aVal, ~rVal+1, 0);
 }
 
-//TODO this should probably be inlined
-void Cpu::ret(bool enable_interrupts) {
-    //xxx handle iterrupts
-    uint16_t ret_addr;
+void Cpu::oph_CP_d8(uint16_t p1, uint16_t p2) {
+    uint8_t aVal = mrA->read();
+    uint8_t dVal = mMmu->readAddr(mrPC->increment());
 
-    ret_addr = mMmu->readAddr(mrSP->read());
-    mrSP->decrement();
-    ret_addr |= mMmu->readAddr(mrSP->read()) << 8;
-    mrSP->decrement();
+    SET_FLAG(FLAG_N);
 
-    mrPC->write(ret_addr);
+    // Simply use the subtraction subroutine, but throw away the result.
+    // This will set all required flags
+    add_3u8(aVal, ~dVal+1, 0);
 }
 
-void Cpu::oph_RET_NZ(uint16_t p1, uint16_t p2) {
-    if(!TEST_FLAG(FLAG_Z)) {
+void Cpu::oph_RET_flag(uint16_t p1, uint16_t p2) {
+    if(!(p2 ^ TEST_FLAG(p1))) {
         mBranchTaken = true;
-        ret(false);
-    }
-}
-
-void Cpu::oph_RET_NC(uint16_t p1, uint16_t p2) {
-    if(!TEST_FLAG(FLAG_C)) {
-        mBranchTaken = true;
-        ret(false);
-    }
-}
-
-void Cpu::oph_RET_Z(uint16_t p1, uint16_t p2) {
-    if(TEST_FLAG(FLAG_Z)) {
-        mBranchTaken = true;
-        ret(false);
-    }
-}
-
-void Cpu::oph_RET_C(uint16_t p1, uint16_t p2) {
-    if(TEST_FLAG(FLAG_C)) {
-        mBranchTaken = true;
-        ret(false);
+        oph_RET(0,0);
     }
 }
 
 void Cpu::oph_RET(uint16_t p1, uint16_t p2) {
-    ret(false);
+    mrPC->write(popStack_16());
 }
 
 void Cpu::oph_RETI(uint16_t p1, uint16_t p2) {
-    ret(true);
+    oph_RET(0,0);
+    //TODO: Enable Interrupts
+}
+
+void Cpu::oph_POP_r16(uint16_t p1, uint16_t p2) {
+    mReg16s[p1]->write(popStack_16());
+}
+
+void Cpu::oph_PUSH_r16(uint16_t p1, uint16_t p2) {
+    pushStack_16(mReg16s[p1]->read());
+}
+
+void Cpu::oph_JP_flag_a16(uint16_t p1, uint16_t p2) {
+    if(!(p2 ^ TEST_FLAG(p1))) {
+        mBranchTaken = true;
+        oph_JP_a16(0,0);
+    }
+}
+
+void Cpu::oph_JP_a16(uint16_t p1, uint16_t p2) {
+    uint16_t pcVal;
+
+    pcVal = mMmu->readAddr(mrPC->increment());
+    pcVal |= (mMmu->readAddr(mrPC->increment()) << 8);
+
+    mrPC->write(pcVal);
+}
+
+void Cpu::oph_JP_arHL(uint16_t p1, uint16_t p2) {
+    mrPC->write(mrHL->read());
+}
+
+void Cpu::oph_CALL_flag_a16(uint16_t p1, uint16_t p2) {
+    if(!(p2 ^ TEST_FLAG(p1))) {
+        mBranchTaken = true;
+        oph_CALL_a16(0,0);
+    }
+}
+
+void Cpu::oph_CALL_a16(uint16_t p1, uint16_t p2) {
+    uint16_t aVal;
+    pushStack_16(mrPC->read()+3);
+    aVal = mMmu->readAddr(mrPC->increment());
+    aVal |= (mMmu->readAddr(mrPC->increment()) << 8);
+    mrPC->write(aVal);
+}
+
+void Cpu::oph_RST_n(uint16_t p1, uint16_t p2) {
+    pushStack_16(mrPC->read());
+    mrPC->write(p1);
+}
+
+void Cpu::oph_LDH_a8_A(uint16_t p1, uint16_t p2) {
+    uint8_t aVal = mMmu->readAddr(mrPC->increment());
+    mMmu->writeAddr(0xFF00 + aVal, mrA->read());
+}
+
+void Cpu::oph_LDH_A_a8(uint16_t p1, uint16_t p2) {
+    uint8_t aVal = mMmu->readAddr(mrPC->increment());
+    mrA->write(mMmu->readAddr(0xFF00 + aVal));
+}
+
+void Cpu::oph_LD_arC_A(uint16_t p1, uint16_t p2) {
+    mMmu->writeAddr(0xFF00 + mReg8s[rC]->read(), mrA->read());
+}
+
+void Cpu::oph_LD_A_arC(uint16_t p1, uint16_t p2) {
+    mrA->write(mMmu->readAddr(0xFF00 + mReg8s[rC]->read()));
+}
+
+void Cpu::oph_ADD_SP_r8(uint16_t p1, uint16_t p2) {
+    uint16_t aVal = mMmu->readAddr(mrPC->increment());
+    uint16_t rVal = mrSP->read();
+
+    uint16_t r = aVal + rVal;
+
+    CLEAR_FLAG(FLAG_Z | FLAG_N);
+    (CARRY_BITS(aVal, rVal, r) & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+    (CARRY_BITS(aVal, rVal, r) & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+    mrSP->write(r);
+}
+
+void Cpu::oph_LD_a16_A(uint16_t p1, uint16_t p2) {
+    uint16_t aVal = mMmu->readAddr(mrPC->increment());
+    aVal |= mMmu->readAddr(mrPC->increment()) << 8;
+
+    mMmu->writeAddr(aVal, mrA->read());
+}
+
+void Cpu::oph_LD_A_a16(uint16_t p1, uint16_t p2) {
+    uint16_t aVal = mMmu->readAddr(mrPC->increment());
+    aVal |= mMmu->readAddr(mrPC->increment()) << 8;
+
+    mrA->write(mMmu->readAddr(aVal));
+}
+
+void Cpu::oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2) {
+    uint16_t aVal = mMmu->readAddr(mrPC->increment());
+    uint16_t rVal = mrSP->read();
+
+    uint16_t r = aVal + rVal;
+
+    CLEAR_FLAG(FLAG_Z | FLAG_N);
+    (CARRY_BITS(aVal, rVal, r) & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+    (CARRY_BITS(aVal, rVal, r) & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+    mrHL->write(r);
+}
+
+void Cpu::oph_LD_SP_HL(uint16_t p1, uint16_t p2) {
+    mrSP->write(mrHL->read());
 }

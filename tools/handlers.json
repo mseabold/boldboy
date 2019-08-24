@@ -76,6 +76,11 @@
         "ops": [ 6, 14, 22, 30, 38, 46, 62 ]
     },
     {
+        "name": "LD_arHL_d8",
+        "params": 0,
+        "ops": [ 54 ]
+    },
+    {
         "name": "LD_a16_SP",
         "params": 0,
         "ops": [ 8 ]
@@ -156,6 +161,11 @@
         "ops": [ 134 ]
     },
     {
+        "name": "ADD_A_d8",
+        "params": 0,
+        "ops": [ 198 ]
+    },
+    {
         "name": "ADC_A_r8",
         "params": 1,
         "ops": [ 136, 137, 138, 139, 140, 141, 143 ]
@@ -164,6 +174,11 @@
         "name": "ADC_A_arHL",
         "params": 0,
         "ops": [ 142 ]
+    },
+    {
+        "name": "ADC_A_d8",
+        "params": 0,
+        "ops": [ 206 ]
     },
     {
         "name": "SUB_A_r8",
@@ -176,6 +191,11 @@
         "ops": [ 150 ]
     },
     {
+        "name": "SUB_A_d8",
+        "params": 0,
+        "ops": [ 214 ]
+    },
+    {
         "name": "SBC_A_r8",
         "params": 1,
         "ops": [ 152, 153, 154, 155, 156, 157, 159]
@@ -184,6 +204,11 @@
         "name": "SBC_A_arHL",
         "params": 0,
         "ops": [ 158 ]
+    },
+    {
+        "name": "SBC_A_d8",
+        "params": 0,
+        "ops": [ 222 ]
     },
     {
         "name": "AND_r8",
@@ -196,6 +221,11 @@
         "ops": [ 166 ]
     },
     {
+        "name": "AND_d8",
+        "params": 0,
+        "ops": [ 230 ]
+    },
+    {
         "name": "XOR_r8",
         "params": 1,
         "ops": [ 168, 169, 170, 171, 172, 173, 175 ]
@@ -204,6 +234,11 @@
         "name": "XOR_arHL",
         "params": 0,
         "ops": [ 174 ]
+    },
+    {
+        "name": "XOR_d8",
+        "params": 0,
+        "ops": [ 238 ]
     },
     {
         "name": "OR_r8",
@@ -216,6 +251,11 @@
         "ops": [ 182 ]
     },
     {
+        "name": "OR_d8",
+        "params": 0,
+        "ops": [ 246 ]
+    },
+    {
         "name": "CP_r8",
         "params": 1,
         "ops": [ 184, 185, 186, 187, 188, 189, 191 ]
@@ -226,24 +266,15 @@
         "ops": [ 190 ]
     },
     {
-        "name": "RET_NZ",
+        "name": "CP_d8",
         "params": 0,
-        "ops": [ 192 ]
+        "ops": [ 254 ]
     },
     {
-        "name": "RET_NC",
-        "params": 0,
-        "ops": [ 208 ]
-    },
-    {
-        "name": "RET_Z",
-        "params": 0,
-        "ops": [ 200 ]
-    },
-    {
-        "name": "RET_C",
-        "params": 0,
-        "ops": [ 216 ]
+        "name": "RET_flag",
+        "params": 2,
+        "ops": [ 192, 200, 208, 216 ],
+        "can_branch": true
     },
     {
         "name": "RET",
@@ -254,6 +285,93 @@
         "name": "RETI",
         "params": 0,
         "ops": [ 217 ]
+    },
+    {
+        "name": "POP_r16",
+        "params": 1,
+        "ops": [ 193, 209, 225, 241 ]
+    },
+    {
+        "name": "PUSH_r16",
+        "params": 1,
+        "ops": [ 197, 213, 229, 245 ]
+    },
+    {
+        "name": "JP_flag_a16",
+        "params": 2,
+        "ops": [ 194, 202, 210, 218 ],
+        "can_branch": true
+    },
+    {
+        "name": "JP_a16",
+        "params": 0,
+        "ops": [ 195 ]
+    },
+    {
+        "name": "JP_arHL",
+        "params": 0,
+        "ops": [ 233 ]
+    },
+    {
+        "name": "CALL_flag_a16",
+        "params": 2,
+        "ops": [ 196, 204, 212, 220 ],
+        "can_branch": true
+    },
+    {
+        "name": "CALL_a16",
+        "params": 0,
+        "ops": [ 205 ]
+    },
+    {
+        "name": "RST_n",
+        "params": 1,
+        "ops": [ 199, 207, 215, 223, 231, 239, 247, 255 ]
+    },
+    {
+        "name": "LDH_a8_A",
+        "params": 0,
+        "ops": [ 224 ]
+    },
+    {
+        "name": "LDH_A_a8",
+        "params": 0,
+        "ops": [ 240 ]
+    },
+    {
+        "name": "LD_arC_A",
+        "params": 0,
+        "ops": [ 226 ]
+    },
+    {
+        "name": "LD_A_arC",
+        "params": 0,
+        "ops": [ 242 ]
+    },
+    {
+        "name": "LD_a16_A",
+        "params": 0,
+        "ops": [ 234 ]
+    },
+    {
+        "name": "LD_A_a16",
+        "params": 0,
+        "ops": [ 250 ]
+    },
+    {
+        "name": "ADD_SP_r8",
+        "params": 0,
+        "ops": [ 232 ]
+    },
+    {
+        "name": "LD_HL_SP_p_r8",
+        "params": 0,
+        "ops": [ 248 ]
+    },
+    {
+        "name": "LD_SP_HL",
+        "params": 0,
+        "ops": [ 249 ]
     },
     {
         "name": "RLC",

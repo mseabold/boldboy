@@ -46,3 +46,32 @@ Cpu::~Cpu()
     for(int i=0;i<NUM_R16;i++)
         delete mReg16s[i];
 }
+
+uint8_t Cpu::add_3u8(uint8_t p1, uint8_t p2, uint8_t p3) {
+    uint16_t result = p1 + p2 + p3;
+    uint16_t carry = CARRY_BITS_3(p1, p2, p3, result);
+
+    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    (carry & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+    (carry & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+
+    return result;
+}
+
+uint16_t Cpu::popStack_16(void) {
+    uint16_t val;
+
+    val = mMmu->readAddr(mrSP->read());
+    mrSP->increment();
+    val |= (mMmu->readAddr(mrSP->read()) << 8);
+    mrSP->increment();
+
+    return val;
+}
+
+void Cpu::pushStack_16(uint16_t val) {
+    mrSP->decrement();
+    mMmu->writeAddr(mrSP->read(), (uint8_t)(val >> 8));
+    mrSP->decrement();
+    mMmu->writeAddr(mrSP->read(), (uint8_t)(val & 0xFF));
+}
