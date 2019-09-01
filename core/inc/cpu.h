@@ -65,6 +65,7 @@ private:
     Reg16 *mrSP;
     Reg16 *mrHL;
     bool mBranchTaken;
+    uint8_t mCurOpcode;
 
 #define FLAG_Z 0x80
 #define FLAG_N 0x40
@@ -75,6 +76,8 @@ private:
 #define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
 #define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ f)
 #define TEST_FLAG(f)  (mrF->read() & f)
+#define CLEAR_FLAGS   mrF->write(0)
+#define CHECK_ZERO(_r) (_r == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z)
 
 #define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
 #define CARRY_BITS_3(_a1, _a2, _a3, _r) (_a1 ^ _a2 ^ _a3 ^ _r)
@@ -109,7 +112,6 @@ private:
     void oph_Dec_arHL(uint16_t p1, uint16_t p2);
     void oph_LD_r8_d8(uint16_t p1, uint16_t p2);
     void oph_LD_arHL_d8(uint16_t p1, uint16_t p2);
-    void oph_RLC(uint16_t p1, uint16_t p2);
     void oph_LD_a16_SP(uint16_t p1, uint16_t p2);
     void oph_ADD_HL_r16(uint16_t p1, uint16_t p2);
     void oph_LD_A_ar16(uint16_t p1, uint16_t p2);
@@ -167,6 +169,17 @@ private:
     void oph_LD_A_a16(uint16_t p1, uint16_t p2);
     void oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2);
     void oph_LD_SP_HL(uint16_t p1, uint16_t p2);
+    void oph_RLC(uint16_t p1, uint16_t p2);
+    void oph_RRC(uint16_t p1, uint16_t p2);
+    void oph_RL(uint16_t p1, uint16_t p2);
+    void oph_RR(uint16_t p1, uint16_t p2);
+    void oph_SLA(uint16_t p1, uint16_t p2);
+    void oph_SRA(uint16_t p1, uint16_t p2);
+    void oph_SWAP(uint16_t p1, uint16_t p2);
+    void oph_SRL(uint16_t p1, uint16_t p2);
+    void oph_BIT(uint16_t p1, uint16_t p2);
+    void oph_RES(uint16_t p1, uint16_t p2);
+    void oph_SET(uint16_t p1, uint16_t p2);
 
 };
 

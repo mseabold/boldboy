@@ -54,7 +54,8 @@
          "cycles": 4,
          "length": 1,
          "mnemonic": "RLCA",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 8,
@@ -110,7 +111,9 @@
          "addr": 15,
          "cycles": 4,
          "length": 1,
-         "mnemonic": "RRCA"
+         "mnemonic": "RRCA",
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 16,
@@ -165,7 +168,9 @@
          "addr": 23,
          "cycles": 4,
          "length": 1,
-         "mnemonic": "RLA"
+         "mnemonic": "RLA",
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 24,
@@ -220,7 +225,9 @@
          "addr": 31,
          "cycles": 4,
          "length": 1,
-         "mnemonic": "RRA"
+         "mnemonic": "RRA",
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 32,
@@ -1847,1792 +1854,2048 @@
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 1,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 2,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 3,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 4,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 5,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 6,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RLC (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 7,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RLC A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 8,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 9,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 10,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 11,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 12,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 13,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 14,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RRC (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 15,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RRC A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 16,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 17,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 18,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 19,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 20,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 21,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 22,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RL (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 23,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RL A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 24,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 25,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 26,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 27,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 28,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 29,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 30,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RR (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 31,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RR A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 32,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 33,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 34,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 35,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 36,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 37,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 38,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SLA (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 39,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SLA A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 40,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 41,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 42,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 43,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 44,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 45,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 46,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SRA (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 47,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRA A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 48,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 49,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 50,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 51,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 52,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 53,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 54,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SWAP (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 55,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SWAP A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 56,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 57,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 58,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 59,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 60,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 61,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 62,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SRL (HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 63,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SRL A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 64,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 65,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 66,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 67,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 68,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 69,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 70,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 0,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 71,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 0,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 72,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 73,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 74,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 75,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 76,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 77,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 78,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 1,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 79,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 1,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 80,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 81,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 82,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 83,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 84,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 85,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 86,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 2,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 87,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 2,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 88,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 89,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 90,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 91,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 92,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 93,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 94,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 3,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 95,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 3,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 96,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 97,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 98,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 99,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 100,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 101,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 102,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 4,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 103,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 4,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 104,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 105,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 106,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 107,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 108,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 109,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 110,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 5,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 111,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 5,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 112,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 113,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 114,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 115,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 116,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 117,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 118,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 6,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 119,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 6,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 120,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 121,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 122,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 123,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 124,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 125,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 126,
          "cycles": 16,
          "length": 2,
          "mnemonic": "BIT 7,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 127,
          "cycles": 8,
          "length": 2,
          "mnemonic": "BIT 7,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 128,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 129,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 130,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 131,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 132,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 133,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 134,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 0,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 135,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 0,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 136,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 137,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 138,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 139,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 140,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 141,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 142,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 1,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 143,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 1,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 144,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 145,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 146,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 147,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 148,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 149,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 150,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 2,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 151,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 2,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 152,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 153,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 154,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 155,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 156,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 157,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 158,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 3,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 159,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 3,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 160,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 161,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 162,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 163,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 164,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 165,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 166,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 4,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 167,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 4,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 168,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 169,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 170,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 171,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 172,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 173,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 174,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 5,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 175,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 5,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 176,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 177,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 178,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 179,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 180,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 181,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 182,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 6,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 183,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 6,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 184,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 185,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 186,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 187,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 188,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 189,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 190,
          "cycles": 16,
          "length": 2,
          "mnemonic": "RES 7,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 191,
          "cycles": 8,
          "length": 2,
          "mnemonic": "RES 7,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 192,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 193,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 194,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 195,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 196,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 197,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 198,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 0,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 199,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 0,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 200,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 201,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 202,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 203,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 204,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 205,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 206,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 1,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 207,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 1,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 208,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 209,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 210,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 211,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 212,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 213,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 214,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 2,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 215,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 2,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 216,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 217,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 218,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 219,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 220,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 221,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 222,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 3,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 223,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 3,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 224,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 225,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 226,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 227,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 228,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 229,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 230,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 4,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 231,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 4,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 232,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 233,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 234,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 235,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 236,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 237,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 238,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 5,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 239,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 5,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 240,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 241,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 242,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 243,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 244,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 245,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 246,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 6,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 247,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 6,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       },
       {
          "addr": 248,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,B",
-         "p1": "rB"
+         "p1": "false",
+         "p2": "rB"
       },
       {
          "addr": 249,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,C",
-         "p1": "rC"
+         "p1": "false",
+         "p2": "rC"
       },
       {
          "addr": 250,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,D",
-         "p1": "rD"
+         "p1": "false",
+         "p2": "rD"
       },
       {
          "addr": 251,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,E",
-         "p1": "rE"
+         "p1": "false",
+         "p2": "rE"
       },
       {
          "addr": 252,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,H",
-         "p1": "rH"
+         "p1": "false",
+         "p2": "rH"
       },
       {
          "addr": 253,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,L",
-         "p1": "rL"
+         "p1": "false",
+         "p2": "rL"
       },
       {
          "addr": 254,
          "cycles": 16,
          "length": 2,
          "mnemonic": "SET 7,(HL)",
-         "p1": "rHL"
+         "p1": "true",
+         "p2": "rHL"
       },
       {
          "addr": 255,
          "cycles": 8,
          "length": 2,
          "mnemonic": "SET 7,A",
-         "p1": "rA"
+         "p1": "false",
+         "p2": "rA"
       }
    ]
 }

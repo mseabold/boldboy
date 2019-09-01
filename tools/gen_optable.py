@@ -68,12 +68,14 @@ class OptableGenerator(object):
 
     def _process_handler(self, output, handler):
         output.write("\n{}// {}\n".format(self._indent, handler[KEY_HANDLER_NAME]))
-        for op in handler[KEY_HANDLER_OPS]:
-            if self._ops_used[op]:
-                raise ValueError("Opcode 0x{:02x} is duplicated".format(op))
 
-            self._ops_used[op] = True
-            self._process_op(output, handler, self._base_ops[op], OP_FMT)
+        if KEY_HANDLER_OPS in handler:
+            for op in handler[KEY_HANDLER_OPS]:
+                if self._ops_used[op]:
+                    raise ValueError("Opcode 0x{:02x} is duplicated".format(op))
+
+                self._ops_used[op] = True
+                self._process_op(output, handler, self._base_ops[op], OP_FMT)
 
         if KEY_HANDLER_EXT_OPS in handler:
             for op in handler[KEY_HANDLER_EXT_OPS]:

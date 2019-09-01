@@ -135,22 +135,6 @@ void Cpu::oph_LD_arHL_d8(uint16_t p1, uint16_t p2) {
     mMmu->writeAddr(mrHL->read(), mMmu->readAddr(mrPC->read()));
 }
 
-void Cpu::oph_RLC(uint16_t p1, uint16_t p2) {
-    uint16_t val = mReg8s[p1]->read();
-    val = val << 1;
-
-    // If carry, shift it to bit 0 and C flag
-    if(val & 0x100)
-    {
-        val |= 1;
-        SET_FLAG(FLAG_C);
-    }
-    else
-        CLEAR_FLAG(FLAG_C);
-
-    mReg8s[p1]->write((uint8_t)val);
-}
-
 void Cpu::oph_LD_a16_SP(uint16_t p1, uint16_t p2) {
     uint16_t addr;
 
@@ -572,4 +556,161 @@ void Cpu::oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_LD_SP_HL(uint16_t p1, uint16_t p2) {
     mrSP->write(mrHL->read());
+}
+
+/*************************************************
+ * Note: all of the bit operations take an initial
+ *       parameter that indicates whether the
+ *       operation is being done on a register or
+ *       to memory via (HL)
+ ************************************************/
+#define GET_VAL(_isHL, _reg) (_isHL)?mMmu->readAddr(mrHL->read()):mReg8s[_reg]->read()
+#define SET_VAL(_isHL, _reg, _val) (_isHL)?mMmu->writeAddr(mrHL->read(), _val):mReg8s[_reg]->write(_val)
+
+void Cpu::oph_RLC(uint16_t p1, uint16_t p2) {
+    uint16_t rVal = (uint16_t)GET_VAL(p1, p2);
+    rVal = rVal << 1;
+
+    // If carry, shift it to bit 0 and C flag
+    if(rVal & 0x100)
+    {
+        rVal |= 1;
+        SET_FLAG(FLAG_C);
+    }
+    else
+        CLEAR_FLAG(FLAG_C);
+
+    CLEAR_FLAG(FLAG_H|FLAG_N);
+
+    SET_VAL(p1, p2, (uint8_t )rVal);
+}
+
+void Cpu::oph_RRC(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+    uint8_t cBit = rVal & 0x01;
+
+    rVal >>= 1;
+
+    if(cBit) {
+        rVal |= 0x80;
+        SET_FLAG(FLAG_C);
+    }
+    else
+        CLEAR_FLAG(FLAG_C);
+
+    CLEAR_FLAG(FLAG_H|FLAG_N);
+
+    SET_VAL(p1, p2, rVal);
+}
+
+void Cpu::oph_RL(uint16_t p1, uint16_t p2) {
+    uint16_t rVal = (uint16_t)GET_VAL(p1, p2);
+    rVal <<= 1;
+
+    if(TEST_FLAG(FLAG_C))
+        rVal |= 0x01;
+
+    if(rVal & 0x100)
+        SET_FLAG(FLAG_C);
+    else
+        CLEAR_FLAG(FLAG_C);
+
+    CLEAR_FLAG(FLAG_N|FLAG_N);
+
+    SET_VAL(p1, p2, (uint8_t )rVal);
+}
+
+void Cpu::oph_RR(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+    uint8_t cBit = rVal & 0x01;
+
+    rVal >>= 1;
+
+    if(TEST_FLAG(FLAG_C))
+        rVal |= 0x80;
+
+    if(cBit)
+        SET_FLAG(FLAG_C);
+    else
+        CLEAR_FLAG(FLAG_C);
+
+    CLEAR_FLAG(FLAG_H|FLAG_N);
+
+    SET_VAL(p1, p2, rVal);
+}
+
+void Cpu::oph_SLA(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    (rVal & 0x80)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    rVal <<= 1;
+
+    (rVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CLEAR_FLAG(FLAG_H|FLAG_N);
+
+    SET_VAL(p1, p2, rVal);
+}
+
+void Cpu::oph_SRA(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    CLEAR_FLAGS;
+    (rVal & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    rVal >>= 1;
+
+    if(rVal & 0x40)
+        rVal |= 0x80;
+
+    CHECK_ZERO(rVal);
+
+    SET_VAL(p1, p2, rVal);
+}
+
+void Cpu::oph_SWAP(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    rVal = (((rVal & 0xF) << 4) | (rVal >> 4));
+    CLEAR_FLAGS;
+    CHECK_ZERO(rVal);
+}
+
+void Cpu::oph_SRL(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    CLEAR_FLAGS;
+    (rVal & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    rVal >>= 1;
+
+    CHECK_ZERO(rVal);
+
+    SET_VAL(p1, p2, rVal);
+}
+
+#define GET_BIT_FROM_OP(_base) ((mCurOpcode - _base) / 8)
+
+void Cpu::oph_BIT(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+    CLEAR_FLAG(FLAG_N);
+    SET_FLAG(FLAG_H);
+
+    CHECK_ZERO((rVal & (1 << GET_BIT_FROM_OP(0x40))));
+}
+
+void Cpu::oph_RES(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    rVal &= ~(1 << GET_BIT_FROM_OP(0x80));
+
+    SET_VAL(p1, p2, rVal);
+}
+
+void Cpu::oph_SET(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = GET_VAL(p1, p2);
+
+    rVal |= (1 << GET_BIT_FROM_OP(0xc0));
+
+    SET_VAL(p1, p2, rVal);
 }
