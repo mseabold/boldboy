@@ -88,7 +88,7 @@ void Cpu::oph_Inc_r8(uint16_t p1, uint16_t p2) {
 
     uint16_t newVal = mReg8s[p1]->increment();
 
-    (newVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CHECK_ZERO(newVal);
     ((newVal & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
 
     CLEAR_FLAG(FLAG_N);
@@ -97,7 +97,7 @@ void Cpu::oph_Inc_r8(uint16_t p1, uint16_t p2) {
 void Cpu::oph_Dec_r8(uint16_t p1, uint16_t p2) {
     uint16_t newVal = mReg8s[p1]->decrement();
 
-    (newVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CHECK_ZERO(newVal);
     ((newVal & 0xf) == 0xf)?CLEAR_FLAG(FLAG_H):SET_FLAG(FLAG_H);
 
     SET_FLAG(FLAG_N);
@@ -108,7 +108,7 @@ void Cpu::oph_Inc_arHL(uint16_t p1, uint16_t p2) {
     ++memVal;
     mMmu->writeAddr(mrHL->read(), memVal);
 
-    (memVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CHECK_ZERO(memVal);
     ((memVal & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
 
     CLEAR_FLAG(FLAG_N);
@@ -119,7 +119,7 @@ void Cpu::oph_Dec_arHL(uint16_t p1, uint16_t p2) {
     --memVal;
     mMmu->writeAddr(mrHL->read(), memVal);
 
-    (memVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CHECK_ZERO(memVal);
     ((memVal & 0xf) == 0xf)?CLEAR_FLAG(FLAG_H):SET_FLAG(FLAG_H);
 
     SET_FLAG(FLAG_N);
@@ -327,78 +327,39 @@ void Cpu::oph_SBC_A_d8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_AND_r8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() & mReg8s[p1]->read();
-
-    CLEAR_FLAG(FLAG_N|FLAG_C);
-    SET_FLAG(FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    and_A(mReg8s[p1]->read());
 }
 
 void Cpu::oph_AND_arHL(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() & mMmu->readAddr(mrHL->read());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C);
-    SET_FLAG(FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    and_A(mMmu->readAddr(mrHL->read()));
 }
 
 void Cpu::oph_AND_d8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() & mMmu->readAddr(mrPC->increment());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C);
-    SET_FLAG(FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    and_A(mMmu->readAddr(mrPC->increment()));
 }
 
 void Cpu::oph_XOR_r8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() ^ mReg8s[p1]->read();
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    xor_A(mReg8s[p1]->read());
 }
 
 void Cpu::oph_XOR_arHL(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() ^ mMmu->readAddr(mrHL->read());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    xor_A(mMmu->readAddr(mrHL->read()));
 }
 
 void Cpu::oph_XOR_d8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() ^ mMmu->readAddr(mrPC->increment());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    xor_A(mMmu->readAddr(mrPC->increment()));
 }
 
 void Cpu::oph_OR_r8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() | mReg8s[p1]->read();
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    or_A(mReg8s[p1]->read());
 }
 
 void Cpu::oph_OR_arHL(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() | mMmu->readAddr(mrHL->read());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    or_A(mMmu->readAddr(mrHL->read()));
 }
 
 void Cpu::oph_OR_d8(uint16_t p1, uint16_t p2) {
-    uint8_t result = mrA->read() | mMmu->readAddr(mrPC->increment());
-
-    CLEAR_FLAG(FLAG_N|FLAG_C|FLAG_H);
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    mrA->write(result);
+    or_A(mMmu->readAddr(mrPC->increment()));
 }
 
 void Cpu::oph_CP_r8(uint16_t p1, uint16_t p2) {
@@ -571,16 +532,14 @@ void Cpu::oph_RLC(uint16_t p1, uint16_t p2) {
     uint16_t rVal = (uint16_t)GET_VAL(p1, p2);
     rVal = rVal << 1;
 
+    CLEAR_FLAGS;
+
     // If carry, shift it to bit 0 and C flag
     if(rVal & 0x100)
     {
         rVal |= 1;
         SET_FLAG(FLAG_C);
     }
-    else
-        CLEAR_FLAG(FLAG_C);
-
-    CLEAR_FLAG(FLAG_H|FLAG_N);
 
     SET_VAL(p1, p2, (uint8_t )rVal);
 }
@@ -591,14 +550,12 @@ void Cpu::oph_RRC(uint16_t p1, uint16_t p2) {
 
     rVal >>= 1;
 
+    CLEAR_FLAGS;
+
     if(cBit) {
         rVal |= 0x80;
         SET_FLAG(FLAG_C);
     }
-    else
-        CLEAR_FLAG(FLAG_C);
-
-    CLEAR_FLAG(FLAG_H|FLAG_N);
 
     SET_VAL(p1, p2, rVal);
 }
@@ -610,12 +567,10 @@ void Cpu::oph_RL(uint16_t p1, uint16_t p2) {
     if(TEST_FLAG(FLAG_C))
         rVal |= 0x01;
 
+    CLEAR_FLAGS;
+
     if(rVal & 0x100)
         SET_FLAG(FLAG_C);
-    else
-        CLEAR_FLAG(FLAG_C);
-
-    CLEAR_FLAG(FLAG_N|FLAG_N);
 
     SET_VAL(p1, p2, (uint8_t )rVal);
 }
@@ -629,12 +584,10 @@ void Cpu::oph_RR(uint16_t p1, uint16_t p2) {
     if(TEST_FLAG(FLAG_C))
         rVal |= 0x80;
 
+    CLEAR_FLAGS;
+
     if(cBit)
         SET_FLAG(FLAG_C);
-    else
-        CLEAR_FLAG(FLAG_C);
-
-    CLEAR_FLAG(FLAG_H|FLAG_N);
 
     SET_VAL(p1, p2, rVal);
 }
@@ -642,12 +595,12 @@ void Cpu::oph_RR(uint16_t p1, uint16_t p2) {
 void Cpu::oph_SLA(uint16_t p1, uint16_t p2) {
     uint8_t rVal = GET_VAL(p1, p2);
 
+    CLEAR_FLAGS;
     (rVal & 0x80)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
 
     rVal <<= 1;
 
-    (rVal == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
-    CLEAR_FLAG(FLAG_H|FLAG_N);
+    CHECK_ZERO(rVal);
 
     SET_VAL(p1, p2, rVal);
 }

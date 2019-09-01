@@ -8,6 +8,21 @@
 #define NUM_R8  8
 #define NUM_R16 6
 
+#define FLAG_Z 0x80
+#define FLAG_N 0x40
+#define FLAG_H 0x20
+#define FLAG_C 0x10
+
+#define SET_FLAG(f)   mrF->write(mrF->read() | f)
+#define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
+#define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ f)
+#define TEST_FLAG(f)  (mrF->read() & f)
+#define CLEAR_FLAGS   mrF->write(0)
+#define CHECK_ZERO(_r) (_r == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z)
+
+#define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
+#define CARRY_BITS_3(_a1, _a2, _a3, _r) (_a1 ^ _a2 ^ _a3 ^ _r)
+
 class Cpu
 {
 public:
@@ -67,21 +82,6 @@ private:
     bool mBranchTaken;
     uint8_t mCurOpcode;
 
-#define FLAG_Z 0x80
-#define FLAG_N 0x40
-#define FLAG_H 0x20
-#define FLAG_C 0x10
-
-#define SET_FLAG(f)   mrF->write(mrF->read() | f)
-#define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
-#define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ f)
-#define TEST_FLAG(f)  (mrF->read() & f)
-#define CLEAR_FLAGS   mrF->write(0)
-#define CHECK_ZERO(_r) (_r == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z)
-
-#define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
-#define CARRY_BITS_3(_a1, _a2, _a3, _r) (_a1 ^ _a2 ^ _a3 ^ _r)
-
     Mmu *mMmu;
 
     Opcode mOpTable[256];
@@ -93,6 +93,9 @@ private:
     uint8_t add_3u8(uint8_t p1, uint8_t p2, uint8_t p3);
     uint16_t popStack_16(void);
     void pushStack_16(uint16_t val);
+    void and_A(uint8_t param);
+    void xor_A(uint8_t param);
+    void or_A(uint8_t param);
 
     /* Opcode Handlers */
     void oph_Nop(uint16_t p1, uint16_t p2);

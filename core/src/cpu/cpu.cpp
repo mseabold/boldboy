@@ -75,3 +75,24 @@ void Cpu::pushStack_16(uint16_t val) {
     mrSP->decrement();
     mMmu->writeAddr(mrSP->read(), (uint8_t)(val & 0xFF));
 }
+
+void Cpu::and_A(uint8_t param) {
+    uint8_t result = mrA->read() & param;
+    CLEAR_FLAGS;
+    CHECK_ZERO(result);
+    mrA->write(result);
+}
+
+void Cpu::xor_A(uint8_t param) {
+    uint8_t result = mrA->read() ^ param;
+    CLEAR_FLAGS;
+    CHECK_ZERO(result);
+    mrA->write(result);
+}
+
+void Cpu::or_A(uint8_t param) {
+    uint8_t result = mrA->read() | param;
+    CLEAR_FLAGS;
+    CHECK_ZERO(result);
+    mrA->write(result);
+}
