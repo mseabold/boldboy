@@ -1,6 +1,5 @@
 #include "mmu.h"
 #include "ramregion.h"
-#include "cartregion.h"
 #include "upperregion.h"
 
 #define CART_ROM_REGION_START 0
@@ -11,7 +10,6 @@
 
 Mmu::Mmu(Cartridge *cart) {
     /* Initialize all of the memory regions. */
-    CartRegion *cartReg = new CartRegion(cart);
     RamRegion *vRam = new RamRegion(0x8000, 0x2000); // 8kB VRAM at 0x8000
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
     mIO = new IoRegion();
@@ -23,16 +21,16 @@ Mmu::Mmu(Cartridge *cart) {
     /* Build out the memory map. We split the map in 8k addressable regions. */
 
     /* Lower 32K is cartridge fixed/switchable ROM */
-    mRegions[CART_ROM_REGION_START] = cartReg;
-    mRegions[CART_ROM_REGION_START+1] = cartReg;
-    mRegions[CART_ROM_REGION_START+2] = cartReg;
-    mRegions[CART_ROM_REGION_START+3] = cartReg;
+    mRegions[CART_ROM_REGION_START] = cart;
+    mRegions[CART_ROM_REGION_START+1] = cart;
+    mRegions[CART_ROM_REGION_START+2] = cart;
+    mRegions[CART_ROM_REGION_START+3] = cart;
 
     /* Next 8K is vRAM */
     mRegions[VRAM_REGION] = vRam;
 
     /* Next 8K is switchable cartridge RAM */
-    mRegions[CART_RAM_REGION] = cartReg;
+    mRegions[CART_RAM_REGION] = cart;
 
     /* Next 8K is internal RAM */
     mRegions[IRAM_REGION] = iRam;

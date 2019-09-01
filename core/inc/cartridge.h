@@ -1,14 +1,14 @@
 #ifndef CARTRIDGE_H
 #define CARTRIDGE_H
 
-class Cartridge
+#include "memregion.h"
+
+class Cartridge : public MemRegion
 {
 private:
-    
 
 public:
-    Cartridge();
-    virtual ~Cartridge();
+    virtual ~Cartridge() = 0;
 };
 
 #endif /* CARTRIDGE_H */
