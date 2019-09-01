@@ -8,7 +8,7 @@ class Cartridge : public MemRegion
 private:
 
 public:
-    virtual ~Cartridge() = 0;
+    virtual ~Cartridge() {};
 };
 
 #endif /* CARTRIDGE_H */

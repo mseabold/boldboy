@@ -7,6 +7,16 @@
 #include "ioregion.h"
 
 #define MMU_NUM_MEM_REGIONS 8
+
+#define CART_ROM_BASE     0x0000
+#define VRAM_BASE         0x8000
+#define CART_RAM_BASE     0xA000
+#define INTERNAL_RAM_BASE 0xC000
+#define RAM_ECHO_BASE     0xE000
+#define OAM_BASE          0xFE00
+#define IO_BASE           0xFF00
+#define UPPER_RAM_BASE    0xFF80
+#define IER_BASE          0xFFFF
 class Mmu
 {
 private:
