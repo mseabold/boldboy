@@ -59,6 +59,8 @@ uint8_t Cpu::tick() {
     } else
         opcode = &mOpTable[op];
 
+    mCurOpcode = op;
+
     (this->*opcode->handler)(opcode->p1, opcode->p2);
 
     mrPC->increment();
@@ -67,6 +69,21 @@ uint8_t Cpu::tick() {
         return opcode->branchCycles;
     else
         return opcode->cycles;
+}
+
+void Cpu::disassemble(char *buffer, uint32_t bufLen) {
+    uint8_t op;
+    Opcode *opcode;
+
+    op = mMmu->readAddr(mrPC->read());
+
+    if(op == 0xcb) {
+        op = mMmu->readAddr(mrPC->read()+1);
+        opcode = &mExtOpTable[op];
+    } else
+        opcode = &mOpTable[op];
+
+    snprintf(buffer, bufLen, "0x%04x: %s", mrPC->read(), opcode->mnemonic);
 }
 
 uint8_t Cpu::add_3u8(uint8_t p1, uint8_t p2, uint8_t p3) {

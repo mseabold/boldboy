@@ -54,6 +54,7 @@ public:
     inline Reg16 *getReg16(reg16_name name) { return mReg16s[name]; };
 
     uint8_t tick();
+    void disassemble(char *buffer, uint32_t bufLen);
 
     class Opcode {
         public:
