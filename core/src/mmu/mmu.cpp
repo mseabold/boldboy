@@ -38,6 +38,7 @@ Mmu::Mmu(Cartridge *cart) {
     /* Upper 8K is special. */
     mRegions[UPPER_REGION] = upper;
 
+    mBootromEnabled = true;
 }
 
 Mmu::~Mmu() {
@@ -50,10 +51,17 @@ Mmu::~Mmu() {
 }
 
 uint8_t Mmu::readAddr(uint16_t addr) {
+    if(mBootromEnabled && addr < 0x100)
+        return sBootROM[addr];
+
     return mRegions[addr >> 13]->readAddr(addr);
 }
 
 void Mmu::writeAddr(uint16_t addr, uint8_t val) {
+    if(addr == 0xff50) {
+        mBootromEnabled = false;
+        return;
+    }
     mRegions[addr >> 13]->writeAddr(addr, val);
 }
 

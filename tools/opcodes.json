@@ -292,7 +292,7 @@
          "cycles": 8,
          "length": 2,
          "mnemonic": "JR Z,r8",
-         "p1": 1
+         "p1": "FLAG_Z"
       },
       {
          "addr": 41,
@@ -406,7 +406,7 @@
          "cycles": 8,
          "length": 2,
          "mnemonic": "JR C,r8",
-         "p1": 1
+         "p1": "FLAG_C"
       },
       {
          "addr": 57,

@@ -47,15 +47,37 @@ Cpu::~Cpu()
         delete mReg16s[i];
 }
 
+uint8_t Cpu::tick() {
+    uint8_t op = mMmu->readAddr(mrPC->read());
+    Opcode *opcode;
+
+    mBranchTaken = false;
+
+    if(op == 0xcb) {
+        op = mMmu->readAddr(mrPC->increment());
+        opcode = &mExtOpTable[op];
+    } else
+        opcode = &mOpTable[op];
+
+    (this->*opcode->handler)(opcode->p1, opcode->p2);
+
+    mrPC->increment();
+
+    if(mBranchTaken)
+        return opcode->branchCycles;
+    else
+        return opcode->cycles;
+}
+
 uint8_t Cpu::add_3u8(uint8_t p1, uint8_t p2, uint8_t p3) {
     uint16_t result = p1 + p2 + p3;
     uint16_t carry = CARRY_BITS_3(p1, p2, p3, result);
 
-    (result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    ((uint8_t)result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
     (carry & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
     (carry & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
 
-    return result;
+    return (uint8_t)result;
 }
 
 uint16_t Cpu::popStack_16(void) {

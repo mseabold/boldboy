@@ -180,23 +180,27 @@ void Cpu::oph_JR(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_JR_Z_NZ(uint16_t p1, uint16_t p2) {
-    if(!(TEST_FLAG(FLAG_Z) ^ p1)) {
+    if(TEST_FLAG(FLAG_Z) == p1) {
         uint16_t pcVal = mrPC->increment();
         int8_t rVal = (int8_t)mMmu->readAddr(pcVal);
         mrPC->write(pcVal + rVal);
         mBranchTaken = true;
-    } else
+    } else {
+        mrPC->increment();
         mBranchTaken = false;
+    }
 }
 
 void Cpu::oph_JR_C_NC(uint16_t p1, uint16_t p2) {
-    if(!(TEST_FLAG(FLAG_C) ^ p1)) {
+    if(TEST_FLAG(FLAG_C) == p1) {
         uint16_t pcVal = mrPC->increment();
         int8_t rVal = (int8_t)mMmu->readAddr(pcVal);
         mrPC->write(pcVal + rVal);
         mBranchTaken = true;
-    } else
+    } else {
+        mrPC->increment();
         mBranchTaken = false;
+    }
 }
 void Cpu::oph_DAA(uint16_t p1, uint16_t p2) {
     //TODO
@@ -448,9 +452,9 @@ void Cpu::oph_CALL_flag_a16(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_CALL_a16(uint16_t p1, uint16_t p2) {
     uint16_t aVal;
-    pushStack_16(mrPC->read()+3);
     aVal = mMmu->readAddr(mrPC->increment());
     aVal |= (mMmu->readAddr(mrPC->increment()) << 8);
+    pushStack_16(mrPC->read());
     mrPC->write(aVal);
 }
 

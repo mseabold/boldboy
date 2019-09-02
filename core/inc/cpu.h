@@ -53,6 +53,8 @@ public:
     inline Reg8 *getReg8(reg8_name name) { return mReg8s[name]; };
     inline Reg16 *getReg16(reg16_name name) { return mReg16s[name]; };
 
+    uint8_t tick();
+
     class Opcode {
         public:
             Opcode();
