@@ -2,9 +2,11 @@
 #define MMU_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include "memregion.h"
 #include "cartridge.h"
 #include "ioregion.h"
+#include "io_serial.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 
@@ -32,6 +34,8 @@ public:
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);
     virtual ~Mmu();
+
+    void setSerialHandler(IoSerial *handler);
 };
 
 #endif /* MMU_H */

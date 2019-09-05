@@ -2,9 +2,10 @@
 
 #include "cpu.h"
 #include "mmu.h"
-#include "test_cart.h"
 #include <string.h>
 #include <stdlib.h>
+#include "serial_console.h"
+#include "io_regs.h"
 
 #define MAX_ARGS 16
 #define COMMAND_STR_SZ 2048
@@ -42,10 +43,12 @@ typedef struct _Command_s {
 
 static int getRegs(ArgList_t *args);
 static int tick(ArgList_t *args);
+static int writeSerial(ArgList_t *args);
 
 static Command_t commandList[] = {
     { "regs", NULL, getRegs },
     { "tick", "t", tick },
+    { "writeserial", NULL, writeSerial },
 };
 
 static Cpu *cpu;
@@ -110,9 +113,25 @@ static int tick(ArgList_t *args) {
     return 0;
 }
 
+static int writeSerial(ArgList_t *args) {
+    if(args->numArgs < 1)
+        return INVALID_PARAMETER;
+
+    printf("Attempting to write \"%s\" to serial\n", args->args[0].asStr);
+    for(unsigned int i = 0; i<strlen(args->args[0].asStr);i++) {
+        mmu->writeAddr(IOREG_SB, (uint8_t)(args->args[0].asStr[i]));
+        mmu->writeAddr(IOREG_SC, IOREG_SC_START_XFER_VAL);
+    }
+
+    mmu->writeAddr(IOREG_SB, (uint8_t)'\n');
+    mmu->writeAddr(IOREG_SC, IOREG_SC_START_XFER_VAL);
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     mmu = new Mmu(new EmptyCart());
+    mmu->setSerialHandler(new SerialConsole());
     cpu =  new Cpu(mmu);
     char command[COMMAND_STR_SZ];
 
