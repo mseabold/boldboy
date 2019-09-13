@@ -1413,7 +1413,7 @@
          "length": 1,
          "mnemonic": "RET NZ",
          "p1": "FLAG_Z",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 193,
@@ -1429,7 +1429,7 @@
          "length": 3,
          "mnemonic": "JP NZ,a16",
          "p1": "FLAG_Z",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 195,
@@ -1444,7 +1444,7 @@
          "length": 3,
          "mnemonic": "CALL NZ,a16",
          "p1": "FLAG_Z",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 197,
@@ -1474,7 +1474,7 @@
          "length": 1,
          "mnemonic": "RET Z",
          "p1": "FLAG_Z",
-         "p2": "true"
+         "p2": "FLAG_Z"
       },
       {
          "addr": 201,
@@ -1489,7 +1489,7 @@
          "length": 3,
          "mnemonic": "JP Z,a16",
          "p1": "FLAG_Z",
-         "p2": "true"
+         "p2": "FLAG_Z"
       },
       {
          "addr": 203,
@@ -1504,7 +1504,7 @@
          "length": 3,
          "mnemonic": "CALL Z,a16",
          "p1": "FLAG_Z",
-         "p2": "true"
+         "p2": "FLAG_Z"
       },
       {
          "addr": 205,
@@ -1533,7 +1533,7 @@
          "length": 1,
          "mnemonic": "RET NC",
          "p1": "FLAG_C",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 209,
@@ -1549,7 +1549,7 @@
          "length": 3,
          "mnemonic": "JP NC,a16",
          "p1": "FLAG_C",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 211,
@@ -1563,7 +1563,7 @@
          "length": 3,
          "mnemonic": "CALL NC,a16",
          "p1": "FLAG_C",
-         "p2": "false"
+         "p2": "0"
       },
       {
          "addr": 213,
@@ -1592,7 +1592,7 @@
          "length": 1,
          "mnemonic": "RET C",
          "p1": "FLAG_C",
-         "p2": "true"
+         "p2": "FLAG_C"
       },
       {
          "addr": 217,
@@ -1607,7 +1607,7 @@
          "length": 3,
          "mnemonic": "JP C,a16",
          "p1": "FLAG_C",
-         "p2": "true"
+         "p2": "FLAG_C"
       },
       {
          "addr": 219,
@@ -1621,7 +1621,7 @@
          "length": 3,
          "mnemonic": "CALL C,a16",
          "p1": "FLAG_C",
-         "p2": "true"
+         "p2": "FLAG_C"
       },
       {
          "addr": 221,
