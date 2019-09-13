@@ -38,7 +38,7 @@ Mmu::Mmu(Cartridge *cart) {
     /* Upper 8K is special. */
     mRegions[UPPER_REGION] = upper;
 
-    mBootromEnabled = true;
+    mBootromEnabled = false;
 }
 
 Mmu::~Mmu() {

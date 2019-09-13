@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <stdio.h>
 
 Cpu::Cpu(Mmu *mmu) : mMmu(mmu)
 {
@@ -52,18 +53,20 @@ uint8_t Cpu::tick() {
     Opcode *opcode;
 
     mBranchTaken = false;
+    mIsCB = false;
 
     if(op == 0xcb) {
         op = mMmu->readAddr(mrPC->increment());
         opcode = &mExtOpTable[op];
+        mIsCB = true;
     } else
         opcode = &mOpTable[op];
 
     mCurOpcode = op;
 
-    (this->*opcode->handler)(opcode->p1, opcode->p2);
-
     mrPC->increment();
+
+    (this->*opcode->handler)(opcode->p1, opcode->p2);
 
     if(mBranchTaken)
         return opcode->branchCycles;
@@ -86,11 +89,35 @@ void Cpu::disassemble(char *buffer, uint32_t bufLen) {
     snprintf(buffer, bufLen, "0x%04x: %s", mrPC->read(), opcode->mnemonic);
 }
 
-uint8_t Cpu::add_3u8(uint8_t p1, uint8_t p2, uint8_t p3) {
-    uint16_t result = p1 + p2 + p3;
-    uint16_t carry = CARRY_BITS_3(p1, p2, p3, result);
+//#define SIGN_EXTEND(_p) ((uint16_t)(_p) | ((_p & 0x80)?0xff00:0));
+#define SIGN_EXTEND(_p) ((uint16_t)_p)
+
+
+uint8_t Cpu::add(uint8_t p1, uint8_t p2, bool checkC) {
+    uint16_t p1e = SIGN_EXTEND(p1);
+    uint16_t p2e = SIGN_EXTEND(p2);
+    uint16_t c = (checkC && TEST_FLAG(FLAG_C))?1:0;
+
+    uint16_t result = p1e + p2e + c;
+    uint16_t carry = CARRY_BITS_3(p1e, p2e, c, result);
 
     ((uint8_t)result == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z);
+    CHECK_ZERO((uint8_t)result);
+    (carry & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+    (carry & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+
+    return (uint8_t)result;
+}
+
+uint8_t Cpu::sub(uint8_t p1, uint8_t p2, bool checkC) {
+    uint16_t p1e = SIGN_EXTEND(p1);
+    uint16_t p2e = SIGN_EXTEND(p2);
+    uint16_t c = (checkC && TEST_FLAG(FLAG_C))?1:0;
+
+    uint16_t result = p1e - p2e - c;
+    uint16_t carry = CARRY_BITS_3(p1e, p2e, c, result);
+
+    CHECK_ZERO((uint8_t)result);
     (carry & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
     (carry & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
 
@@ -119,6 +146,7 @@ void Cpu::and_A(uint8_t param) {
     uint8_t result = mrA->read() & param;
     CLEAR_FLAGS;
     CHECK_ZERO(result);
+    SET_FLAG(FLAG_H);
     mrA->write(result);
 }
 

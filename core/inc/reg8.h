@@ -16,6 +16,8 @@ public:
     uint8_t read(void);
     uint8_t increment(void);
     uint8_t decrement(void);
+    uint8_t postIncrement(void);
+    uint8_t postDecrement(void);
 };
 
 #endif /* REG8_H */

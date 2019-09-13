@@ -42,3 +42,18 @@ uint16_t Reg16::decrement(void) {
     mHigh->write(val >> 8);
     return val;
 }
+
+uint16_t Reg16::postIncrement(void) {
+    uint16_t val = (mHigh->read() << 8) | mLow->read();
+    mLow->write((val+1) & 0xFF);
+    mHigh->write((val+1) >> 8);
+    return val;
+}
+
+uint16_t Reg16::postDecrement(void) {
+    uint16_t val = (mHigh->read() << 8) | mLow->read();
+    --val;
+    mLow->write((val-1) & 0xFF);
+    mHigh->write((val-1) >> 8);
+    return val;
+}

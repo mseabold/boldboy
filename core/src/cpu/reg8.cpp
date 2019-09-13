@@ -23,3 +23,11 @@ uint8_t Reg8::increment(void) {
 uint8_t Reg8::decrement(void) {
     return --mVal;
 }
+
+uint8_t Reg8::postIncrement(void) {
+    return mVal++;
+}
+
+uint8_t Reg8::postDecrement(void) {
+    return mVal--;
+}

@@ -21,6 +21,8 @@ public:
     Reg8 *getHigh(void);
     uint16_t increment(void);
     uint16_t decrement(void);
+    uint16_t postIncrement(void);
+    uint16_t postDecrement(void);
 };
 
 #endif /* REG16_H */

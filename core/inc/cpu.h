@@ -13,10 +13,10 @@
 #define FLAG_H 0x20
 #define FLAG_C 0x10
 
-#define SET_FLAG(f)   mrF->write(mrF->read() | f)
-#define CLEAR_FLAG(f) mrF->write(mrF->read() & ~f)
-#define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ f)
-#define TEST_FLAG(f)  (mrF->read() & f)
+#define SET_FLAG(f)   mrF->write(mrF->read() | (f))
+#define CLEAR_FLAG(f) mrF->write(mrF->read() & ~(f))
+#define TOGGLE_FLAG(f) mrF->write(mrF->read() ^ (f))
+#define TEST_FLAG(f)  (mrF->read() & (f))
 #define CLEAR_FLAGS   mrF->write(0)
 #define CHECK_ZERO(_r) (_r == 0)?SET_FLAG(FLAG_Z):CLEAR_FLAG(FLAG_Z)
 
@@ -84,6 +84,7 @@ private:
     Reg16 *mrHL;
     bool mBranchTaken;
     uint8_t mCurOpcode;
+    bool mIsCB;
 
     Mmu *mMmu;
 
@@ -93,7 +94,8 @@ private:
     void initOps(void);
 
     /* Helpers. */
-    uint8_t add_3u8(uint8_t p1, uint8_t p2, uint8_t p3);
+    uint8_t add(uint8_t p1, uint8_t p2, bool checkC);
+    uint8_t sub(uint8_t p1, uint8_t p2, bool checkC);
     uint16_t popStack_16(void);
     void pushStack_16(uint16_t val);
     void and_A(uint8_t param);
