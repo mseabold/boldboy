@@ -51,7 +51,7 @@ void InterruptController::clearInterrupt(InterruptType type) {
 }
 
 bool InterruptController::isPending(void) {
-    return (mEnabled && (mIF & mIE));
+    return (mIF & mIE);
 }
 
 InterruptController::InterruptType InterruptController::getPending() {
@@ -61,7 +61,7 @@ InterruptController::InterruptType InterruptController::getPending() {
         return itNone;
 
     for(i = 0; i < itNone; ++i) {
-        if(IRQ_TYPE_TO_BIT(i) & mIF & mIE)
+        if(IRQ_TYPE_TO_BIT(i) & mIF)
             return (InterruptType)i;
     }
 

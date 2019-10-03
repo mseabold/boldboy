@@ -63,18 +63,27 @@ uint8_t Cpu::tick() {
     // If there is an interrupt pending, switch to the ISR
     // handler, then let the next tick began handling it
     if(mIC->isPending()) {
-        irqType = mIC->getPending();
+        mIsHalted = false;
 
-        if(irqType != InterruptController::itNone) {
-            mIC->setEnabled(false);
-            mIC->clearInterrupt(irqType);
-            pushStack_16(mrPC->read());
-            mrPC->write(mIC->sISRTable[irqType]);
+        // Only service the interrupt if IME
+        if(mIC->isEnabled()) {
+            irqType = mIC->getPending();
 
-            //Switching to the ISR takes 20 cycles
-            return 20;
+            if(irqType != InterruptController::itNone) {
+                mIC->setEnabled(false);
+                mIC->clearInterrupt(irqType);
+                pushStack_16(mrPC->read());
+                mrPC->write(mIC->sISRTable[irqType]);
+
+                //Switching to the ISR takes 20 cycles
+                return 20;
+            }
         }
     }
+
+    // Do nothing if halted
+    if(mIsHalted)
+        return 4;
 
     op = mMmu->readAddr(mrPC->read());
 

@@ -48,6 +48,7 @@ void Cpu::oph_Stop(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_Halt(uint16_t p1, uint16_t p2) {
+    mIsHalted = true;
 }
 
 void Cpu::oph_EI(uint16_t p1, uint16_t p2) {
