@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include "serial_console.h"
 #include "io_regs.h"
+#include "io_controller.h"
+#include "int_controller.h"
+#include "io_timer.h"
 
 #define MAX_ARGS 16
 #define COMMAND_STR_SZ 2048
@@ -100,6 +103,9 @@ static Cpu *cpu;
 static Mmu *mmu;
 static Cartridge *cart;
 static IoSerial *serial;
+static IoTimer *timer;
+static IoController *io;
+static InterruptController *ic;
 static char *lastCmd;
 static char lastCmdBuf[COMMAND_STR_SZ];
 
@@ -173,7 +179,8 @@ static int tick(ArgList_t *args) {
     char disBuf[512];
     cpu->disassemble(disBuf, sizeof(disBuf));
     printf("%s\n", disBuf);
-    cpu->tick();
+    uint8_t cycles = cpu->tick();
+    io->tick(cycles);
     return 0;
 }
 
@@ -185,7 +192,7 @@ static int writeSerial(ArgList_t *args) {
         return INVALID_PARAMETER;
 
     IoSerial *serial = new SerialConsole();
-    mmu->setSerialHandler(serial);
+    io->setSerialHandler(serial);
 
     printf("Attempting to write \"%s\" to serial\n", args->args[0].asStr);
     for(unsigned int i = 0; i<strlen(args->args[0].asStr);i++) {
@@ -196,7 +203,7 @@ static int writeSerial(ArgList_t *args) {
     mmu->writeAddr(IOREG_SB, (uint8_t)'\n');
     mmu->writeAddr(IOREG_SC, IOREG_SC_START_XFER_VAL);
 
-    mmu->setSerialHandler(NULL);
+    io->setSerialHandler(NULL);
     delete serial;
     return 0;
 }
@@ -214,12 +221,19 @@ static int loadcart_int(char *file) {
         delete cpu;
         delete mmu;
         delete cart;
+        delete io;
+        delete timer;
+        delete ic;
     }
 
     cart = fCart;
-    mmu = new Mmu(cart);
-    mmu->setSerialHandler(serial);
-    cpu = new Cpu(mmu);
+    ic = new InterruptController();
+    io = new IoController(ic);
+    timer = new IoTimer(ic);
+    io->setSerialHandler(serial);
+    io->setTimer(timer);
+    mmu = new Mmu(cart, io);
+    cpu = new Cpu(mmu, ic);
     cpu->getReg16(Cpu::rPC)->write(0x0100);
 
     return 0;
@@ -239,7 +253,7 @@ static int run(ArgList_t *args) {
         return NO_CPU;
 
     while(true) {
-#if 0
+#if 1
         if(debugOp) {
         printf("\n");
         char disBuf[512];
@@ -249,7 +263,7 @@ static int run(ArgList_t *args) {
         printf("%s\n", disBuf);
         getRegs(NULL);
         }
-#if 1
+#if 0
         if(mmu->readAddr(cpu->getReg16(Cpu::rPC)->read()) == 0xE0 && mmu->readAddr(cpu->getReg16(Cpu::rPC)->read()+1) == 0x01) {
             printf("Break on serial write\n");
             return 0;
@@ -267,8 +281,15 @@ static int run(ArgList_t *args) {
             return 0;
         }
 #endif
+#if 1
+        if(mmu->readAddr(cpu->getReg16(Cpu::rPC)->read()) == 0xfb) {
+            printf("Break on EI\n");
+            return 0;
+        }
 #endif
-        cpu->tick();
+#endif
+        uint8_t cycles = cpu->tick();
+        io->tick(cycles);
     }
 }
 

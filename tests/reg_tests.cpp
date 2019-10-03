@@ -18,7 +18,7 @@ static inline uint16_t cpuTestWriteReadReg16(Cpu *cpu, Cpu::reg16_name reg, uint
 
 
 TEST_CASE("8 bit registers", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 
@@ -51,7 +51,7 @@ TEST_CASE("8 bit registers", "[cpu]") {
 }
 
 TEST_CASE("16 bit registers", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 
@@ -78,7 +78,7 @@ TEST_CASE("16 bit registers", "[cpu]") {
 }
 
 TEST_CASE("16 bit write/8 bit read direct", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 
@@ -108,7 +108,7 @@ TEST_CASE("16 bit write/8 bit read direct", "[cpu]") {
 }
 
 TEST_CASE("16 bit write/8 bit read", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 
@@ -154,7 +154,7 @@ TEST_CASE("16 bit write/8 bit read", "[cpu]") {
 }
 
 TEST_CASE("8 bit register increment/decrement", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 
@@ -211,7 +211,7 @@ TEST_CASE("8 bit register increment/decrement", "[cpu]") {
 }
 
 TEST_CASE("16 bit increment/decrement", "[cpu]") {
-    Cpu *cpu = new Cpu(NULL);
+    Cpu *cpu = new Cpu(NULL, NULL);
 
     REQUIRE(cpu != NULL);
 

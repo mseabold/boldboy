@@ -7,7 +7,7 @@
 #define TO_ECHOED_ADDR_SPACE(_addr) (_addr - ECHOED_RAM_OFFSET)
 
 
-UpperRegion::UpperRegion(RamRegion *iRam, IoRegion *io) {
+UpperRegion::UpperRegion(RamRegion *iRam, MemRegion *io) {
     mEchoedRam = iRam;
     mIO = io;
 
@@ -23,9 +23,10 @@ UpperRegion::~UpperRegion() {
 uint8_t UpperRegion::readAddr(uint16_t addr) {
     uint8_t result;
 
-    /* Short circuit if this is the special IER value. */
+    /* Let the IO controller (via the interrupt controller) handle
+     * IER. */
     if(addr == 0xFFFF)
-        return mIER;
+        return mIO->readAddr(addr);
 
     /* Examine the top bits that determine segments. */
     switch(addr & 0xFF00) {
@@ -43,7 +44,7 @@ uint8_t UpperRegion::readAddr(uint16_t addr) {
         case 0xFF00:
             switch(addr & 0xFF80) {
                 case IO_START:
-                    /* TODO: Will IoRegion handle reads into the unused
+                    /* TODO: Will IoController handle reads into the unused
                      * FF4C region, or should we kick that here? */
                     result = mIO->readAddr(addr);
                     break;
@@ -63,9 +64,10 @@ uint8_t UpperRegion::readAddr(uint16_t addr) {
 
 void UpperRegion::writeAddr(uint16_t addr, uint8_t val) {
 
-    /* Short circuit if this is the special IER value. */
+    /* Let the IO controller (via the interrupt controller) handle
+     * IER. */
     if(addr == 0xFFFF)
-        mIER = val;;
+        mIO->writeAddr(addr, val);
 
     /* Examine the top bits that determine segments. */
     switch(addr & 0xFF00) {
@@ -83,7 +85,7 @@ void UpperRegion::writeAddr(uint16_t addr, uint8_t val) {
         case 0xFF00:
             switch(addr & 0xFF80) {
                 case 0xFF00:
-                    /* TODO: Will IoRegion handle writes into the unused
+                    /* TODO: Will IoController handle writes into the unused
                      * FF4C region, or should we kick that here? */
                     mIO->writeAddr(addr, val);
                     break;

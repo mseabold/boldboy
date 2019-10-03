@@ -8,14 +8,13 @@
 #define IRAM_REGION 6
 #define UPPER_REGION 7
 
-Mmu::Mmu(Cartridge *cart) {
+Mmu::Mmu(Cartridge *cart, MemRegion *io) {
     /* Initialize all of the memory regions. */
     RamRegion *vRam = new RamRegion(0x8000, 0x2000); // 8kB VRAM at 0x8000
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
-    mIO = new IoRegion();
 
     /* Upper 8kB contains multiple regions, including IO and echoed iRAM */
-    UpperRegion *upper = new UpperRegion(iRam, mIO);
+    UpperRegion *mUpper = new UpperRegion(iRam, io);
 
 
     /* Build out the memory map. We split the map in 8k addressable regions. */
@@ -36,7 +35,7 @@ Mmu::Mmu(Cartridge *cart) {
     mRegions[IRAM_REGION] = iRam;
 
     /* Upper 8K is special. */
-    mRegions[UPPER_REGION] = upper;
+    mRegions[UPPER_REGION] = mUpper;
 
     mBootromEnabled = false;
 }
@@ -47,7 +46,6 @@ Mmu::~Mmu() {
     delete mRegions[VRAM_REGION];
     delete mRegions[IRAM_REGION];
     delete mRegions[UPPER_REGION];
-    delete mIO;
 }
 
 uint8_t Mmu::readAddr(uint16_t addr) {
@@ -68,10 +66,6 @@ void Mmu::writeAddr(uint16_t addr, uint8_t val) {
 void Mmu::reset(void) {
     /* TODO: We should probably reset the memory to some value as well. */
     mBootromEnabled = true;
-}
-
-void Mmu::setSerialHandler(IoSerial *handler) {
-    mIO->setSerialHandler(handler);
 }
 
 const uint8_t Mmu::sBootROM[256] = {

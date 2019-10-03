@@ -10,11 +10,13 @@ set (SRCS
     src/cpu/cpu_opcodes.cpp
     src/cpu/reg8.cpp
     src/cpu/reg16.cpp
+    src/cpu/int_controller.cpp
     src/mmu/mmu.cpp
     src/mmu/ramregion.cpp
-    src/mmu/ioregion.cpp
     src/mmu/upperregion.cpp
     src/cart/cartridge.cpp
-    src/io/io_serial.cpp)
+    src/io/io_controller.cpp
+    src/io/io_serial.cpp
+    src/io/io_timer.cpp)
 add_library(core ${SRCS} ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp)
 

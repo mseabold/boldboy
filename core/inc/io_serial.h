@@ -20,6 +20,7 @@ class IoSerial : public MemRegion {
 
         uint8_t readAddr(uint16_t addr);
         void writeAddr(uint16_t addr, uint8_t val);
+        void tick(uint8_t cycles);
 
         virtual void doXfer() = 0;
 
@@ -28,6 +29,9 @@ class IoSerial : public MemRegion {
          * timed state that fires when a transfer is completed. */
         uint8_t mSC;
         uint8_t mSB;
+
+        uint8_t cpuTicks;
+        uint8_t bitTicks;
 };
 
 #endif /* __IO_SERIAL_H__ */

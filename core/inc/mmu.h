@@ -5,8 +5,7 @@
 #include <stddef.h>
 #include "memregion.h"
 #include "cartridge.h"
-#include "ioregion.h"
-#include "io_serial.h"
+#include "upperregion.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 
@@ -23,19 +22,17 @@ class Mmu
 {
 private:
     MemRegion *mRegions[MMU_NUM_MEM_REGIONS];
-    IoRegion *mIO;
     bool mBootromEnabled;
+    UpperRegion *mUpper;
 
     static const uint8_t sBootROM[256];
 
 public:
-    Mmu(Cartridge *cart);
+    Mmu(Cartridge *cart, MemRegion *io);
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);
-    virtual ~Mmu();
-
-    void setSerialHandler(IoSerial *handler);
+    ~Mmu();
 };
 
 #endif /* MMU_H */

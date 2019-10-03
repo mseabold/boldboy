@@ -20,12 +20,12 @@
         "ops": [ 203 ]
     },
     {
-        "name": "EI",
+        "name": "DI",
         "params": 0,
         "ops": [ 243 ]
     },
     {
-        "name": "DI",
+        "name": "EI",
         "params": 0,
         "ops": [ 251 ]
     },

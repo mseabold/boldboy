@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include <stdio.h>
 
-Cpu::Cpu(Mmu *mmu) : mMmu(mmu)
+Cpu::Cpu(Mmu *mmu, InterruptController *ic) : mMmu(mmu), mIC(ic)
 {
     for(int i=0;i<NUM_R8;i++) {
         // Create a new R8 for every 8 bit register
@@ -49,11 +49,34 @@ Cpu::~Cpu()
 }
 
 uint8_t Cpu::tick() {
-    uint8_t op = mMmu->readAddr(mrPC->read());
+    uint8_t op;
     Opcode *opcode;
+    InterruptController::InterruptType irqType;
 
     mBranchTaken = false;
     mIsCB = false;
+
+    //TODO: Eventually some/all opcodes will need to be handled
+    //      in multiple ticks with a stored state. But the old adage:
+    //      Premature optimization is the root of evil
+
+    // If there is an interrupt pending, switch to the ISR
+    // handler, then let the next tick began handling it
+    if(mIC->isPending()) {
+        irqType = mIC->getPending();
+
+        if(irqType != InterruptController::itNone) {
+            mIC->setEnabled(false);
+            mIC->clearInterrupt(irqType);
+            pushStack_16(mrPC->read());
+            mrPC->write(mIC->sISRTable[irqType]);
+
+            //Switching to the ISR takes 20 cycles
+            return 20;
+        }
+    }
+
+    op = mMmu->readAddr(mrPC->read());
 
     if(op == 0xcb) {
         op = mMmu->readAddr(mrPC->increment());

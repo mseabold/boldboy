@@ -35,3 +35,5 @@ void IoSerial::writeAddr(uint16_t addr, uint8_t val) {
     }
 }
 
+void IoSerial::tick(uint8_t cycles) {
+}

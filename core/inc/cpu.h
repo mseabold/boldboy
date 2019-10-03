@@ -4,6 +4,7 @@
 #include "reg16.h"
 #include "reg8.h"
 #include "mmu.h"
+#include "int_controller.h"
 
 #define NUM_R8  8
 #define NUM_R16 6
@@ -45,7 +46,7 @@ public:
         rPC,
     };
 
-    Cpu(Mmu *mmu);
+    Cpu(Mmu *mmu, InterruptController *ic);
     ~Cpu();
 
     typedef void (Cpu::*OpHandler)(uint16_t p1, uint16_t p2);
@@ -85,8 +86,11 @@ private:
     bool mBranchTaken;
     uint8_t mCurOpcode;
     bool mIsCB;
+    bool mIsHalted;
+    bool mHaltSkipPC;
 
     Mmu *mMmu;
+    InterruptController *mIC;
 
     Opcode mOpTable[256];
     Opcode mExtOpTable[256];

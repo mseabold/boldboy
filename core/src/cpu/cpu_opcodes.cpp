@@ -51,9 +51,13 @@ void Cpu::oph_Halt(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_EI(uint16_t p1, uint16_t p2) {
+    /* TODO: This needs to be delayed some amount of time that I am
+     * still unsure of, but for now just do it here. */
+    mIC->setEnabled(true);
 }
 
 void Cpu::oph_DI(uint16_t p1, uint16_t p2) {
+    mIC->setEnabled(false);
 }
 
 void Cpu::oph_Prefix(uint16_t p1, uint16_t p2) {
@@ -446,7 +450,7 @@ void Cpu::oph_RET(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_RETI(uint16_t p1, uint16_t p2) {
     oph_RET(0,0);
-    //TODO: Enable Interrupts
+    mIC->setEnabled(true);
 }
 
 void Cpu::oph_POP_r16(uint16_t p1, uint16_t p2) {
@@ -713,6 +717,8 @@ void Cpu::oph_BIT(uint16_t p1, uint16_t p2) {
     CHECK_ZERO((rVal & (1 << GET_BIT_FROM_OP(0x40))));
 }
 
+#include <stdio.h>
+static const char *regnames[] = {"rA", "rF", "rB", "rC", "rD", "rE", "rH", "rL"};
 void Cpu::oph_RES(uint16_t p1, uint16_t p2) {
     uint8_t rVal = GET_VAL(p1, p2);
 
@@ -720,6 +726,8 @@ void Cpu::oph_RES(uint16_t p1, uint16_t p2) {
 
     SET_VAL(p1, p2, rVal);
 }
+
+
 
 void Cpu::oph_SET(uint16_t p1, uint16_t p2) {
     uint8_t rVal = GET_VAL(p1, p2);
