@@ -96,9 +96,6 @@ void UpperRegion::writeAddr(uint16_t addr, uint8_t val) {
             break;
         default:
             /* Everything under 0xFE00 in this segment is an echo of internal RAM */
-            /* TODO Documentation that I've seen is unclear whether writing to the
-             * echoed RAM is a valid operation. I'm going to allow it for now, but this
-             * could be a place to check if memory bugs or rom tests fail in the future. */
             mEchoedRam->writeAddr(TO_ECHOED_ADDR_SPACE(addr), val);
             break;
     }
