@@ -11,6 +11,7 @@ class TestCart : public Cartridge {
         void setRom(uint16_t len, uint8_t *rom);
         uint8_t readAddr(uint16_t addr);
         void writeAddr(uint16_t addr, uint8_t val);
+        bool hasRam();
     private:
         uint8_t *mRom;
         uint16_t mRomLen;

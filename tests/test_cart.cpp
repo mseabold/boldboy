@@ -1,12 +1,12 @@
 #include "test_cart.h"
 #include "mmu.h"
 
-TestCart::TestCart() {
+TestCart::TestCart() : Cartridge(NULL, 0) {
     mRomLen = 0;
     mRom = nullptr;
 }
 
-TestCart::TestCart(uint16_t romLen, uint8_t *rom) {
+TestCart::TestCart(uint16_t romLen, uint8_t *rom) : Cartridge(NULL, 0) {
     setRom(romLen, rom);
 }
 
@@ -32,4 +32,8 @@ void TestCart::writeAddr(uint16_t addr, uint8_t val) {
 void TestCart::setRom(uint16_t len, uint8_t *rom) {
     mRomLen = len;
     mRom = rom;
+}
+
+bool TestCart::hasRam() {
+    return true;
 }

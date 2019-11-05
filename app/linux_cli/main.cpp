@@ -21,7 +21,7 @@
 
 class EmptyCart : public Cartridge {
     public:
-        EmptyCart() {}
+        EmptyCart() : Cartridge(NULL, 0) {}
         ~EmptyCart() {}
         uint8_t readAddr(uint16_t addr) { return 0; }
         void writeAddr(uint16_t addr, uint8_t val) {}
@@ -29,7 +29,7 @@ class EmptyCart : public Cartridge {
 
 class FileCart : public Cartridge {
     public:
-        FileCart() {}
+        FileCart() : Cartridge(NULL, 0) {}
         ~FileCart() {}
 
         int load(char *filename) {
@@ -59,6 +59,8 @@ class FileCart : public Cartridge {
             else
                 printf("!!! UNKOWN WRITE TO CART ROM !!!!!\n");
         }
+
+        bool hasRam() { return false; }
 
     private:
         uint8_t buf[65535];
