@@ -73,9 +73,11 @@ class Cartridge : public MemRegion
 public:
     ~Cartridge();
 
-    static bool validate(uint8_t *buffer, uint32_t sz);
 
     virtual bool hasRam() = 0;
+
+    static bool validate(uint8_t *buffer, uint32_t sz);
+    static Cartridge *loadFromBuffer(uint8_t *buffer, uint32_t sz);
 
 protected:
     Cartridge(uint8_t *buffer, uint32_t sz);

@@ -1,4 +1,6 @@
 #include "cartridge.h"
+#include "cart_rom.h"
+#include "cart_mbc1.h"
 #include <string.h>
 
 Cartridge::Cartridge(uint8_t *buffer, uint32_t sz) {
@@ -133,4 +135,30 @@ bool Cartridge::validate(uint8_t *buffer, uint32_t sz) {
     }
 
     return true;
+}
+
+Cartridge *Cartridge::loadFromBuffer(uint8_t *buffer, uint32_t sz) {
+    if(!validate(buffer, sz))
+        return NULL;
+
+    Cartridge *cart;
+
+    uint8_t type = buffer[CART_HDR_TYPE];
+
+    switch(type) {
+        case CART_HDR_TYPE_ROM_ONLY:
+        case CART_HDR_TYPE_ROM_RAM:
+        case CART_HDR_TYPE_ROM_RAM_BATT:
+            cart = new RomOnly(buffer, sz);
+            break;
+        case CART_HDR_TYPE_MBC1:
+        case CART_HDR_TYPE_MBC1_RAM:
+        case CART_HDR_TYPE_MBC1_RAM_BATT:
+            cart = new MBC1(buffer, sz);
+            break;
+        default:
+            return NULL;
+    }
+
+    return cart;
 }

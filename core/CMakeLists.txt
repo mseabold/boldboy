@@ -15,6 +15,8 @@ set (SRCS
     src/mmu/ramregion.cpp
     src/mmu/upperregion.cpp
     src/cart/cartridge.cpp
+    src/cart/cart_rom.cpp
+    src/cart/cart_mbc1.cpp
     src/io/io_controller.cpp
     src/io/io_serial.cpp
     src/io/io_timer.cpp)
