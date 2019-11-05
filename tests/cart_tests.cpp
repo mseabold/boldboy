@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 #include "cart_rom.h"
 #include "cart_mbc1.h"
+#include "cart_mbc2.h"
 
 #define CALC_ROM_SZ(_banks) (_banks * 0x4000)
 #define READ_U16(_readable, _addr) ((_readable->readAddr(_addr)) + (_readable->readAddr(_addr+1) << 8))
@@ -235,6 +236,85 @@ TEST_CASE("MBC1 RAM Bank Test 512K/32K", "[cart][mbc1][ram]") {
         REQUIRE(cart->readAddr(0xA000) == 0x02);
     }
 
+    delete rom;
+    delete cart;
+}
+
+TEST_CASE("MBC2 ROM Bank Test", "[cart][mbc2]") {
+    uint8_t *rom = createRom(16, CART_HDR_TYPE_MBC2, CART_HDR_ROMSZ_2MBIT, CART_HDR_RAMSZ_NONE);
+
+    Cartridge *cart = new MBC2(rom, CALC_ROM_SZ(16));
+
+    SECTION("Read Bank 0") {
+        REQUIRE(READ_U16(cart, 0x0000) == 0x0000);
+    }
+
+    SECTION("Select Bank 0") {
+        // Select bank 0, which should actually select bank 1
+        cart->writeAddr(0x2100, 0x00);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0001);
+    }
+
+    SECTION("Select Bank 2") {
+        cart->writeAddr(0x2100, 0x02);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0002);
+    }
+
+    SECTION("Select Bank 17") {
+        cart->writeAddr(0x2100, 0x11);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0001);
+    }
+
+    SECTION("Write to ROM Bank without 0x100 set") {
+        cart->writeAddr(0x2100, 0x02);
+
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0002);
+
+        cart->writeAddr(0x2000, 0x03);
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0002);
+    }
+
+    delete rom;
+    delete cart;
+}
+
+TEST_CASE("MBC2 RAM Tests", "[cart][mbc2]") {
+    uint8_t *rom = createRom(16, CART_HDR_TYPE_MBC2, CART_HDR_ROMSZ_2MBIT, CART_HDR_RAMSZ_NONE);
+
+    Cartridge *cart = new MBC2(rom, CALC_ROM_SZ(16));
+
+    // Enable RAM
+    cart->writeAddr(0x0000, 0x0a);
+
+    SECTION("Disable RAM with 0x100 set") {
+        // Set a value
+        cart->writeAddr(0xA000, 0x0b);
+
+        // Disable RAM with an invalid value
+        cart->writeAddr(0x0100, 0x00);
+
+        // RAM should still be enabled
+        REQUIRE(cart->readAddr(0xA000) == 0x0b);
+    }
+
+    SECTION("Disable RAM") {
+        // Set a value
+        cart->writeAddr(0xA000, 0x0b);
+
+        // Disable RAM
+        cart->writeAddr(0x0000, 0x00);
+
+        // RAM should be disabled
+        REQUIRE(cart->readAddr(0xA000) == 0x00);
+    }
+
+    SECTION("Lower 4 bits only") {
+        cart->writeAddr(0xA000, 0x1b);
+        REQUIRE(cart->readAddr(0xA000) == 0x0b);
+    }
     delete rom;
     delete cart;
 }

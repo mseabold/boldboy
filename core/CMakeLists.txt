@@ -17,6 +17,7 @@ set (SRCS
     src/cart/cartridge.cpp
     src/cart/cart_rom.cpp
     src/cart/cart_mbc1.cpp
+    src/cart/cart_mbc2.cpp
     src/io/io_controller.cpp
     src/io/io_serial.cpp
     src/io/io_timer.cpp)
