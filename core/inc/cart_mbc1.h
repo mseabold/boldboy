@@ -18,7 +18,7 @@ class MBC1 : public Cartridge {
         uint16_t mCurRomBank;
         uint16_t mCurRamBank;
         MbcMode mMode;
-        bool mRamBankEnabled;
+        bool mRamEnabled;
 
 };
 
