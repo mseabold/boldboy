@@ -1,6 +1,10 @@
 #include "cartridge.h"
 #include "cart_rom.h"
 #include "cart_mbc1.h"
+#include "cart_mbc2.h"
+#include "cart_mbc3.h"
+#include "cart_mbc5.h"
+
 #include <string.h>
 
 Cartridge::Cartridge(uint8_t *buffer, uint32_t sz) {
@@ -124,11 +128,29 @@ bool Cartridge::validate(uint8_t *buffer, uint32_t sz) {
 
     switch(buffer[CART_HDR_TYPE]) {
         case CART_HDR_TYPE_ROM_ONLY:
-        case CART_HDR_TYPE_ROM_RAM:
-        case CART_HDR_TYPE_ROM_RAM_BATT:
         case CART_HDR_TYPE_MBC1:
         case CART_HDR_TYPE_MBC1_RAM:
         case CART_HDR_TYPE_MBC1_RAM_BATT:
+        case CART_HDR_TYPE_MBC2:
+        case CART_HDR_TYPE_MBC2_BATT:
+        case CART_HDR_TYPE_ROM_RAM:
+        case CART_HDR_TYPE_ROM_RAM_BATT:
+        case CART_HDR_TYPE_MMM01:
+        case CART_HDR_TYPE_MMM01_RAM:
+        case CART_HDR_TYPE_MMM91_RAM_BATT:
+        case CART_HDR_TYPE_MBC3_RTC:
+        case CART_HDR_TYPE_MBC3_RTC_RAM:
+        case CART_HDR_TYPE_MBC3:
+        case CART_HDR_TYPE_MBC3_RAM:
+        case CART_HDR_TYPE_MBC3_RAM_BATT:
+        case CART_HDR_TYPE_MBC5:
+        case CART_HDR_TYPE_MBC5_RAM:
+        case CART_HDR_TYPE_MBC5_RAM_BATT:
+        case CART_HDR_TYPE_MBC5_RUMBLE:
+        case CART_HDR_TYPE_MBC5_RUMBLE_RAM:
+        case CART_HDR_TYPE_MBC5_RUMBLE_RAM_BATT:
+        case CART_HDR_TYPE_MBC6:
+        case CART_HDR_TYPE_MBC7_ETC:
             break;
         default:
             return false;
@@ -155,6 +177,24 @@ Cartridge *Cartridge::loadFromBuffer(uint8_t *buffer, uint32_t sz) {
         case CART_HDR_TYPE_MBC1_RAM:
         case CART_HDR_TYPE_MBC1_RAM_BATT:
             cart = new MBC1(buffer, sz);
+            break;
+        case CART_HDR_TYPE_MBC2:
+        case CART_HDR_TYPE_MBC2_BATT:
+            cart = new MBC2(buffer, sz);
+            break;
+        case CART_HDR_TYPE_MBC3_RTC:
+        case CART_HDR_TYPE_MBC3_RTC_RAM:
+        case CART_HDR_TYPE_MBC3:
+        case CART_HDR_TYPE_MBC3_RAM:
+        case CART_HDR_TYPE_MBC3_RAM_BATT:
+            cart = new MBC3(buffer, sz);
+            break;
+        case CART_HDR_TYPE_MBC5_RAM:
+        case CART_HDR_TYPE_MBC5_RAM_BATT:
+        case CART_HDR_TYPE_MBC5_RUMBLE:
+        case CART_HDR_TYPE_MBC5_RUMBLE_RAM:
+        case CART_HDR_TYPE_MBC5_RUMBLE_RAM_BATT:
+            cart = new MBC5(buffer, sz);
             break;
         default:
             return NULL;
