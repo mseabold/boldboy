@@ -22,7 +22,7 @@ void MBC3::writeAddr(uint16_t addr, uint8_t val) {
             mCurRomBank = val & 0x7f;
 
             if(mCurRomBank == 0)
-                mCurRomBank =1;
+                mCurRomBank = 1;
 
             break;
         case 0x4000:

@@ -42,6 +42,12 @@ Cartridge::Cartridge(uint8_t *buffer, uint32_t sz) {
         case CART_HDR_ROMSZ_16MBIT:
             mRomSz = CART_16MBIT;
             break;
+        case CART_HDR_ROMSZ_32MBIT:
+            mRomSz = CART_32MBIT;
+            break;
+        case CART_HDR_ROMSZ_64MBIT:
+            mRomSz = CART_64MBIT;
+            break;
         case CART_HDR_ROMSZ_9MBIT:
             mRomSz = CART_9MBIT;
             break;

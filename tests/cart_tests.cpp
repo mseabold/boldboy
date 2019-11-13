@@ -2,6 +2,8 @@
 #include "cart_rom.h"
 #include "cart_mbc1.h"
 #include "cart_mbc2.h"
+#include "cart_mbc3.h"
+#include "cart_mbc5.h"
 
 #define CALC_ROM_SZ(_banks) (_banks * 0x4000)
 #define READ_U16(_readable, _addr) ((_readable->readAddr(_addr)) + (_readable->readAddr(_addr+1) << 8))
@@ -317,4 +319,64 @@ TEST_CASE("MBC2 RAM Tests", "[cart][mbc2]") {
     }
     delete rom;
     delete cart;
+}
+
+TEST_CASE("MBC3 ROM Bank Test", "[cart][mbc3]") {
+    uint8_t *rom = createRom(32, CART_HDR_TYPE_MBC3, CART_HDR_ROMSZ_4MBIT, CART_HDR_RAMSZ_NONE);
+
+    Cartridge *cart = new MBC3(rom, CALC_ROM_SZ(32));
+
+    SECTION("Select Bank 0") {
+        // Select bank 0, which should actually select bank 1
+        cart->writeAddr(0x2100, 0x00);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0001);
+    }
+
+    SECTION("Select Bank 2") {
+        cart->writeAddr(0x2100, 0x02);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0002);
+    }
+
+    SECTION("Select Bank 17") {
+        cart->writeAddr(0x2100, 0x11);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0011);
+    }
+}
+
+TEST_CASE("MBC5 ROM Bank Test", "[cart][mbc5]") {
+    uint8_t *rom = createRom(512, CART_HDR_TYPE_MBC5, CART_HDR_ROMSZ_64MBIT, CART_HDR_RAMSZ_NONE);
+
+    Cartridge *cart = new MBC5(rom, CALC_ROM_SZ(512));
+
+    SECTION("Select Bank 0") {
+        // Select bank 0, which should actually wor
+        cart->writeAddr(0x2000, 0x00);
+        // Check our bank ID for bank 1
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0000);
+    }
+
+    SECTION("Select Bank 2") {
+        cart->writeAddr(0x2000, 0x02);
+        // Check our bank ID for bank 2
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0002);
+    }
+
+    SECTION("Select Bank 256") {
+        cart->writeAddr(0x2000, 0x00);
+        cart->writeAddr(0x3000, 0x01);
+        // Check our bank ID for bank 256
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0100);
+    }
+
+    SECTION("Select Bank 257") {
+        cart->writeAddr(0x2000, 0x01);
+        cart->writeAddr(0x3000, 0x01);
+        // Check our bank ID for bank 257
+        REQUIRE(READ_U16(cart, 0x4000) == 0x0101);
+    }
+
+
 }
