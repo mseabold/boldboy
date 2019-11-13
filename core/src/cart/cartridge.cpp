@@ -6,6 +6,7 @@
 #include "cart_mbc5.h"
 
 #include <string.h>
+#include <stdio.h>
 
 Cartridge::Cartridge(uint8_t *buffer, uint32_t sz) {
     uint8_t hdrRomSz, hdrRamSz;
@@ -205,6 +206,43 @@ Cartridge *Cartridge::loadFromBuffer(uint8_t *buffer, uint32_t sz) {
         default:
             return NULL;
     }
+
+    return cart;
+}
+
+Cartridge *Cartridge::loadFromFile(const char *name) {
+    FILE *file;
+    Cartridge *cart = NULL;
+    uint32_t sz;
+    uint8_t *buffer;
+
+    file = fopen(name, "rb");
+
+    if(file == NULL)
+        return NULL;
+
+    // Check how big the file is
+    fseek(file, 0, SEEK_END);
+    long int pos = ftell(file);
+    rewind(file);
+
+    // The whole framework doesn't support anything more than a 4GB ROM
+    // (of course there's no MBC that supports anywhere near that).
+    if(pos < UINT32_MAX) {
+        sz = (uint32_t)pos;
+        buffer = new uint8_t[sz];
+
+        if(buffer != NULL) {
+            if(fread(buffer, 1, sz, file) == sz) {
+                cart = loadFromBuffer(buffer, sz);
+            }
+        }
+
+        // loadFromBuffer copies the ROM
+        delete[] buffer;
+    }
+
+    fclose(file);
 
     return cart;
 }

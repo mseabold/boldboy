@@ -99,6 +99,7 @@ public:
 
     static bool validate(uint8_t *buffer, uint32_t sz);
     static Cartridge *loadFromBuffer(uint8_t *buffer, uint32_t sz);
+    static Cartridge *loadFromFile(const char *name);
 
 protected:
     Cartridge(uint8_t *buffer, uint32_t sz);
