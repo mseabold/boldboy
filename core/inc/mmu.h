@@ -6,6 +6,7 @@
 #include "memregion.h"
 #include "cartridge.h"
 #include "upperregion.h"
+#include "emptyregion.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 
@@ -24,14 +25,17 @@ private:
     MemRegion *mRegions[MMU_NUM_MEM_REGIONS];
     bool mBootromEnabled;
     UpperRegion *mUpper;
+    EmptyRegion *mEmpty;
 
     static const uint8_t sBootROM[256];
 
 public:
     Mmu(Cartridge *cart, MemRegion *io);
+    Mmu(MemRegion *io);
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);
+    void loadCart(Cartridge *cart);
     ~Mmu();
 };
 

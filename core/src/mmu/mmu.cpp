@@ -8,7 +8,11 @@
 #define IRAM_REGION 6
 #define UPPER_REGION 7
 
-Mmu::Mmu(Cartridge *cart, MemRegion *io) {
+Mmu::Mmu(Cartridge *cart, MemRegion *io) : Mmu(io) {
+    loadCart(cart);
+}
+
+Mmu::Mmu(MemRegion *io) {
     /* Initialize all of the memory regions. */
     RamRegion *vRam = new RamRegion(0x8000, 0x2000); // 8kB VRAM at 0x8000
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
@@ -16,20 +20,21 @@ Mmu::Mmu(Cartridge *cart, MemRegion *io) {
     /* Upper 8kB contains multiple regions, including IO and echoed iRAM */
     UpperRegion *mUpper = new UpperRegion(iRam, io);
 
+    mEmpty = new EmptyRegion();
 
     /* Build out the memory map. We split the map in 8k addressable regions. */
 
     /* Lower 32K is cartridge fixed/switchable ROM */
-    mRegions[CART_ROM_REGION_START] = cart;
-    mRegions[CART_ROM_REGION_START+1] = cart;
-    mRegions[CART_ROM_REGION_START+2] = cart;
-    mRegions[CART_ROM_REGION_START+3] = cart;
+    mRegions[CART_ROM_REGION_START] = mEmpty;
+    mRegions[CART_ROM_REGION_START+1] = mEmpty;
+    mRegions[CART_ROM_REGION_START+2] = mEmpty;
+    mRegions[CART_ROM_REGION_START+3] = mEmpty;
 
     /* Next 8K is vRAM */
     mRegions[VRAM_REGION] = vRam;
 
     /* Next 8K is switchable cartridge RAM */
-    mRegions[CART_RAM_REGION] = cart;
+    mRegions[CART_RAM_REGION] = mEmpty;
 
     /* Next 8K is internal RAM */
     mRegions[IRAM_REGION] = iRam;
@@ -42,10 +47,26 @@ Mmu::Mmu(Cartridge *cart, MemRegion *io) {
 
 Mmu::~Mmu() {
     /* Delete each allocated region. */
-    delete mRegions[CART_ROM_REGION_START]; // Cartridge (this takes care of cart RAM)
     delete mRegions[VRAM_REGION];
     delete mRegions[IRAM_REGION];
     delete mRegions[UPPER_REGION];
+    delete mEmpty;
+}
+
+void Mmu::loadCart(Cartridge *cart) {
+    if(cart) {
+        mRegions[CART_ROM_REGION_START] = cart;
+        mRegions[CART_ROM_REGION_START+1] = cart;
+        mRegions[CART_ROM_REGION_START+2] = cart;
+        mRegions[CART_ROM_REGION_START+3] = cart;
+        mRegions[CART_RAM_REGION] = cart;
+    } else {
+        mRegions[CART_ROM_REGION_START] = mEmpty;
+        mRegions[CART_ROM_REGION_START+1] = mEmpty;
+        mRegions[CART_ROM_REGION_START+2] = mEmpty;
+        mRegions[CART_ROM_REGION_START+3] = mEmpty;
+        mRegions[CART_RAM_REGION] = mEmpty;
+    }
 }
 
 uint8_t Mmu::readAddr(uint16_t addr) {
