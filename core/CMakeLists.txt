@@ -6,6 +6,7 @@ add_custom_command(
     DEPENDS ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json
 )
 set (SRCS
+    src/boldboy.cpp
     src/cpu/cpu.cpp
     src/cpu/cpu_opcodes.cpp
     src/cpu/reg8.cpp
