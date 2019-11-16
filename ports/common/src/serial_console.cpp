@@ -7,4 +7,5 @@ SerialConsole::~SerialConsole() {}
 void SerialConsole::doXfer() {
     printf("%c", mSB);
     mSB = 0; //XXX Output only console for now
+    fflush(stdout);
 }
