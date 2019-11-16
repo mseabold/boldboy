@@ -40,8 +40,10 @@ void MBC1::writeAddr(uint16_t addr, uint8_t val) {
 uint8_t MBC1::readAddr(uint16_t addr) {
     switch(addr & 0xe000) {
         case 0x0000:
+        case 0x2000:
             return mRom[addr];
         case 0x4000:
+        case 0x6000:
             return readRom(addr, mCurRomBank);
         case 0xa000:
             if(mRamEnabled)

@@ -124,6 +124,7 @@ bool Cartridge::validate(uint8_t *buffer, uint32_t sz) {
     }
 
     switch(buffer[CART_HDR_RAMSZ]) {
+        case CART_HDR_RAMSZ_NONE:
         case CART_HDR_RAMSZ_16KBIT:
         case CART_HDR_RAMSZ_64KBIT:
         case CART_HDR_RAMSZ_256KBIT:
