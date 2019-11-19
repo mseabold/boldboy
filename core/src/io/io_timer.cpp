@@ -72,11 +72,14 @@ void IoTimer::tick(uint8_t cycles) {
     mTicks += cycles;
 
     if(mTicks >= mDivider) {
-        if(mTIMA == 0xFF) {
+        uint16_t newTIMA = mTIMA + ((uint16_t)mTicks/(uint16_t)mDivider);
+
+        //Check for rollover
+        if(newTIMA >= 0xFF) {
             mTIMA = mTMA;
             mIC->requestInterrupt(InterruptController::itTimerOverflow);
         } else
-            ++mTIMA;
+            mTIMA = (uint8_t)newTIMA;
 
         mTicks %= mDivider;
     }

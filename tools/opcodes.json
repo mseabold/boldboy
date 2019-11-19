@@ -2411,7 +2411,7 @@
       },
       {
          "addr": 70,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 0,(HL)",
          "p1": "true",
@@ -2475,7 +2475,7 @@
       },
       {
          "addr": 78,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 1,(HL)",
          "p1": "true",
@@ -2539,7 +2539,7 @@
       },
       {
          "addr": 86,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 2,(HL)",
          "p1": "true",
@@ -2603,7 +2603,7 @@
       },
       {
          "addr": 94,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 3,(HL)",
          "p1": "true",
@@ -2667,7 +2667,7 @@
       },
       {
          "addr": 102,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 4,(HL)",
          "p1": "true",
@@ -2731,7 +2731,7 @@
       },
       {
          "addr": 110,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 5,(HL)",
          "p1": "true",
@@ -2795,7 +2795,7 @@
       },
       {
          "addr": 118,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 6,(HL)",
          "p1": "true",
@@ -2859,7 +2859,7 @@
       },
       {
          "addr": 126,
-         "cycles": 16,
+         "cycles": 12,
          "length": 2,
          "mnemonic": "BIT 7,(HL)",
          "p1": "true",
