@@ -9,6 +9,7 @@ Boldboy::Boldboy() {
     mCpu = new Cpu(mMmu, mIC);
     mCart = NULL;
     mCpu->getReg16(Cpu::rPC)->write(0x0100);
+    Logger::setLogger(NULL);
 }
 
 Boldboy::~Boldboy() {
@@ -48,4 +49,8 @@ void Boldboy::run() {
 
 void Boldboy::setSerialHandler(IoSerial *serial) {
     mIO->setSerialHandler(serial);
+}
+
+void Boldboy::setLogger(Logger *logger) {
+    Logger::setLogger(logger);
 }

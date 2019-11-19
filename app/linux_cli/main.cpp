@@ -12,6 +12,7 @@
 #include "io_timer.h"
 #include "cart_rom.h"
 #include "boldboy.h"
+#include "console_logger.h"
 
 #define MAX_ARGS 16
 #define COMMAND_STR_SZ 2048
@@ -165,6 +166,9 @@ int main(int argc, char *argv[])
     char command[COMMAND_STR_SZ];
 
     mEmu = new Boldboy();
+    Logger *l = new ConsoleLogger();
+    l->setLevel(LOG_VERBOSE);
+    mEmu->setLogger(l);
     mEmu->setSerialHandler(new SerialConsole());
 
     if(argc >= 2) {

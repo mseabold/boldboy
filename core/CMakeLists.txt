@@ -23,6 +23,8 @@ set (SRCS
     src/cart/cart_mbc5.cpp
     src/io/io_controller.cpp
     src/io/io_serial.cpp
-    src/io/io_timer.cpp)
+    src/io/io_timer.cpp
+    src/log/logger.cpp
+    src/log/console.cpp)
 add_library(core ${SRCS} ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp)
 

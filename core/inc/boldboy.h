@@ -9,6 +9,7 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "logger.h"
 
 class Boldboy {
     public:
@@ -19,6 +20,7 @@ class Boldboy {
         void tick();
         void run();
         void setSerialHandler(IoSerial *serial);
+        void setLogger(Logger *logger);
 
     private:
         Cpu *mCpu;

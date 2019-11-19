@@ -1,4 +1,5 @@
 #include "cart_mbc1.h"
+#include "logger.h"
 
 MBC1::MBC1(uint8_t *buffer, uint32_t sz) : Cartridge(buffer, sz) {
     mMode = mode2MRom8KRam;
@@ -17,6 +18,7 @@ void MBC1::writeAddr(uint16_t addr, uint8_t val) {
             // This sets the lower 5 bits of current bank.
             // Note that these bits CANNOT be all 0. It will always fall to 0x01.
             mCurRomBank = (mCurRomBank & 0x60) | ((val & 0x1f)?(val & 0x1f):0x01);
+            VLOG("ROM Bank Switch: %u\n", mCurRomBank);
             break;
         case 0x4000:
             switch(mMode) {
