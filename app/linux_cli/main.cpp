@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
     mEmu = new Boldboy();
     Logger *l = new ConsoleLogger();
-    l->setLevel(LOG_VERBOSE);
+    l->setLevel(LOG_NONE);
     mEmu->setLogger(l);
     mEmu->setSerialHandler(new SerialConsole());
 
