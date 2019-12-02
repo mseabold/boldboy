@@ -29,6 +29,8 @@ Cpu::Cpu(Mmu *mmu, InterruptController *ic) : mMmu(mmu), mIC(ic)
     mrSP = mReg16s[rSP];
     mrHL = mReg16s[rHL];
     mBranchTaken = false;
+    mCurState = 0;
+    mIsCB = false;
 
     initOps();
 }
@@ -54,7 +56,6 @@ uint8_t Cpu::tick() {
     InterruptController::InterruptType irqType;
 
     mBranchTaken = false;
-    mIsCB = false;
 
     //TODO: Eventually some/all opcodes will need to be handled
     //      in multiple ticks with a stored state. But the old adage:
@@ -62,7 +63,7 @@ uint8_t Cpu::tick() {
 
     // If there is an interrupt pending, switch to the ISR
     // handler, then let the next tick began handling it
-    if(mIC->isPending()) {
+    if(mCurState == 0 && mIC->isPending()) {
         mIsHalted = false;
 
         // Only service the interrupt if IME
@@ -85,25 +86,45 @@ uint8_t Cpu::tick() {
     if(mIsHalted)
         return 4;
 
-    op = mMmu->readAddr(mrPC->read());
+    if(mCurState == 0) {
+        op = mMmu->readAddr(mrPC->read());
 
-    if(op == 0xcb) {
-        op = mMmu->readAddr(mrPC->increment());
-        opcode = &mExtOpTable[op];
-        mIsCB = true;
-    } else
-        opcode = &mOpTable[op];
+        if(op == 0xcb) {
+            op = mMmu->readAddr(mrPC->increment());
+            opcode = &mExtOpTable[op];
+            mIsCB = true;
+        } else {
+            opcode = &mOpTable[op];
+            mIsCB = false;
+        }
 
-    mCurOpcode = op;
+        mCurOpcode = op;
 
-    mrPC->increment();
+        // Populate the intstruction cycles with full number. Some opcodes
+        // may override this if the the opcode should be handled in multiple
+        // states.
+        mCycles = opcode->cycles;
+        mBrCycles = opcode->branchCycles;
+
+        mrPC->increment();
+    } else {
+        if(mIsCB)
+            opcode = &mExtOpTable[mCurOpcode];
+        else
+            opcode = &mOpTable[mCurOpcode];
+
+        // We know if we're in a sub-state that the opcode MUST handle
+        // consuming its own cycles
+        mCycles = 0;
+        mBrCycles = 0;
+    }
 
     (this->*opcode->handler)(opcode->p1, opcode->p2);
 
     if(mBranchTaken)
-        return opcode->branchCycles;
+        return mBrCycles;
     else
-        return opcode->cycles;
+        return mCycles;
 }
 
 void Cpu::disassemble(char *buffer, uint32_t bufLen) {

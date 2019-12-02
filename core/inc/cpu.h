@@ -88,6 +88,10 @@ private:
     bool mIsCB;
     bool mIsHalted;
     bool mHaltSkipPC;
+    uint8_t mCurState;
+    uint8_t mCycles;
+    uint8_t mBrCycles;
+    uint8_t mCache;
 
     Mmu *mMmu;
     InterruptController *mIC;
