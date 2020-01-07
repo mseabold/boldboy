@@ -72,6 +72,15 @@ void Cpu::oph_LD_r16_d16(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_LD_ar16_A(uint16_t p1, uint16_t p2) {
+    mCycles = 4;
+
+    if(mCurState == 0) {
+        mCurState = 1;
+        return;
+    }
+
+    mCurState = 0;
+
     int16_t s_p2 = (int16_t)p2;
     mMmu->writeAddr(mReg16s[p1]->read(), mrA->read());
 
@@ -109,25 +118,55 @@ void Cpu::oph_Dec_r8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_Inc_arHL(uint16_t p1, uint16_t p2) {
-    uint8_t memVal = mMmu->readAddr(mrHL->read());
-    ++memVal;
-    mMmu->writeAddr(mrHL->read(), memVal);
+    switch(mCurState) {
+        case 0:
+            mCycles = 4;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            mCache = mMmu->readAddr(mrHL->read());
+            ++mCurState;
+            break;
+        case 2:
+            ++mCache;
 
-    CHECK_ZERO(memVal);
-    ((memVal & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+            mMmu->writeAddr(mrHL->read(), mCache);
 
-    CLEAR_FLAG(FLAG_N);
+            CHECK_ZERO(mCache);
+            ((mCache & 0xf) == 0)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+            CLEAR_FLAG(FLAG_N);
+
+            mCycles = 4;
+            mCurState = 0;
+            break;
+    }
 }
 
 void Cpu::oph_Dec_arHL(uint16_t p1, uint16_t p2) {
-    uint8_t memVal = mMmu->readAddr(mrHL->read());
-    --memVal;
-    mMmu->writeAddr(mrHL->read(), memVal);
+    switch(mCurState) {
+        case 0:
+            mCycles = 4;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            mCache = mMmu->readAddr(mrHL->read());
+            ++mCurState;
+            break;
+        case 2:
+            --mCache;
 
-    CHECK_ZERO(memVal);
-    ((memVal & 0xf) == 0xf)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+            mMmu->writeAddr(mrHL->read(), mCache);
 
-    SET_FLAG(FLAG_N);
+            CHECK_ZERO(mCache);
+            ((mCache & 0xf) == 0xf)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+            SET_FLAG(FLAG_N);
+
+            mCycles = 4;
+            mCurState = 0;
+            break;
+    }
 }
 
 void Cpu::oph_LD_r8_d8(uint16_t p1, uint16_t p2) {
@@ -136,6 +175,15 @@ void Cpu::oph_LD_r8_d8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_LD_arHL_d8(uint16_t p1, uint16_t p2) {
+    if(mCurState == 0) {
+        mCycles = 8;
+        mCurState = 1;
+        return;
+    }
+
+    mCycles = 4;
+    mCurState = 0;
+
     mMmu->writeAddr(mrHL->read(), mMmu->readAddr(mrPC->read()));
     mrPC->increment();
 }
@@ -640,6 +688,15 @@ void Cpu::oph_LDH_A_a8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_LD_arC_A(uint16_t p1, uint16_t p2) {
+    mCycles = 4;
+
+    if(mCurState == 0) {
+        mCurState = 1;
+        return;
+    }
+
+    mCurState = 0;
+
     mMmu->writeAddr(0xFF00 + mReg8s[rC]->read(), mrA->read());
 }
 
@@ -669,6 +726,15 @@ void Cpu::oph_ADD_SP_r8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_LD_a16_A(uint16_t p1, uint16_t p2) {
+    if(mCurState == 0) {
+        mCycles = 12;
+        mCurState = 1;
+        return;
+    }
+
+    mCycles = 4;
+    mCurState = 0;
+
     uint16_t aVal = mMmu->readAddr(mrPC->postIncrement());
     aVal |= mMmu->readAddr(mrPC->postIncrement()) << 8;
 
@@ -707,178 +773,284 @@ void Cpu::oph_LD_SP_HL(uint16_t p1, uint16_t p2) {
     mrSP->write(mrHL->read());
 }
 
-/*************************************************
- * Note: all of the bit operations take an initial
- *       parameter that indicates whether the
- *       operation is being done on a register or
- *       to memory via (HL)
- ************************************************/
-#define GET_VAL(_isHL, _reg) (_isHL)?mMmu->readAddr(mrHL->read()):mReg8s[_reg]->read()
-#define SET_VAL(_isHL, _reg, _val) (_isHL)?mMmu->writeAddr(mrHL->read(), _val):mReg8s[_reg]->write(_val)
-
-void Cpu::oph_RLC(uint16_t p1, uint16_t p2) {
-    uint16_t rVal = (uint16_t)GET_VAL(p1, p2);
-    rVal = rVal << 1;
-
-    CLEAR_FLAGS;
-
-    // If carry, shift it to bit 0 and C flag
-    if(rVal & 0x100)
-    {
-        rVal |= 1;
-        SET_FLAG(FLAG_C);
-    }
+void Cpu::oph_RLC_r8(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = rlc(mReg8s[p1]->read());
 
     if(mIsCB)
-        CHECK_ZERO((uint8_t)rVal);
+        CHECK_ZERO(rVal);
 
-    SET_VAL(p1, p2, (uint8_t )rVal);
+    mReg8s[p1]->write(rVal);
 }
 
-void Cpu::oph_RRC(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-    uint8_t cBit = rVal & 0x01;
-
-    rVal >>= 1;
-
-    CLEAR_FLAGS;
-
-    if(cBit) {
-        rVal |= 0x80;
-        SET_FLAG(FLAG_C);
-    }
+void Cpu::oph_RRC_r8(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = rrc(mReg8s[p1]->read());
 
     if(mIsCB)
-        CHECK_ZERO((uint8_t)rVal);
+        CHECK_ZERO(rVal);
 
-    SET_VAL(p1, p2, rVal);
+    mReg8s[p1]->write(rVal);
 }
 
-void Cpu::oph_RL(uint16_t p1, uint16_t p2) {
-    uint16_t rVal = (uint16_t)GET_VAL(p1, p2);
-    rVal <<= 1;
-
-    if(TEST_FLAG(FLAG_C))
-        rVal |= 0x01;
-
-    CLEAR_FLAGS;
-
-    if(rVal & 0x100)
-        SET_FLAG(FLAG_C);
+void Cpu::oph_RL_r8(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = rl(mReg8s[p1]->read());
 
     if(mIsCB)
-        CHECK_ZERO((uint8_t)rVal);
+        CHECK_ZERO(rVal);
 
-    SET_VAL(p1, p2, (uint8_t )rVal);
+    mReg8s[p1]->write(rVal);
 }
 
-void Cpu::oph_RR(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-    uint8_t cBit = rVal & 0x01;
-
-    rVal >>= 1;
-
-    if(TEST_FLAG(FLAG_C))
-        rVal |= 0x80;
-
-    CLEAR_FLAGS;
-
-    if(cBit)
-        SET_FLAG(FLAG_C);
+void Cpu::oph_RR_r8(uint16_t p1, uint16_t p2) {
+    uint8_t rVal = rr(mReg8s[p1]->read());
 
     if(mIsCB)
-        CHECK_ZERO((uint8_t)rVal);
+        CHECK_ZERO(rVal);
 
-    SET_VAL(p1, p2, rVal);
+    mReg8s[p1]->write(rVal);
 }
 
-void Cpu::oph_SLA(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-
-    CLEAR_FLAGS;
-    (rVal & 0x80)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
-
-    rVal <<= 1;
-
-    CHECK_ZERO(rVal);
-
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_SLA_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(sla(mReg8s[p1]->read()));
 }
 
-void Cpu::oph_SRA(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-
-    CLEAR_FLAGS;
-    (rVal & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
-
-    rVal >>= 1;
-
-    if(rVal & 0x40)
-        rVal |= 0x80;
-
-    CHECK_ZERO(rVal);
-
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_SRA_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(sra(mReg8s[p1]->read()));
 }
 
-void Cpu::oph_SWAP(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-
-    rVal = (((rVal & 0xF) << 4) | (rVal >> 4));
-    CLEAR_FLAGS;
-    CHECK_ZERO(rVal);
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_SWAP_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(swap(mReg8s[p1]->read()));
 }
 
-void Cpu::oph_SRL(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-
-    CLEAR_FLAGS;
-    (rVal & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
-
-    rVal >>= 1;
-
-    CHECK_ZERO(rVal);
-
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_SRL_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(srl(mReg8s[p1]->read()));
 }
 
-#define GET_BIT_FROM_OP(_base) ((mCurOpcode - _base) / 8)
+void Cpu::oph_BIT_r8(uint16_t p1, uint16_t p2) {
+    bit(mReg8s[p1]->read());
+}
 
-void Cpu::oph_BIT(uint16_t p1, uint16_t p2) {
-    // If this is reading from memory, we need to delay the read
-    if(p1) {
-        if(mCurState == 0) {
+void Cpu::oph_RES_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(res(mReg8s[p1]->read()));
+}
+
+void Cpu::oph_SET_r8(uint16_t p1, uint16_t p2) {
+    mReg8s[p1]->write(set(mReg8s[p1]->read()));
+}
+
+void Cpu::oph_RLC_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
             mCycles = 8;
-            mCurState = 1;
-        } else {
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
             mCycles = 4;
             mCurState = 0;
-        }
+            mCache = rlc(mCache);
+            CHECK_ZERO(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
     }
-    uint8_t rVal = GET_VAL(p1, p2);
-    CLEAR_FLAG(FLAG_N);
-    SET_FLAG(FLAG_H);
-
-    CHECK_ZERO((rVal & (1 << GET_BIT_FROM_OP(0x40))));
 }
 
-#include <stdio.h>
-static const char *regnames[] = {"rA", "rF", "rB", "rC", "rD", "rE", "rH", "rL"};
-void Cpu::oph_RES(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
-
-    rVal &= ~(1 << GET_BIT_FROM_OP(0x80));
-
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_RRC_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = rrc(mCache);
+            CHECK_ZERO(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
 }
 
+void Cpu::oph_RL_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = rl(mCache);
+            CHECK_ZERO(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
 
+void Cpu::oph_RR_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = rr(mCache);
+            CHECK_ZERO(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
 
-void Cpu::oph_SET(uint16_t p1, uint16_t p2) {
-    uint8_t rVal = GET_VAL(p1, p2);
+void Cpu::oph_SLA_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = sla(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
 
-    rVal |= (1 << GET_BIT_FROM_OP(0xc0));
+void Cpu::oph_SRA_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = sra(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
 
-    SET_VAL(p1, p2, rVal);
+void Cpu::oph_SWAP_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = swap(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
+
+void Cpu::oph_SRL_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = srl(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
+
+void Cpu::oph_BIT_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            mCurState = 0;
+            bit(mMmu->readAddr(mrHL->read()));
+            break;
+    }
+}
+
+void Cpu::oph_RES_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = res(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
+}
+
+void Cpu::oph_SET_arHL(uint16_t p1, uint16_t p2) {
+    switch(mCurState) {
+        case 0:
+            mCycles = 8;
+            ++mCurState;
+            break;
+        case 1:
+            mCycles = 4;
+            ++mCurState;
+            mCache = mMmu->readAddr(mrHL->read());
+            break;
+        case 2:
+            mCycles = 4;
+            mCurState = 0;
+            mCache = set(mCache);
+            mMmu->writeAddr(mrHL->read(), mCache);
+            break;
+    }
 }

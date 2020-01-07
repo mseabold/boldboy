@@ -216,3 +216,131 @@ void Cpu::or_A(uint8_t param) {
     CHECK_ZERO(result);
     mrA->write(result);
 }
+
+uint8_t Cpu::rlc(uint8_t p1) {
+    uint16_t result = (uint16_t)p1;
+    result = result << 1;
+
+    CLEAR_FLAGS;
+
+    // If carry, shift it to bit 0 and C flag
+    if(result & 0x100)
+    {
+        result |= 1;
+        SET_FLAG(FLAG_C);
+    }
+
+    return (uint8_t)result;
+}
+
+uint8_t Cpu::rrc(uint8_t p1) {
+    uint8_t cBit = p1 & 0x01;
+
+    p1 >>= 1;
+
+    CLEAR_FLAGS;
+
+    if(cBit) {
+        p1 |= 0x80;
+        SET_FLAG(FLAG_C);
+    }
+
+    return p1;
+}
+
+uint8_t Cpu::rl(uint8_t p1) {
+    uint16_t result = (uint16_t)p1;
+
+    result <<= 1;
+
+    if(TEST_FLAG(FLAG_C))
+        result |= 0x01;
+
+    CLEAR_FLAGS;
+
+    if(result & 0x100)
+        SET_FLAG(FLAG_C);
+
+    return (uint8_t)result;
+}
+
+uint8_t Cpu::rr(uint8_t p1) {
+    uint8_t cBit = p1 & 0x01;
+
+    p1 >>= 1;
+
+    if(TEST_FLAG(FLAG_C))
+        p1 |= 0x80;
+
+    CLEAR_FLAGS;
+
+    if(cBit)
+        SET_FLAG(FLAG_C);
+
+    return p1;
+}
+
+uint8_t Cpu::sla(uint8_t p1) {
+    CLEAR_FLAGS;
+    (p1 & 0x80)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    p1 <<= 1;
+
+    CHECK_ZERO(p1);
+
+    return p1;
+}
+
+uint8_t Cpu::sra(uint8_t p1) {
+    CLEAR_FLAGS;
+    (p1 & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    p1 >>= 1;
+
+    if(p1 & 0x40)
+        p1 |= 0x80;
+
+    CHECK_ZERO(p1);
+
+    return p1;
+}
+
+uint8_t Cpu::swap(uint8_t p1) {
+    p1 = (((p1 & 0xF) << 4) | (p1 >> 4));
+    CLEAR_FLAGS;
+    CHECK_ZERO(p1);
+
+    return p1;
+}
+
+uint8_t Cpu::srl(uint8_t p1) {
+    CLEAR_FLAGS;
+    (p1 & 0x01)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+
+    p1 >>= 1;
+
+    CHECK_ZERO(p1);
+
+    return p1;
+}
+
+#define GET_BIT_FROM_OP(_base) ((mCurOpcode - _base) / 8)
+
+void Cpu::bit(uint8_t p1) {
+    CLEAR_FLAG(FLAG_N);
+    SET_FLAG(FLAG_H);
+
+    CHECK_ZERO((p1 & (1 << GET_BIT_FROM_OP(0x40))));
+}
+
+uint8_t Cpu::res(uint8_t p1) {
+    p1 &= ~(1 << GET_BIT_FROM_OP(0x80));
+
+    return p1;
+}
+
+uint8_t Cpu::set(uint8_t p1) {
+    p1 |= (1 << GET_BIT_FROM_OP(0xc0));
+
+    return p1;
+}

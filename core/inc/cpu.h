@@ -110,6 +110,18 @@ private:
     void xor_A(uint8_t param);
     void or_A(uint8_t param);
 
+    uint8_t rlc(uint8_t p1);
+    uint8_t rrc(uint8_t p1);
+    uint8_t rl(uint8_t p1);
+    uint8_t rr(uint8_t p1);
+    uint8_t sla(uint8_t p1);
+    uint8_t sra(uint8_t p1);
+    uint8_t swap(uint8_t p1);
+    uint8_t srl(uint8_t p1);
+    void bit(uint8_t p1);
+    uint8_t res(uint8_t p1);
+    uint8_t set(uint8_t p1);
+
     /* Opcode Handlers */
     void oph_Nop(uint16_t p1, uint16_t p2);
     void oph_Invalid(uint16_t p1, uint16_t p2);
@@ -185,17 +197,28 @@ private:
     void oph_LD_A_a16(uint16_t p1, uint16_t p2);
     void oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2);
     void oph_LD_SP_HL(uint16_t p1, uint16_t p2);
-    void oph_RLC(uint16_t p1, uint16_t p2);
-    void oph_RRC(uint16_t p1, uint16_t p2);
-    void oph_RL(uint16_t p1, uint16_t p2);
-    void oph_RR(uint16_t p1, uint16_t p2);
-    void oph_SLA(uint16_t p1, uint16_t p2);
-    void oph_SRA(uint16_t p1, uint16_t p2);
-    void oph_SWAP(uint16_t p1, uint16_t p2);
-    void oph_SRL(uint16_t p1, uint16_t p2);
-    void oph_BIT(uint16_t p1, uint16_t p2);
-    void oph_RES(uint16_t p1, uint16_t p2);
-    void oph_SET(uint16_t p1, uint16_t p2);
+    void oph_RLC_r8(uint16_t p1, uint16_t p2);
+    void oph_RRC_r8(uint16_t p1, uint16_t p2);
+    void oph_RL_r8(uint16_t p1, uint16_t p2);
+    void oph_RR_r8(uint16_t p1, uint16_t p2);
+    void oph_SLA_r8(uint16_t p1, uint16_t p2);
+    void oph_SRA_r8(uint16_t p1, uint16_t p2);
+    void oph_SWAP_r8(uint16_t p1, uint16_t p2);
+    void oph_SRL_r8(uint16_t p1, uint16_t p2);
+    void oph_BIT_r8(uint16_t p1, uint16_t p2);
+    void oph_RES_r8(uint16_t p1, uint16_t p2);
+    void oph_SET_r8(uint16_t p1, uint16_t p2);
+    void oph_RLC_arHL(uint16_t p1, uint16_t p2);
+    void oph_RRC_arHL(uint16_t p1, uint16_t p2);
+    void oph_RL_arHL(uint16_t p1, uint16_t p2);
+    void oph_RR_arHL(uint16_t p1, uint16_t p2);
+    void oph_SLA_arHL(uint16_t p1, uint16_t p2);
+    void oph_SRA_arHL(uint16_t p1, uint16_t p2);
+    void oph_SWAP_arHL(uint16_t p1, uint16_t p2);
+    void oph_SRL_arHL(uint16_t p1, uint16_t p2);
+    void oph_BIT_arHL(uint16_t p1, uint16_t p2);
+    void oph_RES_arHL(uint16_t p1, uint16_t p2);
+    void oph_SET_arHL(uint16_t p1, uint16_t p2);
 
 };
 
