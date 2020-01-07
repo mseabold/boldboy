@@ -10,6 +10,11 @@
 #define TIMA_DIVIDER_16_KHZ  256
 #define TIMA_DIVIDER_4_KHZ   1024
 
+#define TIMA_BIT_4_KHZ    0x0200
+#define TIMA_BIT_16_KHZ   0x0080
+#define TIMA_BIT_64_KHZ   0x0020
+#define TIMA_BIT_256_KHZ  0x0008
+
 class IoTimer : public MemRegion {
     public:
         IoTimer(InterruptController *ic);
@@ -24,8 +29,9 @@ class IoTimer : public MemRegion {
         uint8_t mTIMA;
         uint8_t mTMA;
         uint8_t mTAC;
+        uint16_t mSysTick;
         uint32_t mTicks;
-        uint32_t mDivider;
+        uint16_t mMuxBit;
         InterruptController *mIC;
 };
 

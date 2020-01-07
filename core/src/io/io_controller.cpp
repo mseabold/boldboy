@@ -17,10 +17,6 @@ IoController::~IoController() {
 }
 
 uint8_t IoController::readAddr(uint16_t addr) {
-    /* DIV is special, so we can just handle it here. */
-    if(addr == IOREG_DIV)
-        return mDIV;
-
     MemRegion *handler = findHandler(addr);
 
     if(handler)
@@ -30,12 +26,6 @@ uint8_t IoController::readAddr(uint16_t addr) {
 }
 
 void IoController::writeAddr(uint16_t addr, uint8_t val) {
-    /* DIV is special, so we can just handle it here. */
-    if(addr == IOREG_DIV) {
-        mDIV = 0;
-        return;
-    }
-
     MemRegion *handler = findHandler(addr);
 
     if(handler)
@@ -52,13 +42,6 @@ void IoController::tick(uint8_t cycles) {
 
     if(mTimer != NULL)
         mTimer->tick(cycles);
-
-    mDIVticks += cycles;
-
-    if(mDIVticks >= TICKS_PER_DIV) {
-        ++mDIV;
-        mDIV %= TICKS_PER_DIV;
-    }
 }
 
 void IoController::setTimer(IoTimer *timer) {
@@ -76,6 +59,7 @@ MemRegion *IoController::findHandler(uint16_t addr) {
         case IOREG_IF:
         case IOREG_IE:
             return mIC;
+        case IOREG_DIV:
         case IOREG_TIMA:
         case IOREG_TMA:
         case IOREG_TAC:
