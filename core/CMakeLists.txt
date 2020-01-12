@@ -25,6 +25,7 @@ set (SRCS
     src/io/io_serial.cpp
     src/io/io_timer.cpp
     src/log/logger.cpp
-    src/log/console.cpp)
+    src/log/console.cpp
+    src/ppu/ppu.cpp)
 add_library(core ${SRCS} ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp)
 

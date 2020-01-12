@@ -9,6 +9,7 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "ppu.h"
 #include "logger.h"
 
 class Boldboy {
@@ -29,6 +30,7 @@ class Boldboy {
         IoTimer *mTimer;
         IoController *mIO;
         InterruptController *mIC;
+        Ppu *mPpu;
 
 };
 

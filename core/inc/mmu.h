@@ -7,6 +7,7 @@
 #include "cartridge.h"
 #include "upperregion.h"
 #include "emptyregion.h"
+#include "ppu.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 
@@ -30,8 +31,8 @@ private:
     static const uint8_t sBootROM[256];
 
 public:
-    Mmu(Cartridge *cart, MemRegion *io);
-    Mmu(MemRegion *io);
+    Mmu(Cartridge *cart, MemRegion *io, Ppu *ppu);
+    Mmu(MemRegion *io, Ppu *ppu);
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);

@@ -8,13 +8,12 @@
 #define IRAM_REGION 6
 #define UPPER_REGION 7
 
-Mmu::Mmu(Cartridge *cart, MemRegion *io) : Mmu(io) {
+Mmu::Mmu(Cartridge *cart, MemRegion *io, Ppu *ppu) : Mmu(io, ppu) {
     loadCart(cart);
 }
 
-Mmu::Mmu(MemRegion *io) {
+Mmu::Mmu(MemRegion *io, Ppu *ppu) {
     /* Initialize all of the memory regions. */
-    RamRegion *vRam = new RamRegion(0x8000, 0x2000); // 8kB VRAM at 0x8000
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
 
     /* Upper 8kB contains multiple regions, including IO and echoed iRAM */
@@ -30,8 +29,8 @@ Mmu::Mmu(MemRegion *io) {
     mRegions[CART_ROM_REGION_START+2] = mEmpty;
     mRegions[CART_ROM_REGION_START+3] = mEmpty;
 
-    /* Next 8K is vRAM */
-    mRegions[VRAM_REGION] = vRam;
+    /* Next 8K is vRAM, which is handled by the ppu */
+    mRegions[VRAM_REGION] = ppu;
 
     /* Next 8K is switchable cartridge RAM */
     mRegions[CART_RAM_REGION] = mEmpty;
@@ -47,7 +46,6 @@ Mmu::Mmu(MemRegion *io) {
 
 Mmu::~Mmu() {
     /* Delete each allocated region. */
-    delete mRegions[VRAM_REGION];
     delete mRegions[IRAM_REGION];
     delete mRegions[UPPER_REGION];
     delete mEmpty;

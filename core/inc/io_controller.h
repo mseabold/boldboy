@@ -6,6 +6,7 @@
 #include "io_serial.h"
 #include "int_controller.h"
 #include "io_timer.h"
+#include "ppu.h"
 
 class IoController : public MemRegion
 {
@@ -16,11 +17,12 @@ private:
     uint8_t mIF;
     uint8_t mDIV;
     uint16_t mDIVticks;
+    Ppu *mPpu;
 
     MemRegion *findHandler(uint16_t addr);
 
 public:
-    IoController(InterruptController *ic);
+    IoController(InterruptController *ic, Ppu *ppu);
     virtual ~IoController();
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);

@@ -2,10 +2,11 @@
 
 Boldboy::Boldboy() {
     mIC = new InterruptController();
-    mIO = new IoController(mIC);
+    mPpu = new Ppu(mIC);
+    mIO = new IoController(mIC, mPpu);
     mTimer = new IoTimer(mIC);
     mIO->setTimer(mTimer);
-    mMmu = new Mmu(mIO);
+    mMmu = new Mmu(mIO, mPpu);
     mCpu = new Cpu(mMmu, mIC);
     mCart = NULL;
     mCpu->getReg16(Cpu::rPC)->write(0x0100);
@@ -17,6 +18,7 @@ Boldboy::~Boldboy() {
     delete mMmu;
     delete mIO;
     delete mTimer;
+    delete mPpu;
     delete mIC;
 
     if(mCart)

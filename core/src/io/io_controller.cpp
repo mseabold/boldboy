@@ -4,13 +4,14 @@
 
 #define TICKS_PER_DIV 256
 
-IoController::IoController(InterruptController *ic) {
+IoController::IoController(InterruptController *ic, Ppu *ppu) {
     mSerial = NULL;
     mTimer = NULL;
     mIF = 0;
     mDIV = 0;
     mDIVticks = 0;
     mIC = ic;
+    mPpu = ppu;
 }
 
 IoController::~IoController() {
@@ -64,6 +65,18 @@ MemRegion *IoController::findHandler(uint16_t addr) {
         case IOREG_TMA:
         case IOREG_TAC:
             return mTimer;
+        case IOREG_LCDC:
+        case IOREG_STAT:
+        case IOREG_SCY:
+        case IOREG_SCX:
+        case IOREG_LY:
+        case IOREG_LYC:
+        case IOREG_BGP:
+        case IOREG_OBP0:
+        case IOREG_OBP1:
+        case IOREG_WY:
+        case IOREG_WX:
+            return mPpu;
     }
 
     return NULL;
