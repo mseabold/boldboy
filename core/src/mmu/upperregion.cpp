@@ -7,16 +7,15 @@
 #define TO_ECHOED_ADDR_SPACE(_addr) (_addr - ECHOED_RAM_OFFSET)
 
 
-UpperRegion::UpperRegion(RamRegion *iRam, MemRegion *io) {
+UpperRegion::UpperRegion(RamRegion *iRam, MemRegion *io, Ppu* ppu) {
     mEchoedRam = iRam;
     mIO = io;
+    mPpu = ppu;
 
-    mOAM = new RamRegion(OAM_START, 0xA0);
     mUpperRam = new RamRegion(UPPER_RAM_START, 0x80);
 }
 
 UpperRegion::~UpperRegion() {
-    delete mOAM;
     delete mUpperRam;
 }
 
@@ -36,7 +35,7 @@ uint8_t UpperRegion::readAddr(uint16_t addr) {
             /* Attempt to read this value from OAM. If it is
              * beyond the bounds of the OAM segment, the region
              * will reject it. */
-            result = mOAM->readAddr(addr);
+            result = mPpu->readAddr(addr);
             break;
         /* I/O: 0xFF00 - 0xFF4C */
         /* UNUSED: 0xFF4D - 0xFF79 */
@@ -77,7 +76,7 @@ void UpperRegion::writeAddr(uint16_t addr, uint8_t val) {
             /* Attempt to write this value to OAM. If it is
              * beyond the bounds of the OAM segment, the region
              * will reject the write. */
-            mOAM->writeAddr(addr, val);
+            mPpu->writeAddr(addr, val);
             break;
         /* I/O: 0xFF00 - 0xFF4C */
         /* UNUSED: 0xFF4D - 0xFF79 */

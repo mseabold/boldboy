@@ -14,6 +14,7 @@ class Ppu : public MemRegion {
         void tick(uint8_t cycles);
     private:
         uint8_t mVRAM[0x2000];
+        uint8_t mOAM[0xA0];
         InterruptController *mIC;
 };
 
