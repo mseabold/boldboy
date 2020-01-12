@@ -17,7 +17,7 @@ Mmu::Mmu(MemRegion *io, Ppu *ppu) {
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
 
     /* Upper 8kB contains multiple regions, including IO and echoed iRAM */
-    UpperRegion *mUpper = new UpperRegion(iRam, io);
+    UpperRegion *mUpper = new UpperRegion(iRam, io, ppu);
 
     mEmpty = new EmptyRegion();
 
