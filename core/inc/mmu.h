@@ -37,6 +37,7 @@ public:
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);
     void loadCart(Cartridge *cart);
+    void enableBootrom(bool enabled);
     ~Mmu();
 };
 

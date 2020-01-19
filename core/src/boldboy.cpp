@@ -1,15 +1,21 @@
 #include "boldboy.h"
 
-Boldboy::Boldboy() {
+Boldboy::Boldboy() : Boldboy(false) {
+}
+
+Boldboy::Boldboy(bool useBootrom) {
     mIC = new InterruptController();
     mPpu = new Ppu(mIC);
     mIO = new IoController(mIC, mPpu);
     mTimer = new IoTimer(mIC);
     mIO->setTimer(mTimer);
     mMmu = new Mmu(mIO, mPpu);
+    mMmu->enableBootrom(useBootrom);
     mCpu = new Cpu(mMmu, mIC);
     mCart = NULL;
-    mCpu->getReg16(Cpu::rPC)->write(0x0100);
+    // If we aren't emulating the bootrom, move the PC past it
+    if(!useBootrom)
+        mCpu->getReg16(Cpu::rPC)->write(0x0100);
     Logger::setLogger(NULL);
 }
 

@@ -15,6 +15,7 @@
 class Boldboy {
     public:
         Boldboy();
+        Boldboy(bool useBootrom);
         ~Boldboy();
 
         bool loadCart(const char *filename);
