@@ -11,7 +11,7 @@ static inline void writeBuffer(Mmu* mmu, uint16_t base, uint16_t len, uint8_t *b
 
 TEST_CASE("Read from Cart ROM", "[mmu]") {
     Cartridge *cart = new TestCart(sizeof(cartRom), cartRom);
-    Mmu *mmu = new Mmu(cart, NULL);
+    Mmu *mmu = new Mmu(NULL, NULL, cart);
 
     REQUIRE(mmu->readAddr(0) == cartRom[0]);
     REQUIRE(mmu->readAddr(1) == cartRom[1]);
@@ -27,16 +27,6 @@ TEST_CASE("Write then read from Internal RAM", "[mmu]") {
     REQUIRE(mmu->readAddr(INTERNAL_RAM_BASE+1) == cartRom[1]);
     REQUIRE(mmu->readAddr(INTERNAL_RAM_BASE+2) == cartRom[2]);
     REQUIRE(mmu->readAddr(INTERNAL_RAM_BASE+3) == cartRom[3]);
-}
-
-TEST_CASE("Write then read from Video RAM", "[mmu]") {
-    Mmu *mmu = new Mmu(NULL, NULL);
-    writeBuffer(mmu, VRAM_BASE, sizeof(cartRom), cartRom);
-
-    REQUIRE(mmu->readAddr(VRAM_BASE+0) == cartRom[0]);
-    REQUIRE(mmu->readAddr(VRAM_BASE+1) == cartRom[1]);
-    REQUIRE(mmu->readAddr(VRAM_BASE+2) == cartRom[2]);
-    REQUIRE(mmu->readAddr(VRAM_BASE+3) == cartRom[3]);
 }
 
 TEST_CASE("Write to echoed RAM then read from Internal RAM", "[mmu]") {
