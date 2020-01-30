@@ -48,6 +48,7 @@ bool Boldboy::loadCart(const char *filename) {
 void Boldboy::tick() {
     uint8_t cycles = mCpu->tick();
     mIO->tick(cycles);
+    mPpu->tick(cycles);
 }
 
 void Boldboy::run() {
