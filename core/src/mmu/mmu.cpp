@@ -8,7 +8,7 @@
 #define IRAM_REGION 6
 #define UPPER_REGION 7
 
-Mmu::Mmu(Cartridge *cart, MemRegion *io, Ppu *ppu) : Mmu(io, ppu) {
+Mmu::Mmu(MemRegion *io, Ppu *ppu, Cartridge *cart) : Mmu(io, ppu) {
     loadCart(cart);
 }
 

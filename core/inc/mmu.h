@@ -31,7 +31,7 @@ private:
     static const uint8_t sBootROM[256];
 
 public:
-    Mmu(Cartridge *cart, MemRegion *io, Ppu *ppu);
+    Mmu(MemRegion *io, Ppu *ppu, Cartridge *cart);
     Mmu(MemRegion *io, Ppu *ppu);
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);
