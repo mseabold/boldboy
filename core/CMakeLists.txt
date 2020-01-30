@@ -1,8 +1,10 @@
 find_package (Python3 COMPONENTS Interpreter REQUIRED)
-set (TOOLSDIR ${CMAKE_SOURCE_DIR}/tools)
+
+set (TOOLSDIR ${PROJECT_SOURCE_DIR}/tools)
+
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp
-    COMMAND ${Python3_EXECUTABLE} ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json -f ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp
+    OUTPUT ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp
+    COMMAND ${Python3_EXECUTABLE} ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json -f ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp
     DEPENDS ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json
 )
 set (SRCS
@@ -27,5 +29,10 @@ set (SRCS
     src/log/logger.cpp
     src/log/console.cpp
     src/ppu/ppu.cpp)
-add_library(core ${SRCS} ${CMAKE_CURRENT_BINARY_DIR}/src/cpu/optable.cpp)
 
+add_library(gbcore ${SRCS} ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp)
+
+target_include_directories(gbcore
+    PUBLIC
+        inc
+)
