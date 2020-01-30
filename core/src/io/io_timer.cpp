@@ -79,20 +79,14 @@ uint8_t IoTimer::readAddr(uint16_t addr) {
 void IoTimer::tick(uint8_t cycles) {
     uint16_t oldSysTick = mSysTick;
 
-    DLOG("Timer Tick %u cycles\n", cycles);
-
     // If the timer isn't running, we can just update systick
     if(!mStarted) {
         mSysTick += cycles;
-        VLOG("SysTick: 0x%04x\n", mSysTick);
-        VLOG("TIMA: 0x%04x\n", mTIMA);
         return;
     }
 
     while(cycles > 0) {
         mSysTick += 1;
-
-        DLOG("xored: 0x%04x, mux bit: 0x%04x\n", (oldSysTick ^ mSysTick), (mSysTick & mMuxBit));
 
         if((((oldSysTick ^ mSysTick) & mMuxBit) != 0) && ((mSysTick & mMuxBit) == 0)) {
             ++mTIMA;
@@ -108,8 +102,4 @@ void IoTimer::tick(uint8_t cycles) {
         oldSysTick = mSysTick;
         --cycles;
     }
-
-    VLOG("SysTick: 0x%04x\n", mSysTick);
-    VLOG("TIMA: 0x%04x\n", mTIMA);
-    VLOG("TIMA DIV: %u\n", mSysTick % (mMuxBit << 1));
 }
