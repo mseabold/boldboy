@@ -166,7 +166,8 @@ uint8_t Ppu::readAddr(uint16_t addr) {
 void Ppu::tick(uint8_t cycles) {
     uint8_t vtile, htile, mapEntry;
     uint8_t tileH, tileL;
-    uint8_t pixIdx;
+    uint8_t pixIdx, tileIdx;
+    uint8_t pixInLine;
     uint8_t pix;
     uint8_t scrolledY;
 
@@ -186,7 +187,13 @@ void Ppu::tick(uint8_t cycles) {
             case IOREG_STAT_MODE_3_DATA_XFER:
                 scrolledY = mLY + mSCY;
                 vtile = scrolledY / 8;
-                for(htile=0; htile < 20; ++htile) {
+                pixInLine = 0;
+
+                /*
+                 * Start at the tile based on SCX, then loop for 21 tiles (to handle
+                 * partial tiles). Note that uint8_t wrapping is desirable behavior.
+                 */
+                for(tileIdx=0,htile=mSCX/8; tileIdx < 21; ++htile,++tileIdx) {
                     mapEntry = mVRAM[mBgMapOffset + (vtile * 32 + htile)];
                     if((mLCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800) {
                         // In "8800" mode, the tile index is signed
@@ -197,13 +204,21 @@ void Ppu::tick(uint8_t cycles) {
                         tileH = mVRAM[mTileDataOffset + (mapEntry * TILE_SIZE) + (scrolledY % 8)*2 + 1];
                     }
 
-                    for(pixIdx=0;pixIdx < 8;++pixIdx) {
+                    /*
+                     * If this is the first tile of the line and SCX is not a multiple
+                     * of 8, then we need to offset into the tile.
+                     */
+                    for(pixIdx = pixInLine?0:mSCX%8; pixIdx < 8 && pixInLine < 160; ++pixIdx,++pixInLine) {
                         pix = (tileL & 0x80)?0x1:0x0;
                         pix |= (tileH & 0x80)?0x2:0x0;
-                        frameBuf[mLY][htile*8+pixIdx] = TO_PALLETTE(pix, mBGP);
+                        frameBuf[mLY][pixInLine] = TO_PALLETTE(pix, mBGP);
                         tileL = tileL << 1;
                         tileH = tileH << 1;
                     }
+
+                    // Do not move onto tile 21 if we have completed the line (SCX % 8 == 0)
+                    if(pixInLine == 160)
+                        break;
                 }
                 mRemCycles = HBLANK_CYCLES-cycles;
                 setMode(IOREG_STAT_MODE_0_HBLANK);
