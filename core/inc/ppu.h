@@ -15,7 +15,6 @@ class Ppu : public MemRegion {
     private:
         uint8_t mVRAM[0x2000];
         uint8_t mOAM[0xA0];
-        uint8_t mMode;
         uint8_t mLCDC;
         uint8_t mSCY;
         uint8_t mSCX;
@@ -41,6 +40,7 @@ class Ppu : public MemRegion {
         uint8_t frameBuf[144][160];
 
         void setLine(uint8_t line);
+        void setMode(uint8_t mode);
 };
 
 #endif /* __PPU_H__ */

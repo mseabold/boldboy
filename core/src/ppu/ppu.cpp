@@ -19,9 +19,10 @@
 #define HBLANK_CYCLES 208
 #define LINE_CYCLES 456
 
+#define MODE (mSTAT & IOREG_STAT_MODE_MASK)
+
 Ppu::Ppu(InterruptController *ic) {
     mIC = ic;
-    mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
     mRemCycles = OAM_CYCLES;
     mEnabled = false;
 
@@ -35,7 +36,7 @@ Ppu::Ppu(InterruptController *ic) {
     mOBP1 = 0;
     mWY = 0;
     mWX = 0;
-    mSTAT = 0;
+    mSTAT = IOREG_STAT_MODE_2_OAM_SEARCH;
     mTileDataOffset = OFFSET_9000;
 }
 
@@ -46,7 +47,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // Check if the write is in VRAM
     if((addr & 0xE000) == VRAM_BASE) {
         //VRAM Access is not allowed during pixel transfer
-        if(mMode != IOREG_STAT_MODE_3_DATA_XFER)
+        if(MODE != IOREG_STAT_MODE_3_DATA_XFER)
             mVRAM[addr-VRAM_BASE] = val;
     }
     // Check if the write is in the 0xFFXX region, which we'll
@@ -61,9 +62,10 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
                         mEnabled = true;
                     } else {
                         mLY = 0;
-                        mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
-                        mRemCycles = OAM_CYCLES;
                         mEnabled = false;
+                        // XXX Should this be possible to trigger an interrupt?
+                        setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
+                        mRemCycles = OAM_CYCLES;
                     }
                 }
                 mBgMapOffset = ((val & IOREG_LCDC_BG_TILE_MAP_SEL_9800) == IOREG_LCDC_BG_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
@@ -104,7 +106,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // Check if the write is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
         // OAM can only be accessed during blanking
-        if(mMode == IOREG_STAT_MODE_0_HBLANK || mMode == IOREG_STAT_MODE_1_VBLANK)
+        if(MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
             mOAM[addr-OAM_BASE] = val;
     }
 }
@@ -113,7 +115,7 @@ uint8_t Ppu::readAddr(uint16_t addr) {
     // Check if the read is in VRAM
     if((addr & 0xE000) == VRAM_BASE) {
         //VRAM Access is not allowed during pixel transfer
-        if(mMode != IOREG_STAT_MODE_3_DATA_XFER) {
+        if(MODE != IOREG_STAT_MODE_3_DATA_XFER) {
             return mVRAM[addr-VRAM_BASE];
         }
     }
@@ -124,7 +126,7 @@ uint8_t Ppu::readAddr(uint16_t addr) {
             case IOREG_LCDC:
                 return mLCDC;
             case IOREG_STAT:
-                return mMode | mSTAT;
+                return mSTAT;
             case IOREG_SCY:
                 return mSCY;
             case IOREG_SCX:
@@ -148,7 +150,7 @@ uint8_t Ppu::readAddr(uint16_t addr) {
     // Check if the read is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
         // OAM can only be accessed during blanking
-        if(mMode == IOREG_STAT_MODE_0_HBLANK || mMode == IOREG_STAT_MODE_1_VBLANK)
+        if(MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
             return mOAM[addr-OAM_BASE];
     }
     return 0;
@@ -175,10 +177,10 @@ void Ppu::tick(uint8_t cycles) {
         mRemCycles -= cycles;
     } else {
         cycles -= mRemCycles;
-        switch(mMode) {
+        switch(MODE) {
             case IOREG_STAT_MODE_2_OAM_SEARCH:
                 mRemCycles = DATA_XFER_CYCLES-cycles;
-                mMode = IOREG_STAT_MODE_3_DATA_XFER;
+                setMode(IOREG_STAT_MODE_3_DATA_XFER);
                 //DLOG("%s\n", "Switch to XFER");
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
@@ -204,18 +206,18 @@ void Ppu::tick(uint8_t cycles) {
                     }
                 }
                 mRemCycles = HBLANK_CYCLES-cycles;
-                mMode = IOREG_STAT_MODE_0_HBLANK;
+                setMode(IOREG_STAT_MODE_0_HBLANK);
                 break;
             case IOREG_STAT_MODE_0_HBLANK:
                 if(mLY < 143) {
                     // If we are still drawing screen lines, move back to OAM search
                     mRemCycles = OAM_CYCLES-cycles;
-                    mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
+                    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
                     setLine(mLY+1);
                 } else if(mLY == 143) {
                     // Time for VBlank
                     mRemCycles = LINE_CYCLES - cycles;
-                    mMode = IOREG_STAT_MODE_1_VBLANK;
+                    setMode(IOREG_STAT_MODE_1_VBLANK);
                     setLine(mLY+1);
                 }
                 break;
@@ -245,7 +247,7 @@ void Ppu::tick(uint8_t cycles) {
 #endif
                     // Switch back to OAM earch and start the next frame
                     mRemCycles = OAM_CYCLES;
-                    mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
+                    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
                     setLine(0);
                 }
         }
@@ -263,4 +265,16 @@ void Ppu::setLine(uint8_t line) {
     } else {
         mSTAT &= ~IOREG_STAT_COINCIDENCE_FLAG_EQ;
     }
+}
+
+void Ppu::setMode(uint8_t mode) {
+    mSTAT = (mSTAT & ~IOREG_STAT_MODE_MASK) | mode;
+
+    /*
+     * The order of STAT bits for enabling interrupts mirrors the order
+     * of mode values, so we can simply shift by mode to check the corresponding
+     * bit.
+     */
+    if(mEnabled && mode != IOREG_STAT_MODE_3_DATA_XFER && (mSTAT & (1 << (IOREG_STAT_INTRS_SHIFT + mode))))
+        mIC->requestInterrupt(InterruptController::itLCDCStatus);
 }
