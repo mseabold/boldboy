@@ -35,6 +35,7 @@ Ppu::Ppu(InterruptController *ic) {
     mOBP1 = 0;
     mWY = 0;
     mWX = 0;
+    mSTAT = 0;
     mTileDataOffset = OFFSET_9000;
 }
 
@@ -72,7 +73,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
                 DLOG("LCDC write: 0x%02x\n", mLCDC);
                 break;
             case IOREG_STAT:
-                //TODO
+                mSTAT = (val & IOREG_STAT_INTRS_MASK) | (mSTAT & ~IOREG_STAT_INTRS_MASK);
                 break;
             case IOREG_SCY:
                 mSCY = val;
@@ -123,8 +124,7 @@ uint8_t Ppu::readAddr(uint16_t addr) {
             case IOREG_LCDC:
                 return mLCDC;
             case IOREG_STAT:
-                //TODO
-                return mMode;
+                return mMode | mSTAT;
             case IOREG_SCY:
                 return mSCY;
             case IOREG_SCX:
@@ -211,19 +211,19 @@ void Ppu::tick(uint8_t cycles) {
                     // If we are still drawing screen lines, move back to OAM search
                     mRemCycles = OAM_CYCLES-cycles;
                     mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
-                    ++mLY;
+                    setLine(mLY+1);
                 } else if(mLY == 143) {
                     // Time for VBlank
                     mRemCycles = LINE_CYCLES - cycles;
                     mMode = IOREG_STAT_MODE_1_VBLANK;
-                    ++mLY;
+                    setLine(mLY+1);
                 }
                 break;
             case IOREG_STAT_MODE_1_VBLANK:
                 if(mLY < 153) {
                     // Eat an entire line's worth of cycles for each VBlank line
                     mRemCycles = LINE_CYCLES - cycles;
-                    ++mLY;
+                    setLine(mLY+1);
                 } else {
 #if 0
                     DLOG("%c",'+');
@@ -246,8 +246,21 @@ void Ppu::tick(uint8_t cycles) {
                     // Switch back to OAM earch and start the next frame
                     mRemCycles = OAM_CYCLES;
                     mMode = IOREG_STAT_MODE_2_OAM_SEARCH;
-                    mLY = 0;
+                    setLine(0);
                 }
         }
+    }
+}
+
+void Ppu::setLine(uint8_t line) {
+    mLY = line;
+
+    if(mLY == mLYC) {
+        mSTAT |= IOREG_STAT_COINCIDENCE_FLAG_EQ;
+
+        if(mSTAT & IOREG_STAT_COINCIDENCE_INTR)
+            mIC->requestInterrupt(InterruptController::itLCDCStatus);
+    } else {
+        mSTAT &= ~IOREG_STAT_COINCIDENCE_FLAG_EQ;
     }
 }

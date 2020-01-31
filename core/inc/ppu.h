@@ -26,6 +26,7 @@ class Ppu : public MemRegion {
         uint8_t mOBP1;
         uint8_t mWY;
         uint8_t mWX;
+        uint8_t mSTAT;
 
         uint16_t mBgMapOffset;
         uint16_t mWinMapOffset;
@@ -38,6 +39,8 @@ class Ppu : public MemRegion {
         InterruptController *mIC;
 
         uint8_t frameBuf[144][160];
+
+        void setLine(uint8_t line);
 };
 
 #endif /* __PPU_H__ */
