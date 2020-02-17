@@ -9,7 +9,7 @@ class EmulatorWorker : public QObject {
     Q_OBJECT
 
     public:
-        EmulatorWorker();
+        EmulatorWorker(const char *romfile);
 
     public slots:
         void drawFrame(void);

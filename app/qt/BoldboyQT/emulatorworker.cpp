@@ -1,13 +1,13 @@
 #include "emulatorworker.h"
 #include "console_logger.h"
 
-EmulatorWorker::EmulatorWorker() {
+EmulatorWorker::EmulatorWorker(const char *romfile) {
     mCount = 0;
     mEmu = new Boldboy(false);
     Logger *l = new ConsoleLogger();
-    l->setLevel(LOG_DEBUG);
+    l->setLevel(LOG_NONE);
     mEmu->setLogger(l);
-    mEmu->loadCart("/home/matt/Downloads/pokemon_red.gb");
+    mEmu->loadCart(romfile);
 }
 
 void EmulatorWorker::drawFrame() {

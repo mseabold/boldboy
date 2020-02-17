@@ -17,6 +17,7 @@ class BoldboyQT : public QMainWindow
 public:
     BoldboyQT(QWidget *parent = nullptr);
     ~BoldboyQT();
+    void loadRom(const char *romfile);
 
 public slots:
     void frameDone(QPixmap frame);
