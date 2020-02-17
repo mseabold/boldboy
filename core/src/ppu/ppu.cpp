@@ -285,6 +285,9 @@ void Ppu::setLine(uint8_t line) {
 void Ppu::setMode(uint8_t mode) {
     mSTAT = (mSTAT & ~IOREG_STAT_MODE_MASK) | mode;
 
+    if(mode == IOREG_STAT_MODE_1_VBLANK)
+        mIC->requestInterrupt(InterruptController::itVBlank);
+
     /*
      * The order of STAT bits for enabling interrupts mirrors the order
      * of mode values, so we can simply shift by mode to check the corresponding
