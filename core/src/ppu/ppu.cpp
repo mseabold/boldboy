@@ -21,6 +21,8 @@
 
 #define MODE (mSTAT & IOREG_STAT_MODE_MASK)
 
+static const uint8_t DMG_PALLETTE[] = { 255, 169, 84, 0};
+
 Ppu::Ppu(InterruptController *ic) {
     mIC = ic;
     mRemCycles = OAM_CYCLES;
@@ -36,6 +38,7 @@ Ppu::Ppu(InterruptController *ic) {
     mOBP1 = 0;
     mWY = 0;
     mWX = 0;
+    mCurWinY = 0;
     mSTAT = IOREG_STAT_MODE_2_OAM_SEARCH;
     mTileDataOffset = OFFSET_9000;
 }
@@ -62,6 +65,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
                         mEnabled = true;
                     } else {
                         mLY = 0;
+                        mCurWinY = 0;
                         mEnabled = false;
                         // XXX Should this be possible to trigger an interrupt?
                         setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
@@ -164,12 +168,13 @@ uint8_t Ppu::readAddr(uint16_t addr) {
  * this in the future.
  */
 void Ppu::tick(uint8_t cycles) {
-    uint8_t vtile, htile, mapEntry;
-    uint8_t tileH, tileL;
-    uint8_t pixIdx, tileIdx;
-    uint8_t pixInLine;
+    uint8_t pixIdx;
     uint8_t pix;
     uint8_t scrolledY;
+    uint8_t winX;
+
+    Tile bgTile(0,0);
+    Tile winTile(0,0);
 
     if(!mEnabled)
         return;
@@ -186,40 +191,33 @@ void Ppu::tick(uint8_t cycles) {
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
                 scrolledY = mLY + mSCY;
-                vtile = scrolledY / 8;
-                pixInLine = 0;
 
-                /*
-                 * Start at the tile based on SCX, then loop for 21 tiles (to handle
-                 * partial tiles). Note that uint8_t wrapping is desirable behavior.
-                 */
-                for(tileIdx=0,htile=mSCX/8; tileIdx < 21; ++htile,++tileIdx) {
-                    mapEntry = mVRAM[mBgMapOffset + (vtile * 32 + htile)];
-                    if((mLCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800) {
-                        // In "8800" mode, the tile index is signed
-                        tileL = mVRAM[mTileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (scrolledY % 8)*2];
-                        tileH = mVRAM[mTileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (scrolledY % 8)*2 + 1];
-                    } else {
-                        tileL = mVRAM[mTileDataOffset + (mapEntry * TILE_SIZE) + (scrolledY % 8)*2];
-                        tileH = mVRAM[mTileDataOffset + (mapEntry * TILE_SIZE) + (scrolledY % 8)*2 + 1];
+                bgTile = loadTile(false, scrolledY, mSCX);
+
+                winX = 0;
+
+                for(pixIdx=0; pixIdx < 160; ++pixIdx) {
+                    if(bgTile.isDone())
+                        bgTile = loadTile(false, scrolledY, mSCX+pixIdx);
+                    if(pixIdx >= (mWX - 7) && (pixIdx - (mWX - 7)) % 8 == 0)
+                        winTile = loadTile(true, mCurWinY, winX);
+
+                    if((mLCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && pixIdx >= mWX - 7 && mLY >= mWY) {
+                        pix = winTile.shiftout();
+                        ++winX;
                     }
-
-                    /*
-                     * If this is the first tile of the line and SCX is not a multiple
-                     * of 8, then we need to offset into the tile.
-                     */
-                    for(pixIdx = pixInLine?0:mSCX%8; pixIdx < 8 && pixInLine < 160; ++pixIdx,++pixInLine) {
-                        pix = (tileL & 0x80)?0x1:0x0;
-                        pix |= (tileH & 0x80)?0x2:0x0;
-                        frameBuf[mLY][pixInLine] = TO_PALLETTE(pix, mBGP);
-                        tileL = tileL << 1;
-                        tileH = tileH << 1;
+                    else if((mLCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_ON) {
+                        pix = bgTile.shiftout();
                     }
+                    else
+                        pix = 1;
 
-                    // Do not move onto tile 21 if we have completed the line (SCX % 8 == 0)
-                    if(pixInLine == 160)
-                        break;
+                    frameBuf[mLY][pixIdx] = DMG_PALLETTE[TO_PALLETTE(pix, mBGP)]; //FIXME
                 }
+
+                if((mLCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLY >= mWY)
+                    ++mCurWinY;
+
                 mRemCycles = HBLANK_CYCLES-cycles;
                 setMode(IOREG_STAT_MODE_0_HBLANK);
                 break;
@@ -262,6 +260,7 @@ void Ppu::tick(uint8_t cycles) {
 #endif
                     // Switch back to OAM earch and start the next frame
                     mRemCycles = OAM_CYCLES;
+                    mCurWinY = 0;
                     setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
                     setLine(0);
                 }
@@ -295,4 +294,30 @@ void Ppu::setMode(uint8_t mode) {
      */
     if(mEnabled && mode != IOREG_STAT_MODE_3_DATA_XFER && (mSTAT & (1 << (IOREG_STAT_INTRS_SHIFT + mode))))
         mIC->requestInterrupt(InterruptController::itLCDCStatus);
+}
+
+void Ppu::getFrame(uint8_t frame[144][160]) {
+    memcpy(frame, frameBuf, 144*160);
+}
+
+Ppu::PpuMode Ppu::getMode() {
+    return static_cast<PpuMode>(mSTAT & IOREG_STAT_MODE_MASK);
+}
+
+Ppu::Tile Ppu::loadTile(bool isWindow, uint8_t y, uint8_t x) {
+    uint8_t mapEntry = mVRAM[(isWindow?mWinMapOffset:mBgMapOffset) + ((y/8) * 32) + (x/8)];
+    uint8_t *dataOffset;
+
+    // In "8800" mode, the tile index is signed
+    if((mLCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
+        dataOffset = &mVRAM[mTileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (y % 8)*2];
+    else
+        dataOffset = &mVRAM[mTileDataOffset + (mapEntry * TILE_SIZE) + (y % 8)*2];
+
+    Tile tile(dataOffset[0], dataOffset[1]);
+
+    if(!isWindow)
+        tile.shift(x%8);
+
+    return tile;
 }
