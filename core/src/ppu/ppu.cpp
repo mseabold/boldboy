@@ -1,6 +1,7 @@
 #include "ppu.h"
 #include "io_regs.h"
 #include "logger.h"
+#include "string.h"
 
 #define VRAM_BASE         0x8000
 #define OAM_BASE 0xFE00
