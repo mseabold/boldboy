@@ -64,3 +64,19 @@ void Boldboy::setSerialHandler(IoSerial *serial) {
 void Boldboy::setLogger(Logger *logger) {
     Logger::setLogger(logger);
 }
+
+void Boldboy::waitForFrame() {
+    while(true) {
+        Ppu::PpuMode curMode = mPpu->getMode();
+        tick();
+        Ppu::PpuMode newMode = mPpu->getMode();
+
+        if(curMode != Ppu::modeVBlank && newMode == Ppu::modeVBlank)
+            break;
+    }
+}
+
+void Boldboy::getFrame(uint8_t frame[144][160]) {
+    //DLOG("%s\n", "Get Frame");
+    mPpu->getFrame(frame);
+}

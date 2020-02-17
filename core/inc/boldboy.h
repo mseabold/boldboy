@@ -23,6 +23,8 @@ class Boldboy {
         void run();
         void setSerialHandler(IoSerial *serial);
         void setLogger(Logger *logger);
+        void waitForFrame();
+        void getFrame(uint8_t frame[144][160]);
 
     private:
         Cpu *mCpu;
