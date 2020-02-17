@@ -133,11 +133,19 @@ void Cpu::disassemble(char *buffer, uint32_t bufLen) {
 
     op = mMmu->readAddr(mrPC->read());
 
-    if(op == 0xcb) {
-        op = mMmu->readAddr(mrPC->read()+1);
-        opcode = &mExtOpTable[op];
-    } else
-        opcode = &mOpTable[op];
+    if(mCurState == 0) {
+        if(op == 0xcb) {
+            op = mMmu->readAddr(mrPC->read()+1);
+            opcode = &mExtOpTable[op];
+        } else
+            opcode = &mOpTable[op];
+    } else {
+        if(mIsCB) {
+            op = mMmu->readAddr(mrPC->read()+1);
+            opcode = &mExtOpTable[mCurOpcode];
+        } else
+            opcode = &mOpTable[mCurOpcode];
+    }
 
     snprintf(buffer, bufLen, "0x%04x: %s", mrPC->read(), opcode->mnemonic);
 }
