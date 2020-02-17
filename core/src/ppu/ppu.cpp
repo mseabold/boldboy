@@ -68,8 +68,8 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
                         mRemCycles = OAM_CYCLES;
                     }
                 }
-                mBgMapOffset = ((val & IOREG_LCDC_BG_TILE_MAP_SEL_9800) == IOREG_LCDC_BG_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
-                mTileDataOffset = ((val & IOREG_LCDC_TILE_DATA_SEL_8000) == IOREG_LCDC_TILE_DATA_SEL_8000)?0:OFFSET_9000;
+                mBgMapOffset = ((val & IOREG_LCDC_BG_TILE_MAP_SEL_MASK) == IOREG_LCDC_BG_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
+                mTileDataOffset = ((val & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8000)?0:OFFSET_9000;
                 mWinMapOffset = ((val & IOREG_LCDC_WIN_TILE_MAP_SEL_MASK) == IOREG_LCDC_WIN_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
                 mLCDC = val;
                 DLOG("LCDC write: 0x%02x\n", mLCDC);
