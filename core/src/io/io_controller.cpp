@@ -23,6 +23,9 @@ uint8_t IoController::readAddr(uint16_t addr) {
     if(handler)
         return handler->readAddr(addr);
 
+    // XXX Hack to handle joypad for now because we need to return 0f for no buttons pressed (buttons are active low)
+    if(addr == 0xff00)
+        return 0x0f;
     return 0;
 }
 
