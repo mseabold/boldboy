@@ -65,8 +65,10 @@ void UpperRegion::writeAddr(uint16_t addr, uint8_t val) {
 
     /* Let the IO controller (via the interrupt controller) handle
      * IER. */
-    if(addr == 0xFFFF)
+    if(addr == 0xFFFF) {
         mIO->writeAddr(addr, val);
+        return;
+    }
 
     /* Examine the top bits that determine segments. */
     switch(addr & 0xFF00) {
