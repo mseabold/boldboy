@@ -14,8 +14,9 @@ Boldboy::Boldboy(bool useBootrom) {
     mCpu = new Cpu(mMmu, mIC);
     mCart = NULL;
     // If we aren't emulating the bootrom, move the PC past it
+    mCpu->getReg16(Cpu::rPC)->write(useBootrom?0x0000:0x0100);
     if(!useBootrom)
-        mCpu->getReg16(Cpu::rPC)->write(0x0100);
+        mCpu->getReg16(Cpu::rSP)->write(0xfffe);
     Logger::setLogger(NULL);
 }
 
