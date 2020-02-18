@@ -1,6 +1,7 @@
 #include "mmu.h"
 #include "ramregion.h"
 #include "upperregion.h"
+#include "io_oam_dma.h"
 
 #define CART_ROM_REGION_START 0
 #define CART_RAM_REGION 5
@@ -8,11 +9,7 @@
 #define IRAM_REGION 6
 #define UPPER_REGION 7
 
-Mmu::Mmu(MemRegion *io, Ppu *ppu, Cartridge *cart) : Mmu(io, ppu) {
-    loadCart(cart);
-}
-
-Mmu::Mmu(MemRegion *io, Ppu *ppu) {
+Mmu::Mmu(MemRegion *io, Ppu *ppu, OAMDMA *dma) {
     /* Initialize all of the memory regions. */
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
 
@@ -42,6 +39,9 @@ Mmu::Mmu(MemRegion *io, Ppu *ppu) {
     mRegions[UPPER_REGION] = mUpper;
 
     mBootromEnabled = false;
+
+    mDMA = dma;
+    mDMA->setRAM(iRam);
 }
 
 Mmu::~Mmu() {
@@ -58,16 +58,19 @@ void Mmu::loadCart(Cartridge *cart) {
         mRegions[CART_ROM_REGION_START+2] = cart;
         mRegions[CART_ROM_REGION_START+3] = cart;
         mRegions[CART_RAM_REGION] = cart;
+        mDMA->setCart(cart);
     } else {
         mRegions[CART_ROM_REGION_START] = mEmpty;
         mRegions[CART_ROM_REGION_START+1] = mEmpty;
         mRegions[CART_ROM_REGION_START+2] = mEmpty;
         mRegions[CART_ROM_REGION_START+3] = mEmpty;
         mRegions[CART_RAM_REGION] = mEmpty;
+        mDMA->setCart(NULL);
     }
 }
 
 uint8_t Mmu::readAddr(uint16_t addr) {
+    //TODO block during DMA
     if(mBootromEnabled && addr < 0x100)
         return sBootROM[addr];
 
@@ -75,6 +78,7 @@ uint8_t Mmu::readAddr(uint16_t addr) {
 }
 
 void Mmu::writeAddr(uint16_t addr, uint8_t val) {
+    //TODO block during DMA
     if(addr == 0xff50) {
         mBootromEnabled = false;
         return;

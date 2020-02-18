@@ -8,6 +8,7 @@
 #include "upperregion.h"
 #include "emptyregion.h"
 #include "ppu.h"
+#include "io_oam_dma.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 
@@ -27,12 +28,12 @@ private:
     bool mBootromEnabled;
     UpperRegion *mUpper;
     EmptyRegion *mEmpty;
+    OAMDMA *mDMA;
 
     static const uint8_t sBootROM[256];
 
 public:
-    Mmu(MemRegion *io, Ppu *ppu, Cartridge *cart);
-    Mmu(MemRegion *io, Ppu *ppu);
+    Mmu(MemRegion *io, Ppu *ppu, OAMDMA *dma);
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);
     void reset(void);

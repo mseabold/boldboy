@@ -14,6 +14,7 @@
 #define IOREG_SCX  0xFF43
 #define IOREG_LY   0xFF44
 #define IOREG_LYC  0xFF45
+#define IOREG_DMA  0xFF46
 #define IOREG_BGP  0xFF47
 #define IOREG_OBP0 0xFF48
 #define IOREG_OBP1 0xFF49

@@ -6,10 +6,11 @@ Boldboy::Boldboy() : Boldboy(false) {
 Boldboy::Boldboy(bool useBootrom) {
     mIC = new InterruptController();
     mPpu = new Ppu(mIC);
-    mIO = new IoController(mIC, mPpu);
+    mDMA = new OAMDMA(mPpu, mPpu);
+    mIO = new IoController(mIC, mPpu, mDMA);
     mTimer = new IoTimer(mIC);
     mIO->setTimer(mTimer);
-    mMmu = new Mmu(mIO, mPpu);
+    mMmu = new Mmu(mIO, mPpu, mDMA);
     mMmu->enableBootrom(useBootrom);
     mCpu = new Cpu(mMmu, mIC);
     mCart = NULL;

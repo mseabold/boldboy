@@ -34,6 +34,7 @@ class Boldboy {
         IoController *mIO;
         InterruptController *mIC;
         Ppu *mPpu;
+        OAMDMA *mDMA;
 
 };
 

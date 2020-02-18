@@ -4,7 +4,7 @@
 
 #define TICKS_PER_DIV 256
 
-IoController::IoController(InterruptController *ic, Ppu *ppu) {
+IoController::IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma) {
     mSerial = NULL;
     mTimer = NULL;
     mIF = 0;
@@ -12,6 +12,7 @@ IoController::IoController(InterruptController *ic, Ppu *ppu) {
     mDIVticks = 0;
     mIC = ic;
     mPpu = ppu;
+    mDMA = dma;
 }
 
 IoController::~IoController() {
@@ -46,6 +47,8 @@ void IoController::tick(uint8_t cycles) {
 
     if(mTimer != NULL)
         mTimer->tick(cycles);
+
+    mDMA->tick(cycles);
 }
 
 void IoController::setTimer(IoTimer *timer) {
@@ -80,6 +83,8 @@ MemRegion *IoController::findHandler(uint16_t addr) {
         case IOREG_WY:
         case IOREG_WX:
             return mPpu;
+        case IOREG_DMA:
+            return mDMA;
     }
 
     return NULL;
