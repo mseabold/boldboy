@@ -4,6 +4,7 @@
 #include "memregion.h"
 #include "int_controller.h"
 #include "io_regs.h"
+#include "ppu/registers.h"
 
 #define MAX_NUM_OBJS 10
 
@@ -26,22 +27,7 @@ class Ppu : public MemRegion {
     private:
         uint8_t mVRAM[0x2000];
         uint8_t mOAM[0xA0];
-        uint8_t mLCDC;
-        uint8_t mSCY;
-        uint8_t mSCX;
-        uint8_t mLY;
-        uint8_t mLYC;
-        uint8_t mBGP;
-        uint8_t mOBP0;
-        uint8_t mOBP1;
-        uint8_t mWY;
-        uint8_t mWX;
-        uint8_t mSTAT;
-
-        uint16_t mBgMapOffset;
-        uint16_t mWinMapOffset;
-        uint16_t mTileMapOffset;
-        uint16_t mTileDataOffset;
+        PpuRegisters *mRegs;
 
         uint16_t mRemCycles;
 

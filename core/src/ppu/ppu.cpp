@@ -7,10 +7,6 @@
 #define OAM_BASE 0xFE00
 #define OAM_TOP 0xFEA0
 
-#define OFFSET_9000 0x1000
-#define OFFSET_9800 0x1800
-#define OFFSET_9C00 0x1C00
-
 #define TO_PALLETTE(_pix, _pal) ((_pal >> ((_pix & 0x3) * 2)) & 0x3)
 
 #define TILE_SIZE 16
@@ -20,7 +16,7 @@
 #define HBLANK_CYCLES 208
 #define LINE_CYCLES 456
 
-#define MODE (mSTAT & IOREG_STAT_MODE_MASK)
+#define MODE (mRegs->STAT & IOREG_STAT_MODE_MASK)
 
 static const uint8_t DMG_PALLETTE[] = { 255, 169, 84, 0};
 
@@ -28,23 +24,13 @@ Ppu::Ppu(InterruptController *ic) {
     mIC = ic;
     mRemCycles = OAM_CYCLES;
     mEnabled = false;
-
-    mLCDC = 0;
-    mSCY = 0;
-    mSCX = 0;
-    mLY = 0;
-    mLYC = 0;
-    mBGP = 0;
-    mOBP0 = 0;
-    mOBP1 = 0;
-    mWY = 0;
-    mWX = 0;
     mCurWinY = 0;
-    mSTAT = IOREG_STAT_MODE_2_OAM_SEARCH;
-    mTileDataOffset = OFFSET_9000;
+
+    mRegs = new PpuRegisters();
 }
 
 Ppu::~Ppu() {
+    delete mRegs;
 }
 
 void Ppu::writeAddr(uint16_t addr, uint8_t val) {
@@ -58,55 +44,26 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // then check for known IO Registers that are writable
     else if((addr & 0xFF00) == 0xFF00) {
         uint8_t changes = 0;
-        switch(addr) {
-            case IOREG_LCDC:
-                changes = val ^ mLCDC;
-                if(changes & IOREG_LCDC_ENABLE_MASK) {
-                    if((val & IOREG_LCDC_ENABLE_MASK) == IOREG_LCDC_ENABLE) {
-                        mEnabled = true;
-                    } else {
-                        mLY = 0;
-                        mCurWinY = 0;
-                        mEnabled = false;
-                        // XXX Should this be possible to trigger an interrupt?
-                        setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
-                        mRemCycles = OAM_CYCLES;
-                    }
+
+        // Handle LCDC here as well to clear states
+        if(addr == IOREG_LCDC) {
+            changes = val ^ mRegs->LCDC;
+            if(changes & IOREG_LCDC_ENABLE_MASK) {
+                if((val & IOREG_LCDC_ENABLE_MASK) == IOREG_LCDC_ENABLE) {
+                    mEnabled = true;
+                } else {
+                    mRegs->LY = 0;
+                    mCurWinY = 0;
+                    mEnabled = false;
+                    // XXX Should this be possible to trigger an interrupt?
+                    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
+                    mRemCycles = OAM_CYCLES;
                 }
-                mBgMapOffset = ((val & IOREG_LCDC_BG_TILE_MAP_SEL_MASK) == IOREG_LCDC_BG_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
-                mTileDataOffset = ((val & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8000)?0:OFFSET_9000;
-                mWinMapOffset = ((val & IOREG_LCDC_WIN_TILE_MAP_SEL_MASK) == IOREG_LCDC_WIN_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
-                mLCDC = val;
-                DLOG("LCDC write: 0x%02x\n", mLCDC);
-                break;
-            case IOREG_STAT:
-                mSTAT = (val & IOREG_STAT_INTRS_MASK) | (mSTAT & ~IOREG_STAT_INTRS_MASK);
-                break;
-            case IOREG_SCY:
-                mSCY = val;
-                break;
-            case IOREG_SCX:
-                mSCX = val;
-                break;
-            case IOREG_LYC:
-                mLYC = val;
-                break;
-            case IOREG_BGP:
-                mBGP = val;
-                break;
-            case IOREG_OBP0:
-                mOBP0 = val;
-                break;
-            case IOREG_OBP1:
-                mOBP1 = val;
-                break;
-            case IOREG_WY:
-                mWY = val;
-                break;
-            case IOREG_WX:
-                mWX = val;
-                break;
+            }
         }
+
+        // Pass on to the registers
+        mRegs->write(addr, val);
     }
     // Check if the write is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
@@ -127,30 +84,7 @@ uint8_t Ppu::readAddr(uint16_t addr) {
     // Check if the read is in the 0xFFXX region, which we'll
     // then check for known IO Registers
     else if((addr & 0xFF00) == 0xFF00) {
-        switch(addr) {
-            case IOREG_LCDC:
-                return mLCDC;
-            case IOREG_STAT:
-                return mSTAT;
-            case IOREG_SCY:
-                return mSCY;
-            case IOREG_SCX:
-                return mSCX;
-            case IOREG_LY:
-                return mLY;
-            case IOREG_LYC:
-                return mLYC;
-            case IOREG_BGP:
-                return mBGP;
-            case IOREG_OBP0:
-                return mOBP0;
-            case IOREG_OBP1:
-                return mOBP1;
-            case IOREG_WY:
-                return mWY;
-            case IOREG_WX:
-                return mWX;
-        }
+        return mRegs->read(addr);
     }
     // Check if the read is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
@@ -191,55 +125,55 @@ void Ppu::tick(uint8_t cycles) {
                 //DLOG("%s\n", "Switch to XFER");
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
-                scrolledY = mLY + mSCY;
+                scrolledY = mRegs->LY + mRegs->SCY;
 
-                bgTile = loadTile(false, scrolledY, mSCX);
+                bgTile = loadTile(false, scrolledY, mRegs->SCX);
 
                 winX = 0;
 
                 for(pixIdx=0; pixIdx < 160; ++pixIdx) {
                     if(bgTile.isDone())
-                        bgTile = loadTile(false, scrolledY, mSCX+pixIdx);
-                    if(pixIdx >= (mWX - 7) && (pixIdx - (mWX - 7)) % 8 == 0)
+                        bgTile = loadTile(false, scrolledY, mRegs->SCX+pixIdx);
+                    if(pixIdx >= (mRegs->WX - 7) && (pixIdx - (mRegs->WX - 7)) % 8 == 0)
                         winTile = loadTile(true, mCurWinY, winX);
 
-                    if((mLCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && pixIdx >= mWX - 7 && mLY >= mWY) {
+                    if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && pixIdx >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY) {
                         pix = winTile.shiftout();
                         ++winX;
                     }
-                    else if((mLCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_ON) {
+                    else if((mRegs->LCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_ON) {
                         pix = bgTile.shiftout();
                     }
                     else
                         pix = 1;
 
-                    frameBuf[mLY][pixIdx] = DMG_PALLETTE[TO_PALLETTE(pix, mBGP)]; //FIXME
+                    frameBuf[mRegs->LY][pixIdx] = DMG_PALLETTE[TO_PALLETTE(pix, mRegs->BGP)]; //FIXME
                 }
 
-                if((mLCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLY >= mWY)
+                if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mRegs->LY >= mRegs->WY)
                     ++mCurWinY;
 
                 mRemCycles = HBLANK_CYCLES-cycles;
                 setMode(IOREG_STAT_MODE_0_HBLANK);
                 break;
             case IOREG_STAT_MODE_0_HBLANK:
-                if(mLY < 143) {
+                if(mRegs->LY < 143) {
                     // If we are still drawing screen lines, move back to OAM search
                     mRemCycles = OAM_CYCLES-cycles;
                     setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
-                    setLine(mLY+1);
-                } else if(mLY == 143) {
+                    setLine(mRegs->LY+1);
+                } else if(mRegs->LY == 143) {
                     // Time for VBlank
                     mRemCycles = LINE_CYCLES - cycles;
                     setMode(IOREG_STAT_MODE_1_VBLANK);
-                    setLine(mLY+1);
+                    setLine(mRegs->LY+1);
                 }
                 break;
             case IOREG_STAT_MODE_1_VBLANK:
-                if(mLY < 153) {
+                if(mRegs->LY < 153) {
                     // Eat an entire line's worth of cycles for each VBlank line
                     mRemCycles = LINE_CYCLES - cycles;
-                    setLine(mLY+1);
+                    setLine(mRegs->LY+1);
                 } else {
 #if 0
                     DLOG("%c",'+');
@@ -270,20 +204,20 @@ void Ppu::tick(uint8_t cycles) {
 }
 
 void Ppu::setLine(uint8_t line) {
-    mLY = line;
+    mRegs->LY = line;
 
-    if(mLY == mLYC) {
-        mSTAT |= IOREG_STAT_COINCIDENCE_FLAG_EQ;
+    if(mRegs->LY == mRegs->LYC) {
+        mRegs->STAT |= IOREG_STAT_COINCIDENCE_FLAG_EQ;
 
-        if(mSTAT & IOREG_STAT_COINCIDENCE_INTR)
+        if(mRegs->STAT & IOREG_STAT_COINCIDENCE_INTR)
             mIC->requestInterrupt(InterruptController::itLCDCStatus);
     } else {
-        mSTAT &= ~IOREG_STAT_COINCIDENCE_FLAG_EQ;
+        mRegs->STAT &= ~IOREG_STAT_COINCIDENCE_FLAG_EQ;
     }
 }
 
 void Ppu::setMode(uint8_t mode) {
-    mSTAT = (mSTAT & ~IOREG_STAT_MODE_MASK) | mode;
+    mRegs->STAT = (mRegs->STAT & ~IOREG_STAT_MODE_MASK) | mode;
 
     if(mode == IOREG_STAT_MODE_1_VBLANK)
         mIC->requestInterrupt(InterruptController::itVBlank);
@@ -293,7 +227,7 @@ void Ppu::setMode(uint8_t mode) {
      * of mode values, so we can simply shift by mode to check the corresponding
      * bit.
      */
-    if(mEnabled && mode != IOREG_STAT_MODE_3_DATA_XFER && (mSTAT & (1 << (IOREG_STAT_INTRS_SHIFT + mode))))
+    if(mEnabled && mode != IOREG_STAT_MODE_3_DATA_XFER && (mRegs->STAT & (1 << (IOREG_STAT_INTRS_SHIFT + mode))))
         mIC->requestInterrupt(InterruptController::itLCDCStatus);
 }
 
@@ -302,18 +236,18 @@ void Ppu::getFrame(uint8_t frame[144][160]) {
 }
 
 Ppu::PpuMode Ppu::getMode() {
-    return static_cast<PpuMode>(mSTAT & IOREG_STAT_MODE_MASK);
+    return static_cast<PpuMode>(mRegs->STAT & IOREG_STAT_MODE_MASK);
 }
 
 Ppu::Tile Ppu::loadTile(bool isWindow, uint8_t y, uint8_t x) {
-    uint8_t mapEntry = mVRAM[(isWindow?mWinMapOffset:mBgMapOffset) + ((y/8) * 32) + (x/8)];
+    uint8_t mapEntry = mVRAM[(isWindow?mRegs->winMapOffset:mRegs->bgMapOffset) + ((y/8) * 32) + (x/8)];
     uint8_t *dataOffset;
 
     // In "8800" mode, the tile index is signed
-    if((mLCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
-        dataOffset = &mVRAM[mTileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (y % 8)*2];
+    if((mRegs->LCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
+        dataOffset = &mVRAM[mRegs->tileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (y % 8)*2];
     else
-        dataOffset = &mVRAM[mTileDataOffset + (mapEntry * TILE_SIZE) + (y % 8)*2];
+        dataOffset = &mVRAM[mRegs->tileDataOffset + (mapEntry * TILE_SIZE) + (y % 8)*2];
 
     Tile tile(dataOffset[0], dataOffset[1]);
 
