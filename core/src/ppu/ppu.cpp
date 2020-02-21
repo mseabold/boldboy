@@ -51,7 +51,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // Check if the write is in VRAM
     if((addr & 0xE000) == VRAM_BASE) {
         //VRAM Access is not allowed during pixel transfer
-        if(MODE != IOREG_STAT_MODE_3_DATA_XFER)
+        if(!mEnabled || MODE != IOREG_STAT_MODE_3_DATA_XFER)
             mVRAM[addr-VRAM_BASE] = val;
     }
     // Check if the write is in the 0xFFXX region, which we'll
@@ -111,7 +111,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // Check if the write is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
         // OAM can only be accessed during blanking
-        if(MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
+        if(!mEnabled || MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
             mOAM[addr-OAM_BASE] = val;
     }
 }
