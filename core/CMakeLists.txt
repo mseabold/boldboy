@@ -29,7 +29,11 @@ set (SRCS
     src/io/io_oam_dma.cpp
     src/log/logger.cpp
     src/log/console.cpp
-    src/ppu/ppu.cpp)
+    src/ppu/ppu.cpp
+    src/ppu/fetcher.cpp
+    src/ppu/tileline.cpp
+    src/ppu/oamentry.cpp
+    src/ppu/pixelfifo.cpp)
 
 add_library(gbcore ${SRCS} ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp)
 

@@ -22,14 +22,19 @@ static const uint8_t DMG_PALLETTE[] = { 255, 169, 84, 0};
 
 Ppu::Ppu(InterruptController *ic) {
     mIC = ic;
-    mRemCycles = OAM_CYCLES;
     mEnabled = false;
     mCurWinY = 0;
+    mLineCycles = 0;
 
     mRegs = new PpuRegisters();
+    mFetcher = new Fetcher(mVRAM, mOAM, mRegs);
+    mFIFO = new PixelFIFO(mRegs);
+    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
 }
 
 Ppu::~Ppu() {
+    delete mFIFO;
+    delete mFetcher;
     delete mRegs;
 }
 
@@ -57,7 +62,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
                     mEnabled = false;
                     // XXX Should this be possible to trigger an interrupt?
                     setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
-                    mRemCycles = OAM_CYCLES;
+                    mLineCycles = 0;
                 }
             }
         }
@@ -103,102 +108,127 @@ uint8_t Ppu::readAddr(uint16_t addr) {
  * this in the future.
  */
 void Ppu::tick(uint8_t cycles) {
-    uint8_t pixIdx;
     uint8_t pix;
-    uint8_t scrolledY;
-    uint8_t winX;
-
-    Tile bgTile(0,0);
-    Tile winTile(0,0);
+    uint8_t consumedCycles;
+    uint8_t tickIdx;
 
     if(!mEnabled)
         return;
 
-    if(mRemCycles > cycles) {
-        mRemCycles -= cycles;
-    } else {
-        cycles -= mRemCycles;
+    while(cycles) {
+        consumedCycles = cycles;
+
         switch(MODE) {
             case IOREG_STAT_MODE_2_OAM_SEARCH:
-                mRemCycles = DATA_XFER_CYCLES-cycles;
-                setMode(IOREG_STAT_MODE_3_DATA_XFER);
+                if(mLineCycles + cycles >= OAM_CYCLES) {
+                    setMode(IOREG_STAT_MODE_3_DATA_XFER);
+                    mLinePixCnt = 0;
+                    mTossedPixCnt = 0;
+                    consumedCycles = OAM_CYCLES - mLineCycles;
+                }
                 //DLOG("%s\n", "Switch to XFER");
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
-                scrolledY = mRegs->LY + mRegs->SCY;
+                consumedCycles = 0;
 
-                bgTile = loadTile(false, scrolledY, mRegs->SCX);
+                for(tickIdx=0; tickIdx < cycles; ++tickIdx) {
+                    ++consumedCycles;
 
-                winX = 0;
-
-                for(pixIdx=0; pixIdx < 160; ++pixIdx) {
-                    if(bgTile.isDone())
-                        bgTile = loadTile(false, scrolledY, mRegs->SCX+pixIdx);
-                    if(pixIdx >= (mRegs->WX - 7) && (pixIdx - (mRegs->WX - 7)) % 8 == 0)
-                        winTile = loadTile(true, mCurWinY, winX);
-
-                    if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && pixIdx >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY) {
-                        pix = winTile.shiftout();
-                        ++winX;
+                    //TODO Handle BG being disabled
+                    if(mFetcher->tick()) {
+                        if(mFIFO->count() <= 8) {
+                            mFIFO->loadLine(mFetcher->getLine());
+                        }
                     }
-                    else if((mRegs->LCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_ON) {
-                        pix = bgTile.shiftout();
-                    }
-                    else
-                        pix = 1;
 
-                    frameBuf[mRegs->LY][pixIdx] = DMG_PALLETTE[TO_PALLETTE(pix, mRegs->BGP)]; //FIXME
+                    if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLinePixCnt >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
+                        mFetcher->setMode(Fetcher::fmWindow, mCurWinY);
+                        mFIFO->clear();
+                        return;
+                    }
+
+                    pix = mFIFO->tick();
+                    //VLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLinePixCnt, pix);
+
+                    if(pix != PIXELFIFO_TICK_LOCKED) {
+                        if(mTossedPixCnt >= mRegs->SCX % 8) {
+                            frameBuf[mRegs->LY][mLinePixCnt] = DMG_PALLETTE[pix];
+                            ++mLinePixCnt;
+                        } else {
+                            ++mTossedPixCnt;
+                        }
+                    }
+
+
+                    if(mLinePixCnt == 160) {
+                        setMode(IOREG_STAT_MODE_0_HBLANK);
+                        mFetcher->reset();
+                        mFIFO->clear();
+
+                        if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mRegs->LY >= mRegs->WY)
+                            ++mCurWinY;
+
+                        // Stop transferring data
+                        break;
+                    }
                 }
-
-                if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mRegs->LY >= mRegs->WY)
-                    ++mCurWinY;
-
-                mRemCycles = HBLANK_CYCLES-cycles;
-                setMode(IOREG_STAT_MODE_0_HBLANK);
                 break;
             case IOREG_STAT_MODE_0_HBLANK:
-                if(mRegs->LY < 143) {
-                    // If we are still drawing screen lines, move back to OAM search
-                    mRemCycles = OAM_CYCLES-cycles;
-                    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
-                    setLine(mRegs->LY+1);
-                } else if(mRegs->LY == 143) {
-                    // Time for VBlank
-                    mRemCycles = LINE_CYCLES - cycles;
-                    setMode(IOREG_STAT_MODE_1_VBLANK);
-                    setLine(mRegs->LY+1);
+                if(mLineCycles + cycles >= LINE_CYCLES) {
+                    consumedCycles = LINE_CYCLES-mLineCycles;
+                    if(mRegs->LY < 143) {
+                        // If we are still drawing screen lines, move back to OAM search
+                        setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
+                        setLine(mRegs->LY+1);
+                    } else if(mRegs->LY == 143) {
+                        // Time for VBlank
+                        setMode(IOREG_STAT_MODE_1_VBLANK);
+                        setLine(mRegs->LY+1);
+                    }
                 }
                 break;
             case IOREG_STAT_MODE_1_VBLANK:
-                if(mRegs->LY < 153) {
-                    // Eat an entire line's worth of cycles for each VBlank line
-                    mRemCycles = LINE_CYCLES - cycles;
-                    setLine(mRegs->LY+1);
-                } else {
+                    if(mLineCycles + cycles >= LINE_CYCLES) {
+                        consumedCycles = LINE_CYCLES-cycles;
+
+                        if(mRegs->LY < 153) {
+                            // Eat an entire line's worth of cycles for each VBlank line
+                            setLine(mRegs->LY+1);
+                        } else {
 #if 0
-                    DLOG("%c",'+');
-                    for(vtile=0;vtile<160;vtile++)
-                        DLOG("%c", '-');
-                    DLOG("%s","+\n");
-                    for(vtile = 0;vtile < 144;++vtile) {
-                        DLOG("%c",'|');
-                        for(htile =0;htile < 160;++htile) {
-                            DLOG("%c", frameBuf[vtile][htile]?'*':' ');
-                        }
-                        DLOG("%s", "|\n");
-                    }
-                    DLOG("%c",'+');
-                    for(vtile=0;vtile<160;vtile++)
-                        DLOG("%c", '-');
-                    DLOG("%c",'+');
-                    DLOG("%s", "\n");
+                            DLOG("%c",'+');
+                            for(vtile=0;vtile<160;vtile++)
+                                DLOG("%c", '-');
+                            DLOG("%s","+\n");
+                            for(vtile = 0;vtile < 144;++vtile) {
+                                DLOG("%c",'|');
+                                for(htile =0;htile < 160;++htile) {
+                                    DLOG("%c", frameBuf[vtile][htile]?'*':' ');
+                                }
+                                DLOG("%s", "|\n");
+                            }
+                            DLOG("%c",'+');
+                            for(vtile=0;vtile<160;vtile++)
+                                DLOG("%c", '-');
+                            DLOG("%c",'+');
+                            DLOG("%s", "\n");
 #endif
-                    // Switch back to OAM earch and start the next frame
-                    mRemCycles = OAM_CYCLES;
-                    mCurWinY = 0;
-                    setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
-                    setLine(0);
+                            // Switch back to OAM earch and start the next frame
+                            mCurWinY = 0;
+                            setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
+                            setLine(0);
+                            VLOG("%s\n", "====== Start Frame");
+                        }
                 }
+        }
+
+        mLineCycles += consumedCycles;
+        cycles -= consumedCycles;
+
+        // If we completed the line (End of HBlank or end of VBlank Line,
+        // reset the line cycle count
+        if(mLineCycles >= LINE_CYCLES) {
+            mLineCycles = 0;
         }
     }
 }
@@ -237,22 +267,4 @@ void Ppu::getFrame(uint8_t frame[144][160]) {
 
 Ppu::PpuMode Ppu::getMode() {
     return static_cast<PpuMode>(mRegs->STAT & IOREG_STAT_MODE_MASK);
-}
-
-Ppu::Tile Ppu::loadTile(bool isWindow, uint8_t y, uint8_t x) {
-    uint8_t mapEntry = mVRAM[(isWindow?mRegs->winMapOffset:mRegs->bgMapOffset) + ((y/8) * 32) + (x/8)];
-    uint8_t *dataOffset;
-
-    // In "8800" mode, the tile index is signed
-    if((mRegs->LCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
-        dataOffset = &mVRAM[mRegs->tileDataOffset + ((int8_t)mapEntry * TILE_SIZE) + (y % 8)*2];
-    else
-        dataOffset = &mVRAM[mRegs->tileDataOffset + (mapEntry * TILE_SIZE) + (y % 8)*2];
-
-    Tile tile(dataOffset[0], dataOffset[1]);
-
-    if(!isWindow)
-        tile.shift(x%8);
-
-    return tile;
 }
