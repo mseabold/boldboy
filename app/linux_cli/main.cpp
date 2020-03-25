@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #include "serial_console.h"
 #include "io_regs.h"
-#include "io_controller.h"
+#include "io/io_controller.h"
 #include "int_controller.h"
-#include "io_timer.h"
+#include "io/io_timer.h"
 #include "cart_rom.h"
 #include "boldboy.h"
 #include "console_logger.h"

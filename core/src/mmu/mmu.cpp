@@ -1,7 +1,7 @@
 #include "mmu.h"
 #include "ramregion.h"
 #include "upperregion.h"
-#include "io_oam_dma.h"
+#include "io/io_oam_dma.h"
 
 #define CART_ROM_REGION_START 0
 #define CART_RAM_REGION 5

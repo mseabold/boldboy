@@ -1,7 +1,7 @@
 #ifndef __SERIAL_CONSOLE_H__
 #define __SERIAL_CONSOLE_H__
 
-#include "io_serial.h"
+#include "io/io_serial.h"
 
 class SerialConsole : public IoSerial {
     public:

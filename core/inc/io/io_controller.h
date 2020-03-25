@@ -3,11 +3,11 @@
 
 #include <stddef.h>
 #include "memregion.h"
-#include "io_serial.h"
+#include "io/io_serial.h"
 #include "int_controller.h"
-#include "io_timer.h"
+#include "io/io_timer.h"
 #include "ppu.h"
-#include "io_oam_dma.h"
+#include "io/io_oam_dma.h"
 
 class IoController : public MemRegion
 {

@@ -8,7 +8,7 @@
 #include "upperregion.h"
 #include "emptyregion.h"
 #include "ppu.h"
-#include "io_oam_dma.h"
+#include "io/io_oam_dma.h"
 
 #define MMU_NUM_MEM_REGIONS 8
 

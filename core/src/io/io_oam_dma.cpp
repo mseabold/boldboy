@@ -1,4 +1,4 @@
-#include "io_oam_dma.h"
+#include "io/io_oam_dma.h"
 #include "io_regs.h"
 #include <stddef.h>
 #include "logger.h"
