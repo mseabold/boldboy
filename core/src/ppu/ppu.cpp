@@ -315,6 +315,7 @@ void Ppu::setMode(uint8_t mode) {
      * The order of STAT bits for enabling interrupts mirrors the order
      * of mode values, so we can simply shift by mode to check the corresponding
      * bit.
+     * TODO: There is more precise timing here
      */
     if(mEnabled && mode != IOREG_STAT_MODE_3_DATA_XFER && (mRegs->STAT & (1 << (IOREG_STAT_INTRS_SHIFT + mode))))
         mIC->requestInterrupt(InterruptController::itLCDCStatus);

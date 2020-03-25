@@ -31,7 +31,7 @@ void Fetcher::tick() {
         case fsReadNum1:
             // Mid-line SCY changes should be respected, so we will always check the register
             // here when selecting a tile.
-            y = ((mMode == fmBackground)?(mRegs->LY + mRegs->SCY):mWinY)/8;
+            y = (mMode == fmBackground)?(mRegs->LY + mRegs->SCY):mWinY;
 
             //XXX I'm not sure if mid-line SCX changes affect the fetch address.
             //    I've seen some documentation which suggests that the lower 5 bits
@@ -42,7 +42,8 @@ void Fetcher::tick() {
             //    later.
             x = (mTileCnt + ((mMode == fmBackground)?mRegs->SCX/8:0))%32;
 
-            mTileNum = mVRAM[((mMode == fmBackground)?mRegs->bgMapOffset:mRegs->winMapOffset) + y * 32 + x];
+
+            mTileNum = mVRAM[((mMode == fmBackground)?mRegs->bgMapOffset:mRegs->winMapOffset) + y / 8 * 32 + x];
             NEXT_STATE(mState);
             break;
 
