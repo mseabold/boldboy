@@ -4,9 +4,9 @@
 EmulatorWorker::EmulatorWorker(const char *romfile) {
     mCount = 0;
     mEmu = new Boldboy(false);
-    Logger *l = new ConsoleLogger();
-    l->setLevel(LOG_NONE);
-    mEmu->setLogger(l);
+    mLogger = new ConsoleLogger();
+    mLogger->setLevel(LOG_NONE);
+    mEmu->setLogger(mLogger);
     mEmu->loadCart(romfile);
 }
 

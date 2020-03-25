@@ -10,6 +10,8 @@ class EmulatorWorker : public QObject {
 
     public:
         EmulatorWorker(const char *romfile);
+        Boldboy *mEmu;
+        Logger *mLogger;
 
     public slots:
         void drawFrame(void);
@@ -18,7 +20,6 @@ class EmulatorWorker : public QObject {
         void frameDone(QPixmap frame);
 
     private:
-        Boldboy *mEmu;
         int mCount;
 };
 

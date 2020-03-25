@@ -38,6 +38,24 @@ void BoldboyQT::loadRom(const char *romfile) {
     mTimer->setTimerType(Qt::TimerType::PreciseTimer);
     connect(mTimer, &QTimer::timeout, mWorker, &EmulatorWorker::drawFrame);
     connect(mWorker, &EmulatorWorker::frameDone, this, &BoldboyQT::frameDone);
+    connect(this, &BoldboyQT::drawFrame, mWorker, &EmulatorWorker::drawFrame);
     mWorkerThread.start();
     mTimer->start(17);
+    mRunning = true;
+}
+
+void BoldboyQT::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Z) {
+        if(mRunning) {
+            mTimer->stop();
+            mRunning = false;
+        } else {
+            mTimer->start(17);
+            mRunning = true;
+        }
+    } else if(event->key() == Qt::Key_F && !mRunning) {
+        emit drawFrame();
+    } else if(event->key() == Qt::Key_L && !mRunning) {
+        mWorker->mLogger->setLevel(LOG_VERBOSE);
+    }
 }

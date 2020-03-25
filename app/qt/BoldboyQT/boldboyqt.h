@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QThread>
 #include <QTimer>
+#include <QKeyEvent>
 #include "emulatorworker.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,12 +23,19 @@ public:
 public slots:
     void frameDone(QPixmap frame);
 
+signals:
+    void drawFrame(void);
+
 private:
     Ui::Boldboy *ui;
     uint32_t mCnt;
     QThread mWorkerThread;
     EmulatorWorker *mWorker;
     QTimer *mTimer;
+    bool mRunning;
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
 
 };
 #endif // BOLDBOY_H
