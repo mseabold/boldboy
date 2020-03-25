@@ -167,7 +167,8 @@ void Ppu::tick(uint8_t cycles) {
                     // actually starting a Sprite.
 #if 1
                     newSpritePending = false;
-                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt) {
+                    //TODO Handle sprites that are partially scrolled off screen to the left
+                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt+8) {
                         if(!mFetcher->spritePending()) {
                             mFIFO->lock();
                             mFetcher->startSprite(&mFoundObjs[mCurObj]);
