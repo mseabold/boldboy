@@ -1,6 +1,19 @@
 #include "ppu/oamentry.h"
 
-OAMEntry::OAMEntry(uint8_t OAMData[4]) {
+OAMEntry::OAMEntry() {
+    oamIdx = 0;
+    y = 0;
+    x = 0;
+    tile = 0;
+    flags = 0;
+    xFlip = false;
+    yFlip = false;
+    belowBG = false;
+    OBP1 = false;
+}
+
+OAMEntry::OAMEntry(uint8_t OAMData[4], uint8_t oamIdx) {
+    this->oamIdx = oamIdx;
     y = OAMData[0];
     x = OAMData[1];
     tile = OAMData[2];
@@ -13,6 +26,7 @@ OAMEntry::OAMEntry(uint8_t OAMData[4]) {
 }
 
 OAMEntry::OAMEntry(const OAMEntry &other) {
+    oamIdx = other.oamIdx;
     y = other.y;
     x = other.x;
     tile = other.tile;

@@ -27,8 +27,8 @@ Ppu::Ppu(InterruptController *ic) {
     mLineCycles = 0;
 
     mRegs = new PpuRegisters();
-    mFetcher = new Fetcher(mVRAM, mOAM, mRegs);
     mFIFO = new PixelFIFO(mRegs);
+    mFetcher = new Fetcher(mFIFO, mVRAM, mOAM, mRegs);
     setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
 }
 
@@ -110,7 +110,11 @@ uint8_t Ppu::readAddr(uint16_t addr) {
 void Ppu::tick(uint8_t cycles) {
     uint8_t pix;
     uint8_t consumedCycles;
-    uint8_t tickIdx;
+    uint8_t idx,idx2;
+    uint8_t *oamPtr;
+    uint8_t oamY;
+    OAMEntry temp;
+    bool newSpritePending;
 
     if(!mEnabled)
         return;
@@ -121,6 +125,29 @@ void Ppu::tick(uint8_t cycles) {
         switch(MODE) {
             case IOREG_STAT_MODE_2_OAM_SEARCH:
                 if(mLineCycles + cycles >= OAM_CYCLES) {
+                    mNumObjs = 0;
+                    mCurObj = 0;
+
+                    for(oamPtr = mOAM; oamPtr < mOAM + 0xA0 && mNumObjs < MAX_NUM_OBJS; oamPtr += 4) {
+                        oamY = oamPtr[0];
+
+                        if(oamY > 0 && mRegs->LY < oamY && (oamY - mRegs->LY - 1) < 16 && (oamY - mRegs->LY) >= 9) {
+                            mFoundObjs[mNumObjs++] = OAMEntry(oamPtr, (oamPtr-mOAM)/4);
+                        }
+                    }
+
+                    // Do a quick and dirty sort of the found entries for easier access later.
+                    // Considering the max of 10 entries, this should be fairly low cost.
+                    for(idx = 0; idx < mNumObjs-1; ++idx) {
+                        for(idx2 = idx+1; idx2 < mNumObjs; ++idx2) {
+                            if(mFoundObjs[idx2].x < mFoundObjs[idx].x || (mFoundObjs[idx2].x == mFoundObjs[idx].x && mFoundObjs[idx2].oamIdx < mFoundObjs[idx].oamIdx)) {
+                                temp = mFoundObjs[idx2];
+                                mFoundObjs[idx2] = mFoundObjs[idx];
+                                mFoundObjs[idx] = temp;
+                            }
+                        }
+                    }
+
                     setMode(IOREG_STAT_MODE_3_DATA_XFER);
                     mLinePixCnt = 0;
                     mTossedPixCnt = 0;
@@ -131,39 +158,70 @@ void Ppu::tick(uint8_t cycles) {
             case IOREG_STAT_MODE_3_DATA_XFER:
                 consumedCycles = 0;
 
-                for(tickIdx=0; tickIdx < cycles; ++tickIdx) {
+                for(idx=0; idx < cycles; ++idx) {
                     ++consumedCycles;
 
+                    // We can safely start a sprite even before we have loaded enough pixels into the FIFO,
+                    // because the Fetcher will check the count before starting fetching a Sprite.
+                    // This is being done this way in order to atomically handle ticking the Fetcher and
+                    // actually starting a Sprite.
+#if 1
+                    newSpritePending = false;
+                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt) {
+                        if(!mFetcher->spritePending()) {
+                            mFIFO->lock();
+                            mFetcher->startSprite(&mFoundObjs[mCurObj]);
+                            ++mCurObj;
+                        } else
+                            newSpritePending = true;
+                    }
+#endif
+
                     //TODO Handle BG being disabled
-                    if(mFetcher->tick()) {
-                        if(mFIFO->count() <= 8) {
-                            mFIFO->loadLine(mFetcher->getLine());
-                        }
+                    mFetcher->tick();
+
+                    // If another sprite at the same needs to be handled, we do not want to process the FIFO yet
+                    if(newSpritePending)
+                        continue;
+
+                    // Don't do anything until we have enough pixels in FIFO
+                    if(mFIFO->count() <= 8)
+                        continue;
+
+                    // Toss any pixels before we do anything else
+                    if(mTossedPixCnt < mRegs->SCX % 8) {
+                        pix = mFIFO->tick();
+
+                        if(pix != PIXELFIFO_TICK_LOCKED)
+                            ++mTossedPixCnt;
+
+                        // Always short circuit the rest of this tick, even if we didn't actually drop a pixel.
+                        // We can't start the window until we load BG tiles and drop the correct number
+                        // of pixels, even if there's a window at X position 0.
+                        continue;
                     }
 
                     if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLinePixCnt >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
                         mFetcher->setMode(Fetcher::fmWindow, mCurWinY);
-                        mFIFO->clear();
-                        return;
+                        mFIFO->clear(false);
+                        // TODO Check the exact timing here between switching over.
+                        continue;
                     }
 
+
                     pix = mFIFO->tick();
-                    //VLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLinePixCnt, pix);
 
                     if(pix != PIXELFIFO_TICK_LOCKED) {
-                        if(mTossedPixCnt >= mRegs->SCX % 8) {
-                            frameBuf[mRegs->LY][mLinePixCnt] = DMG_PALLETTE[pix];
-                            ++mLinePixCnt;
-                        } else {
-                            ++mTossedPixCnt;
-                        }
+                        //VLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLinePixCnt, pix);
+                        frameBuf[mRegs->LY][mLinePixCnt] = DMG_PALLETTE[pix];
+                        ++mLinePixCnt;
                     }
 
 
                     if(mLinePixCnt == 160) {
                         setMode(IOREG_STAT_MODE_0_HBLANK);
                         mFetcher->reset();
-                        mFIFO->clear();
+                        mFIFO->clear(true);
 
                         if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mRegs->LY >= mRegs->WY)
                             ++mCurWinY;

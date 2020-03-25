@@ -1,31 +1,34 @@
 #include "ppu/fetcher.h"
+#include "io_regs.h"
 #include "ppu/tileline.h"
 #include "logger.h"
 
-Fetcher::Fetcher(uint8_t *VRAM, uint8_t *OAMRAM, PpuRegisters *registers) {
+#define NEXT_STATE(_state) _state = (_state < fsWriteLine1)?(FetcherState)(((uint8_t)_state)+1):_state
+
+Fetcher::Fetcher(PixelFIFO *fifo, uint8_t *VRAM, uint8_t *OAMRAM, PpuRegisters *registers) {
+    mFIFO = fifo;
     mRegs = registers;
     mVRAM = VRAM;
     mOAMRAM = OAMRAM;
     reset();
 }
 
-bool Fetcher::tick() {
-    bool tileDone = false;
-
-    // Filter out every-other tick since the fetcher runs at half speed
-    if(mTick0) {
-        mTick0 = false;
-        return (mState == fsTileReady || mState == fsSpriteReady);
-    }
-
-    mTick0 = true;
-
+void Fetcher::tick() {
     uint8_t x;
     uint8_t y;
+    uint8_t count;
+
+    FLOG("Fetcher: Tick Enter (%u, %u)\n", (unsigned int)mState, (unsigned int)mSpriteState);
 
     switch(mState)
     {
-        case fsReadNum:
+        case fsReadNum0:
+        case fsReadHigh0:
+        case fsReadLow0:
+            // These states take 2 cycles, so each of these states simply eat the first cycle
+            NEXT_STATE(mState);
+            break;
+        case fsReadNum1:
             // Mid-line SCY changes should be respected, so we will always check the register
             // here when selecting a tile.
             y = ((mMode == fmBackground)?(mRegs->LY + mRegs->SCY):mWinY)/8;
@@ -39,63 +42,110 @@ bool Fetcher::tick() {
             //    later.
             x = (mTileCnt + ((mMode == fmBackground)?mRegs->SCX/8:0))%32;
 
-            //VLOG("Fetchers reads tile %u (0x%04x) (SCX=%u)\n", mTileCnt, ((mMode == fmBackground)?mRegs->bgMapOffset:mRegs->winMapOffset) + y * 32 + x + 0x8000, mRegs->SCX);
             mTileNum = mVRAM[((mMode == fmBackground)?mRegs->bgMapOffset:mRegs->winMapOffset) + y * 32 + x];
-            mState = fsReadD0;
+            NEXT_STATE(mState);
             break;
 
-        case fsReadD0:
+        case fsReadHigh1:
             // XXX Again, I am uncertain whether changing SCY in-between a map read and a data
             //     read is respected. I don't see why not, though.
             y = (mMode == fmBackground)?(mRegs->LY + mRegs->SCY)%8 : mWinY % 8;
+
 
             if((mRegs->LCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
                 mTileData[0] = mVRAM[mRegs->tileDataOffset + ((int8_t)mTileNum * 16) + (y * 2)];
             else
                 mTileData[0] = mVRAM[mRegs->tileDataOffset + (mTileNum * 16) + (y * 2)];
-            mState = fsReadD1;
+
+            NEXT_STATE(mState);
             break;
 
-        case fsReadD1:
+        case fsReadLow1:
             y = (mMode == fmBackground)?(mRegs->LY + mRegs->SCY)%8 : mWinY % 8;
             if((mRegs->LCDC & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8800)
                 mTileData[1] = mVRAM[mRegs->tileDataOffset + ((int8_t)mTileNum * 16) + (y * 2)+1];
             else
                 mTileData[1] = mVRAM[mRegs->tileDataOffset + (mTileNum * 16) + (y * 2)+1];
-            mState = fsTileReady;
+
+            mLine.load(mTileData, (mMode == fmBackground)?Pixel::ptBackground:Pixel::ptWindow, 0);
+
+            //XXX Does the line load here, or is there another tick?
+            NEXT_STATE(mState);
+            break;
+        case fsWriteLine0:
+            // Docs/research indicates the fetcher X increments exactly in this step
             ++mTileCnt;
 
-            mLine.load(mTileData, mMode == fmWindow?Pixel::ptWindow:Pixel::ptBackground);
-
-            mState = fsTileReady;
-
-            tileDone = true;
+            // Fall through!
+        case fsWriteLine1:
+            tryWriteLine();
             break;
-
-        case fsTileReady:
-            tileDone = true;
+        case fsIdle:
+            // Do nothing, the sprite fetch will pull us out of this state
             break;
-
         default:
             break;
     }
 
-    return tileDone;
-}
+    // Sprite fetch is allowed to start after tick "5" based on documentation I've seen
+    if(mSpriteState != fsIdle && mState >= fsReadLow1) {
+        switch(mSpriteState) {
+            case fsReadNum0:
+            case fsReadHigh0:
+            case fsReadLow0:
+                NEXT_STATE(mSpriteState);
+                break;
+            case fsReadNum1:
+                // TODO Figure out when memory is actually accessed here. For now, this already cached in my OAMEntry
+                mSpriteTileNum = mSprite->tile;
+                NEXT_STATE(mSpriteState);
+                break;
+            case fsReadHigh1:
+                // Selecting the Y line does not depend on whether the sprite is in 8 or 16 px height mode,
+                // Y is always based on an offset of 16
+                if(mSprite->yFlip)
+                    y = mSprite->y - mRegs->LY - 1;
+                else
+                    y = 16 - (mSprite->y - mRegs->LY);
 
-TileLine Fetcher::getLine() {
-    // Clear out any sprite and return to normal mode
-    mSprite = NULL;
-    mState = fsReadNum;
-    return mLine;
+                mSpriteTileData[0] = mVRAM[mSpriteTileNum * (((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16)?32:16) + (y*2)];
+                NEXT_STATE(mSpriteState);
+                break;
+            case fsReadLow1:
+                // Selecting the Y line does not depend on whether the sprite is in 8 or 16 px height mode,
+                // Y is always based on an offset of 16
+                if(mSprite->yFlip)
+                    y = mSprite->y - mRegs->LY - 1;
+                else
+                    y = 16 - (mSprite->y - mRegs->LY);
+
+                mSpriteTileData[1] = mVRAM[mSpriteTileNum * (((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16)?32:16) + (y*2) + 1];
+
+                mSpriteLine.load(mSpriteTileData, mSprite->OBP1?Pixel::ptSprite1:Pixel::ptSprite0, mSprite->belowBG?PIXEL_FLAGS_SPRITE_BELOW_BG:0, mSprite->xFlip);
+                mFIFO->loadMixSprite(mSpriteLine, mSprite);
+
+                if(mState == fsIdle)
+                    mState = fsReadNum0;
+
+                mSpriteState = fsIdle;
+                mSprite = NULL;
+
+                // TODO move this somewhere?
+                mFIFO->unlock();
+                break;
+            default:
+                break;
+        }
+    }
+    FLOG("%s\n", "Fetcher: Tick Exit");
 }
 
 void Fetcher::reset() {
-    mState = fsReadNum;
+    mState = fsReadNum0;
+    mSpriteState = fsIdle;
     mMode = fmBackground;
-    mSprite = 0;
+    mSprite = NULL;
     mTileCnt = 0;
-    mTick0 = true;
 }
 
 void Fetcher::setMode(FetcherMode mode) {
@@ -106,6 +156,7 @@ void Fetcher::setMode(FetcherMode mode) {
 void Fetcher::setMode(FetcherMode mode, uint8_t winY) {
     mMode = mode;
     mWinY = winY;
+    mTileCnt = 0;
 }
 
 Fetcher::FetcherMode Fetcher::getMode() {
@@ -117,8 +168,24 @@ void Fetcher::setWinY(uint8_t winY) {
 }
 
 void Fetcher::startSprite(OAMEntry *sprite) {
-    // XXX Should we force a BG tile to finish?
     mSprite = sprite;
-    mState = fsReadSpriteNum;
+    mSpriteState = fsReadNum0;
 }
 
+bool Fetcher::spritePending() {
+    return (mSprite != NULL);
+}
+
+bool Fetcher::tryWriteLine() {
+    if(mFIFO->count() <= 8) {
+        // If we can load the line then we either restart the fetcher,
+        // or move into a pending state if we are awaiting a sprite fetch.
+        mFIFO->loadBG(mLine);
+        mState = (mSpriteState == fsIdle)?fsReadNum0:fsIdle;
+        return true;
+    }
+
+    // We cannot load the line yet, so just advance the state
+    NEXT_STATE(mState);
+    return false;
+}

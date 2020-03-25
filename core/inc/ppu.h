@@ -4,6 +4,7 @@
 #include "memregion.h"
 #include "int_controller.h"
 #include "io_regs.h"
+#include "ppu/oamentry.h"
 #include "ppu/registers.h"
 #include "ppu/fetcher.h"
 #include "ppu/pixelfifo.h"
@@ -37,7 +38,8 @@ class Ppu : public MemRegion {
         InterruptController *mIC;
 
         uint8_t mNumObjs;
-        uint8_t mFoundObjs[10];
+        uint8_t mCurObj;
+        OAMEntry mFoundObjs[10];
 
         uint8_t mCurWinY;
 

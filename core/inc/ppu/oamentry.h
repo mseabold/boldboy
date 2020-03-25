@@ -18,8 +18,10 @@
 
 class OAMEntry {
     public:
-        OAMEntry(uint8_t OAMData[4]);
+        OAMEntry();
+        OAMEntry(uint8_t OAMData[4], uint8_t oamIdx);
         OAMEntry(const OAMEntry &other);
+        uint8_t oamIdx;
         uint8_t x;
         uint8_t y;
         uint8_t tile;

@@ -14,17 +14,21 @@ class PixelFIFO {
 
         uint8_t tick();
         uint8_t count();
-        bool loadLine(TileLine line);
-        bool mixSprite(TileLine line, OAMEntry *sprite);
-        void clear();
+        bool loadBG(TileLine line);
+        bool loadMixSprite(TileLine line, OAMEntry *sprite);
+        void clear(bool clearSprites);
         void lock();
         void unlock();
     private:
         PpuRegisters *mRegs;
-        Pixel mPixels[16];
-        uint8_t mHead;
-        uint8_t mTail;
-        uint8_t mCount;
+        Pixel mBGPixs[16];
+        Pixel mOBJPixs[16];
+        uint8_t mBGHead;
+        uint8_t mBGTail;
+        uint8_t mBGCount;
+        uint8_t mOBJHead;
+        uint8_t mOBJTail;
+        uint8_t mOBJCount;
         bool mLocked;
 };
 
