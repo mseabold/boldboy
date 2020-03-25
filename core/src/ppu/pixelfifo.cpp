@@ -19,7 +19,7 @@ uint8_t PixelFIFO::tick() {
     uint8_t pallette;
     Pixel pix;
 
-    if(mBGCount <= 8 || mLocked)
+    if(mBGCount == 0 || mLocked)
         return PIXELFIFO_TICK_LOCKED;
 
     pix = mBGPixs[mBGHead];

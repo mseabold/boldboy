@@ -53,6 +53,7 @@ class Ppu : public MemRegion {
 
         uint8_t mLinePixCnt;
         uint8_t mTossedPixCnt;
+        uint8_t mPreFifoTicks;
 };
 
 #endif /* __PPU_H__ */

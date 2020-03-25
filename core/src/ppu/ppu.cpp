@@ -151,7 +151,12 @@ void Ppu::tick(uint8_t cycles) {
                     setMode(IOREG_STAT_MODE_3_DATA_XFER);
                     mLinePixCnt = 0;
                     mTossedPixCnt = 0;
+                    mPreFifoTicks = 8;
                     consumedCycles = OAM_CYCLES - mLineCycles;
+
+                    // Start with an empty line so that FIFO can start early and shift off-screen
+                    // sprite pixels out before shifting to the display
+                    mFIFO->loadBG(TileLine::empty());
                 }
                 //DLOG("%s\n", "Switch to XFER");
                 break;
@@ -167,8 +172,9 @@ void Ppu::tick(uint8_t cycles) {
                     // actually starting a Sprite.
 #if 1
                     newSpritePending = false;
-                    //TODO Handle sprites that are partially scrolled off screen to the left
-                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt+8) {
+
+                    // TODO Verify the fetch timing for off-screen sprites
+                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt + 8 - mPreFifoTicks) {
                         if(!mFetcher->spritePending()) {
                             mFIFO->lock();
                             mFetcher->startSprite(&mFoundObjs[mCurObj]);
@@ -178,16 +184,18 @@ void Ppu::tick(uint8_t cycles) {
                     }
 #endif
 
-                    //TODO Handle BG being disabled
                     mFetcher->tick();
 
                     // If another sprite at the same needs to be handled, we do not want to process the FIFO yet
                     if(newSpritePending)
                         continue;
 
-                    // Don't do anything until we have enough pixels in FIFO
-                    if(mFIFO->count() <= 8)
+                    // Eat scrolled off pixels
+                    if(mPreFifoTicks > 0) {
+                        if(mFIFO->tick() != PIXELFIFO_TICK_LOCKED)
+                            --mPreFifoTicks;
                         continue;
+                    }
 
                     // Toss any pixels before we do anything else
                     if(mTossedPixCnt < mRegs->SCX % 8) {
