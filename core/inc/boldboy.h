@@ -25,6 +25,8 @@ class Boldboy {
         void setLogger(Logger *logger);
         void waitForFrame();
         void getFrame(uint8_t frame[144][160]);
+        void buttonPressed(IoJoypad::Button button);
+        void buttonReleased(IoJoypad::Button button);
 
     private:
         Cpu *mCpu;
@@ -35,6 +37,7 @@ class Boldboy {
         InterruptController *mIC;
         Ppu *mPpu;
         OAMDMA *mDMA;
+        IoJoypad *mJoypad;
 
 };
 

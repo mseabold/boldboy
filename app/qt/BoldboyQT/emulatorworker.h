@@ -15,6 +15,7 @@ class EmulatorWorker : public QObject {
 
     public slots:
         void drawFrame(void);
+        void keyPressed(int key, bool pressed);
 
     signals:
         void frameDone(QPixmap frame);

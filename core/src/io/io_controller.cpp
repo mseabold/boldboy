@@ -4,7 +4,7 @@
 
 #define TICKS_PER_DIV 256
 
-IoController::IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma) {
+IoController::IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma, IoJoypad *joypad) {
     mSerial = NULL;
     mTimer = NULL;
     mIF = 0;
@@ -13,6 +13,7 @@ IoController::IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma) {
     mIC = ic;
     mPpu = ppu;
     mDMA = dma;
+    mJoypad = joypad;
 }
 
 IoController::~IoController() {
@@ -85,6 +86,8 @@ MemRegion *IoController::findHandler(uint16_t addr) {
             return mPpu;
         case IOREG_DMA:
             return mDMA;
+        case IOREG_P1:
+            return mJoypad;
     }
 
     return NULL;

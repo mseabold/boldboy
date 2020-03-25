@@ -27,6 +27,7 @@ set (SRCS
     src/io/io_serial.cpp
     src/io/io_timer.cpp
     src/io/io_oam_dma.cpp
+    src/io/io_joypad.cpp
     src/log/logger.cpp
     src/log/console.cpp
     src/ppu/ppu.cpp

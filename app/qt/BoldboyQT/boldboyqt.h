@@ -25,6 +25,7 @@ public slots:
 
 signals:
     void drawFrame(void);
+    void keyPressed(int key, bool pressed);
 
 private:
     Ui::Boldboy *ui;
@@ -36,6 +37,7 @@ private:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 };
 #endif // BOLDBOY_H

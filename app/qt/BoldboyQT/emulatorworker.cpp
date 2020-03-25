@@ -18,3 +18,44 @@ void EmulatorWorker::drawFrame() {
     memcpy(frameImg.bits(), frame, 144*160);
     emit frameDone(QPixmap::fromImage(frameImg));
 }
+
+void EmulatorWorker::keyPressed(int key, bool pressed) {
+    bool handle = true;
+    IoJoypad::Button padButton;
+    switch(key) {
+        case Qt::Key_A:
+            padButton = IoJoypad::A;
+            break;
+        case Qt::Key_B:
+            padButton = IoJoypad::B;
+            break;
+        case Qt::Key_X:
+            padButton = IoJoypad::START;
+            break;
+        case Qt::Key_Shift:
+            padButton = IoJoypad::SELECT;
+            break;
+        case Qt::Key_Up:
+            padButton = IoJoypad::UP;
+            break;
+        case Qt::Key_Down:
+            padButton = IoJoypad::DOWN;
+            break;
+        case Qt::Key_Left:
+            padButton = IoJoypad::LEFT;
+            break;
+        case Qt::Key_Right:
+            padButton = IoJoypad::RIGHT;
+            break;
+        default:
+            handle = false;
+            break;
+    }
+
+    if(handle) {
+        if(pressed)
+            mEmu->buttonPressed(padButton);
+        else
+            mEmu->buttonReleased(padButton);
+    }
+}

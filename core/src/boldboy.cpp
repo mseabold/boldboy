@@ -7,7 +7,8 @@ Boldboy::Boldboy(bool useBootrom) {
     mIC = new InterruptController();
     mPpu = new Ppu(mIC);
     mDMA = new OAMDMA(mPpu, mPpu);
-    mIO = new IoController(mIC, mPpu, mDMA);
+    mJoypad = new IoJoypad(mIC);
+    mIO = new IoController(mIC, mPpu, mDMA, mJoypad);
     mTimer = new IoTimer(mIC);
     mIO->setTimer(mTimer);
     mMmu = new Mmu(mIO, mPpu, mDMA);
@@ -27,6 +28,7 @@ Boldboy::~Boldboy() {
     delete mIO;
     delete mTimer;
     delete mPpu;
+    delete mJoypad;
     delete mIC;
 
     if(mCart)
@@ -80,4 +82,12 @@ void Boldboy::waitForFrame() {
 void Boldboy::getFrame(uint8_t frame[144][160]) {
     //DLOG("%s\n", "Get Frame");
     mPpu->getFrame(frame);
+}
+
+void Boldboy::buttonPressed(IoJoypad::Button button) {
+    mJoypad->buttonPressed(button);
+}
+
+void Boldboy::buttonReleased(IoJoypad::Button button) {
+    mJoypad->buttonReleased(button);
 }

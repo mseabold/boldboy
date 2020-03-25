@@ -8,6 +8,7 @@
 #include "io/io_timer.h"
 #include "ppu.h"
 #include "io/io_oam_dma.h"
+#include "io/io_joypad.h"
 
 class IoController : public MemRegion
 {
@@ -20,11 +21,12 @@ private:
     uint16_t mDIVticks;
     Ppu *mPpu;
     OAMDMA *mDMA;
+    IoJoypad *mJoypad;
 
     MemRegion *findHandler(uint16_t addr);
 
 public:
-    IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma);
+    IoController(InterruptController *ic, Ppu *ppu, OAMDMA *dma, IoJoypad *joypad);
     virtual ~IoController();
     uint8_t readAddr(uint16_t addr);
     void writeAddr(uint16_t addr, uint8_t val);

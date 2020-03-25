@@ -1,6 +1,7 @@
 #ifndef __IO_REGS_H__
 #define __IO_REGS_H__
 
+#define IOREG_P1   0xFF00
 #define IOREG_SB   0xFF01
 #define IOREG_SC   0xFF02
 #define IOREG_DIV  0xFF04
@@ -21,6 +22,19 @@
 #define IOREG_WY   0xFF4A
 #define IOREG_WX   0xFF4B
 #define IOREG_IE   0xFFFF
+
+#define IOREG_P1_IN_MASK         0x0F
+#define IOREG_P1_OUT_MASK        0x30
+#define IOREG_P1_IN_A            0x01
+#define IOREG_P1_IN_B            0x02
+#define IOREG_P1_IN_SELECT       0x04
+#define IOREG_P1_IN_START        0x08
+#define IOREG_P1_IN_RIGHT        0x01
+#define IOREG_P1_IN_LEFT         0x02
+#define IOREG_P1_IN_UP           0x04
+#define IOREG_P1_IN_DOWN         0x08
+#define IOREG_P1_OUT_P14         0x10
+#define IOREG_P1_OUT_P15         0x20
 
 #define IOREG_TAC_STOP_MASK      0x04
 #define IOREG_TAC_CLOCK_SEL_MASK 0x03
