@@ -9,19 +9,19 @@
 
 #ifdef BOLDBOG_LOG_ENABLE
 
-#define ELOG(_fmt, ...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_ERROR, _fmt, __VA_ARGS__); } while(0)
-#define WLOG(_fmt, ...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_WARNING, _fmt, __VA_ARGS__); } while(0)
-#define VLOG(_fmt, ...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_VERBOSE, _fmt, __VA_ARGS__); } while(0)
-#define DLOG(_fmt, ...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_DEBUG, _fmt, __VA_ARGS__); } while(0)
-#define FLOG(_fmt, ...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_FUNCTION, _fmt, __VA_ARGS__); } while(0)
+#define ELOG(...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_ERROR, __VA_ARGS__); } while(0)
+#define WLOG(...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_WARNING, __VA_ARGS__); } while(0)
+#define VLOG(...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_VERBOSE, __VA_ARGS__); } while(0)
+#define DLOG(...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_DEBUG, __VA_ARGS__); } while(0)
+#define FLOG(...) do { if(Logger::sLogger) Logger::sLogger->logWrite(LOG_FUNCTION, __VA_ARGS__); } while(0)
 
 #else
 
-#define ELOG(_fmt, ...) ((void)0)
-#define WLOG(_fmt, ...) ((void)0)
-#define VLOG(_fmt, ...) ((void)0)
-#define DLOG(_fmt, ...) ((void)0)
-#define FLOG(_fmt, ...) ((void)0)
+#define ELOG(...) ((void)0)
+#define WLOG(...) ((void)0)
+#define VLOG(...) ((void)0)
+#define DLOG(...) ((void)0)
+#define FLOG(...) ((void)0)
 
 #endif
 
