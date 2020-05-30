@@ -18,39 +18,56 @@ PixelFIFO::PixelFIFO(PpuRegisters *registers) {
 uint8_t PixelFIFO::tick() {
     uint8_t pallette;
     Pixel pix;
+    uint8_t retPix;
 
-    if(mBGCount == 0 || mLocked)
-        return PIXELFIFO_TICK_LOCKED;
+    if(mLocked)
+        return PIXELFIFO_INVALID_PIX;
 
-    pix = mBGPixs[mBGHead];
-    pallette = mRegs->BGP;
+    /* If tick() is called with no Background pixels, it can still pop an OBJ pixel
+     * from the queue (in order to eat partially visible sprites). However, in this case
+     * we'll still return INVALID_PIX, since this should never occur for a _displayable_
+     * pixel. */
+    if(mBGCount > 0) {
+        pix = mBGPixs[mBGHead];
+        pallette = mRegs->BGP;
 
-    if(pix.type == Pixel::ptBackground && ((mRegs->LCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_OFF)) {
-        pix.value = 0;
-        pallette = 0;
-    }
-
-    if(pix.type == Pixel::ptWindow && ((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_OFF)) {
-        pix.value = 0;
-        pallette = 0;
-    }
-
-    mBGHead = (mBGHead + 1) % 16;
-    --mBGCount;
-
-    if(mOBJCount > 0 && ((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON)) {
-        if(mOBJPixs[mOBJHead].value != 0) {
-            if(!(mOBJPixs[mOBJHead].flags & PIXEL_FLAGS_SPRITE_BELOW_BG) || pix.value == 0) {
-                pix = mOBJPixs[mOBJHead];
-                pallette = (mOBJPixs[mOBJHead].type == Pixel::ptSprite0)?mRegs->OBP0:mRegs->OBP1;
-            }
+        if(pix.type == Pixel::ptBackground && ((mRegs->LCDC & IOREG_LCDC_BG_DISPLAY_MASK) == IOREG_LCDC_BG_DISPLAY_OFF)) {
+            pix.value = 0;
+            pallette = 0;
         }
-        mOBJHead = (mOBJHead + 1) % 16;
-        --mOBJCount;
+
+        if(pix.type == Pixel::ptWindow && ((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_OFF)) {
+            pix.value = 0;
+            pallette = 0;
+        }
+
+        mBGHead = (mBGHead + 1) % 16;
+        --mBGCount;
+
+        if(mOBJCount > 0 && ((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON)) {
+            if(mOBJPixs[mOBJHead].value != 0) {
+                if(!(mOBJPixs[mOBJHead].flags & PIXEL_FLAGS_SPRITE_BELOW_BG) || pix.value == 0) {
+                    pix = mOBJPixs[mOBJHead];
+                    pallette = (mOBJPixs[mOBJHead].type == Pixel::ptSprite0)?mRegs->OBP0:mRegs->OBP1;
+                }
+            }
+            mOBJHead = (mOBJHead + 1) % 16;
+            --mOBJCount;
+        }
+
+
+        retPix = TO_PALLETTE(pix.value, pallette);
+    } else {
+        /* Simply pop an OBJ pixel without returning it. */
+        if(mOBJCount > 0) {
+            mOBJHead = (mOBJHead + 1) % 16;
+            --mOBJCount;
+        }
+
+        retPix = PIXELFIFO_INVALID_PIX;
     }
 
-
-    return TO_PALLETTE(pix.value, pallette);
+    return retPix;
 }
 
 uint8_t PixelFIFO::count() {
@@ -58,8 +75,8 @@ uint8_t PixelFIFO::count() {
 }
 
 bool PixelFIFO::loadBG(TileLine line) {
-    // Cannot load a line if there is not enough space
-    if(mBGCount > 8)
+    /* Cannot load if there is not enough space or the BG is disabled */
+    if(mBGCount > 8 || !mBgEnabled)
         return false;
 
     uint8_t idx;
@@ -108,5 +125,19 @@ void PixelFIFO::lock() {
 }
 
 void PixelFIFO::unlock() {
+    mLocked = false;
+}
+
+bool PixelFIFO::isLocked() {
+    return mLocked;
+}
+
+void PixelFIFO::enableBG(bool enabled) {
+    mBgEnabled = enabled;
+}
+
+void PixelFIFO::reset() {
+    mBgEnabled = false;
+    clear(true);
     mLocked = false;
 }

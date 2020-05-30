@@ -6,7 +6,7 @@
 #include "ppu/registers.h"
 #include "ppu/oamentry.h"
 
-#define PIXELFIFO_TICK_LOCKED 0xff
+#define PIXELFIFO_INVALID_PIX 0xff
 
 class PixelFIFO {
     public:
@@ -19,6 +19,9 @@ class PixelFIFO {
         void clear(bool clearSprites);
         void lock();
         void unlock();
+        bool isLocked();
+        void enableBG(bool enabled);
+        void reset();
     private:
         PpuRegisters *mRegs;
         Pixel mBGPixs[16];
@@ -30,6 +33,7 @@ class PixelFIFO {
         uint8_t mOBJTail;
         uint8_t mOBJCount;
         bool mLocked;
+        bool mBgEnabled;
 };
 
 #endif /* __PIXELFIFO_H__ */

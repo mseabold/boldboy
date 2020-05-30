@@ -2,6 +2,7 @@
 #include "io_regs.h"
 #include "logger.h"
 #include "string.h"
+#include "assert.h"
 
 #define VRAM_BASE         0x8000
 #define OAM_BASE 0xFE00
@@ -114,7 +115,6 @@ void Ppu::tick(uint8_t cycles) {
     uint8_t *oamPtr;
     uint8_t oamY;
     OAMEntry temp;
-    bool newSpritePending;
 
     if(!mEnabled)
         return;
@@ -149,14 +149,8 @@ void Ppu::tick(uint8_t cycles) {
                     }
 
                     setMode(IOREG_STAT_MODE_3_DATA_XFER);
-                    mLinePixCnt = 0;
-                    mTossedPixCnt = 0;
-                    mPreFifoTicks = 8;
                     consumedCycles = OAM_CYCLES - mLineCycles;
-
-                    // Start with an empty line so that FIFO can start early and shift off-screen
-                    // sprite pixels out before shifting to the display
-                    mFIFO->loadBG(TileLine::empty());
+                    mLineXPos = -8 - (mRegs->SCX % 8);
                 }
                 //DLOG("%s\n", "Switch to XFER");
                 break;
@@ -166,71 +160,77 @@ void Ppu::tick(uint8_t cycles) {
                 for(idx=0; idx < cycles; ++idx) {
                     ++consumedCycles;
 
-                    // We can safely start a sprite even before we have loaded enough pixels into the FIFO,
-                    // because the Fetcher will check the count before starting fetching a Sprite.
-                    // This is being done this way in order to atomically handle ticking the Fetcher and
-                    // actually starting a Sprite.
-#if 1
-                    newSpritePending = false;
-
                     // TODO Verify the fetch timing for off-screen sprites
-                    if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLinePixCnt + 8 - mPreFifoTicks) {
-                        if(!mFetcher->spritePending()) {
+                    if(mFetcher->spritePending()) {
+                        /* Tick the fetcher in sprite mode first. */
+                        mFetcher->tick();
+
+                        /* Now, if we completed the sprite, and another sprite exists at the
+                         * same X position, go ahead and start it. */
+                        if(!mFetcher->spritePending() &&
+                                (mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON &&
+                                mCurObj < mNumObjs &&
+                                mFoundObjs[mCurObj].x == mLineXPos + 8) {
+                            mFetcher->startSprite(&mFoundObjs[mCurObj++]);
                             mFIFO->lock();
-                            mFetcher->startSprite(&mFoundObjs[mCurObj]);
-                            ++mCurObj;
-                        } else
-                            newSpritePending = true;
-                    }
-#endif
 
-                    mFetcher->tick();
+                            /* We've consumed this cycle by ticking the fetcher, but we do
+                             * not want the FIFO to tick, so move to the next cycle. */
+                            continue;
+                        }
+                    } else {
+                        /* No sprite pending, check if we should start one. */
+                        if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLineXPos + 8) {
+                            if(!mFetcher->spritePending()) {
+                                VLOG("Test String");
+                                VLOG("Load sprite at x (%d)\n", mLineXPos);
+                                mFIFO->lock();
+                                mFetcher->startSprite(&mFoundObjs[mCurObj]);
+                                ++mCurObj;
+                            }
+                        }
 
-                    // If another sprite at the same needs to be handled, we do not want to process the FIFO yet
-                    if(newSpritePending)
-                        continue;
-
-                    // Eat scrolled off pixels
-                    if(mPreFifoTicks > 0) {
-                        if(mFIFO->tick() != PIXELFIFO_TICK_LOCKED)
-                            --mPreFifoTicks;
-                        continue;
-                    }
-
-                    // Toss any pixels before we do anything else
-                    if(mTossedPixCnt < mRegs->SCX % 8) {
-                        pix = mFIFO->tick();
-
-                        if(pix != PIXELFIFO_TICK_LOCKED)
-                            ++mTossedPixCnt;
-
-                        // Always short circuit the rest of this tick, even if we didn't actually drop a pixel.
-                        // We can't start the window until we load BG tiles and drop the correct number
-                        // of pixels, even if there's a window at X position 0.
-                        continue;
+                        /* Tick the fetcher now */
+                        mFetcher->tick();
                     }
 
-                    if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLinePixCnt >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
+
+                    //TODO This should probably move above the Sprite logic
+                    if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLineXPos >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
+                        VLOG("Start Window at X (%u). Fifo has %u pixels.\n", mLineXPos, mFIFO->count());
                         mFetcher->setMode(Fetcher::fmWindow, mCurWinY);
                         mFIFO->clear(false);
                         // TODO Check the exact timing here between switching over.
                         continue;
                     }
 
+                    /* If the FIFO is locked or empty when we need a displayable pixel
+                     * (not scrolled off screen), then we need to eat this cycle. */
+                    if(mFIFO->isLocked() || (mFIFO->count() == 0 && mLineXPos >= 0))
+                        continue;
 
                     pix = mFIFO->tick();
 
-                    if(pix != PIXELFIFO_TICK_LOCKED) {
-                        //VLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLinePixCnt, pix);
-                        frameBuf[mRegs->LY][mLinePixCnt] = DMG_PALLETTE[pix];
-                        ++mLinePixCnt;
+                    if(mLineXPos >= 0) {
+                        assert(pix != PIXELFIFO_INVALID_PIX);
+                        DLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLineXPos, pix);
+                        frameBuf[mRegs->LY][mLineXPos] = DMG_PALLETTE[pix];
                     }
 
+                    ++mLineXPos;
 
-                    if(mLinePixCnt == 160) {
+                    /* Once we he reached the off-screen position that matches the BG scroll,
+                     * so enable the BG in the FIFO in order to start dropping scrolled pixels. */
+                    //TODO Determine whether the fetch of the tile should START here, or if the tile
+                    //     can already be fetched and just pending the FIFO to enable (current impl).
+                    VLOG("Check %d == %d\n", mLineXPos, -(mRegs->SCX % 8));
+                    if(mLineXPos == -(mRegs->SCX % 8))
+                        mFIFO->enableBG(true);
+
+                    if(mLineXPos == 160) {
                         setMode(IOREG_STAT_MODE_0_HBLANK);
                         mFetcher->reset();
-                        mFIFO->clear(true);
+                        mFIFO->reset();
 
                         if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mRegs->LY >= mRegs->WY)
                             ++mCurWinY;

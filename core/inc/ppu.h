@@ -51,9 +51,7 @@ class Ppu : public MemRegion {
         Fetcher *mFetcher;
         PixelFIFO *mFIFO;
 
-        uint8_t mLinePixCnt;
-        uint8_t mTossedPixCnt;
-        uint8_t mPreFifoTicks;
+        int16_t mLineXPos;
 };
 
 #endif /* __PPU_H__ */
