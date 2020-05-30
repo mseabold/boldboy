@@ -58,11 +58,16 @@ void BoldboyQT::keyPressEvent(QKeyEvent *event) {
         emit drawFrame();
     } else if(event->key() == Qt::Key_L && !mRunning) {
         mWorker->mLogger->setLevel(LOG_DEBUG);
+    } else if(event->key() == Qt::Key_T && mRunning) {
+        mTimer->setInterval(6);
     } else {
         emit keyPressed(event->key(), true);
     }
 }
 
 void BoldboyQT::keyReleaseEvent(QKeyEvent *event) {
-    emit keyPressed(event->key(), false);
+    if(event->key() == Qt::Key_T)
+        mTimer->setInterval(17);
+    else
+        emit keyPressed(event->key(), false);
 }
