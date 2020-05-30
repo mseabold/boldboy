@@ -52,6 +52,7 @@ class Ppu : public MemRegion {
         PixelFIFO *mFIFO;
 
         int16_t mLineXPos;
+        uint8_t mMode3DelayCycles;
 };
 
 #endif /* __PPU_H__ */

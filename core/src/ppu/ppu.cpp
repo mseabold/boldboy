@@ -150,12 +150,19 @@ void Ppu::tick(uint8_t cycles) {
 
                     setMode(IOREG_STAT_MODE_3_DATA_XFER);
                     consumedCycles = OAM_CYCLES - mLineCycles;
-                    mLineXPos = -8 - (mRegs->SCX % 8);
+                    mLineXPos = -8;
+                    mMode3DelayCycles = mRegs->SCX % 8;
                 }
                 //DLOG("%s\n", "Switch to XFER");
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
                 consumedCycles = 0;
+
+                if(mMode3DelayCycles) {
+                    --mMode3DelayCycles;
+                    mFetcher->tick();
+                    continue;
+                }
 
                 for(idx=0; idx < cycles; ++idx) {
                     ++consumedCycles;
