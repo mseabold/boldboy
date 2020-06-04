@@ -3,8 +3,9 @@ find_package (Python3 COMPONENTS Interpreter REQUIRED)
 set (TOOLSDIR ${PROJECT_SOURCE_DIR}/tools)
 
 add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp
-    COMMAND ${Python3_EXECUTABLE} ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json -f ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp
+    OUTPUT ${PROJECT_BINARY_DIR}/core/src/cpu/optable.cpp
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/core/src/cpu
+    COMMAND ${Python3_EXECUTABLE} ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json -f ${PROJECT_BINARY_DIR}/core/src/cpu/optable.cpp
     DEPENDS ${TOOLSDIR}/gen_optable.py ${TOOLSDIR}/handlers.json ${TOOLSDIR}/opcodes.json
 )
 set (SRCS
@@ -36,7 +37,7 @@ set (SRCS
     src/ppu/oamentry.cpp
     src/ppu/pixelfifo.cpp)
 
-add_library(gbcore ${SRCS} ${PROJECT_BINARY_DIR}/src/cpu/optable.cpp)
+add_library(gbcore ${SRCS} ${PROJECT_BINARY_DIR}/core/src/cpu/optable.cpp)
 
 target_include_directories(gbcore
     PUBLIC
