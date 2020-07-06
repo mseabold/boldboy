@@ -3,7 +3,7 @@
 #include "ppu/tileline.h"
 #include "logger.h"
 
-#define NEXT_STATE(_state) do {FetcherState newstate = (_state < fsWriteLine1)?(FetcherState)(((uint8_t)_state)+1):_state; VLOG("Fetcher %u => %u\n", _state, newstate); _state = newstate;} while(0)
+#define NEXT_STATE(_state) do {FetcherState newstate = (_state < fsWriteLine1)?(FetcherState)(((uint8_t)_state)+1):_state; VLOG(ZONE_PPU, "Fetcher %u => %u\n", _state, newstate); _state = newstate;} while(0)
 
 Fetcher::Fetcher(PixelFIFO *fifo, uint8_t *VRAM, uint8_t *OAMRAM, PpuRegisters *registers) {
     mFIFO = fifo;
@@ -18,7 +18,7 @@ void Fetcher::tick() {
     uint8_t y;
     uint8_t count;
 
-    FLOG("Fetcher: Tick Enter (%u, %u)\n", (unsigned int)mState, (unsigned int)mSpriteState);
+    FLOG(ZONE_PPU, "Fetcher: Tick Enter (%u, %u)\n", (unsigned int)mState, (unsigned int)mSpriteState);
 
     switch(mState)
     {
@@ -138,7 +138,7 @@ void Fetcher::tick() {
                 break;
         }
     }
-    FLOG("%s\n", "Fetcher: Tick Exit");
+    FLOG(ZONE_PPU, "%s\n", "Fetcher: Tick Exit");
 }
 
 void Fetcher::reset() {
@@ -184,7 +184,7 @@ bool Fetcher::tryWriteLine() {
     if(mFIFO->count() == 0 && mFIFO->loadBG(mLine)) {
         /* If we succesfully loaded the line, then we either need to restart
          * the fetched or move into a pending state if we are awaiting a sprite fetch. */
-        VLOG("%s\n", "Loaded BG Tile");
+        VLOG(ZONE_PPU, "%s\n", "Loaded BG Tile");
         mState = (mSpriteState == fsIdle)?fsReadNum0:fsIdle;
         return true;
     }

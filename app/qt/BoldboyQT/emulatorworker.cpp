@@ -6,6 +6,7 @@ EmulatorWorker::EmulatorWorker(const char *romfile) {
     mEmu = new Boldboy(false);
     mLogger = new ConsoleLogger();
     mLogger->setLevel(LOG_NONE);
+    mLogger->setZone(ZONE_MMU|ZONE_DMA|ZONE_CPU);
     mEmu->setLogger(mLogger);
     mEmu->loadCart(romfile);
 }

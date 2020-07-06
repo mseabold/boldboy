@@ -43,7 +43,6 @@ uint8_t OAMDMA::readAddr(uint16_t addr) {
 }
 
 void OAMDMA::tick(uint8_t cycles) {
-    VLOG("%s\n", "TIck Enter");
     if(!mActive)
         return;
 
@@ -61,12 +60,11 @@ void OAMDMA::tick(uint8_t cycles) {
             region = mRAM;
 
         for(uint16_t i=0; i<160; ++i) {
-            VLOG("DMA 0x%04x to 0x%04x\n", addr + i, 0xfe00+i);
+            VLOG(ZONE_DMA, "DMA 0x%04x to 0x%04x\n", addr + i, 0xfe00+i);
             mOAM->writeAddr(0xfe00+i, region->readAddr(addr + i));
         }
 
     } else {
         mCycles -= cycles;
     }
-    VLOG("%s\n", "TIck Exit");
 }

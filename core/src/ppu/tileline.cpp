@@ -20,7 +20,7 @@ void TileLine::load(uint8_t *tileData, Pixel::PixelType pixelType, uint8_t flags
     uint8_t lo = tileData[0];
     uint16_t hi = (uint16_t)tileData[1] << 1;
 
-    //VLOG("Loading tile data 0x%02x%02x\n", tileData[0], tileData[1]);
+    //VLOG(ZONE_PPU, "Loading tile data 0x%02x%02x\n", tileData[0], tileData[1]);
 
     // We're from the bottom of the data bytes, which are the last pixels
     for(int8_t pixIdx = 7; pixIdx >= 0; --pixIdx) {
@@ -34,7 +34,7 @@ void TileLine::load(uint8_t *tileData, Pixel::PixelType pixelType, uint8_t flags
     }
 
     for(uint8_t pixIdx = 0; pixIdx < 8; ++ pixIdx) {
-        //VLOG("Line[%u] = 0x%02x\n", pixIdx, mPixels[pixIdx].value);
+        //VLOG(ZONE_PPU, "Line[%u] = 0x%02x\n", pixIdx, mPixels[pixIdx].value);
     }
 
     mIsFlipped = flipped;

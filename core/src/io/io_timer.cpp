@@ -22,11 +22,11 @@ void IoTimer::writeAddr(uint16_t addr, uint8_t val) {
             //TODO Handle TIMA gltiching
             break;
         case IOREG_TIMA:
-            VLOG("Write TIMA: %u\n", val);
+            VLOG(ZONE_IO, "Write TIMA: %u\n", val);
             mTIMA = val;
             break;
         case IOREG_TMA:
-            VLOG("Write TMA: %u\n", val);
+            VLOG(ZONE_IO, "Write TMA: %u\n", val);
             mTMA = val;
             break;
         case IOREG_TAC:
@@ -37,7 +37,7 @@ void IoTimer::writeAddr(uint16_t addr, uint8_t val) {
                     mStarted = false;
                     break;
                 case IOREG_TAC_START:
-                    VLOG("%s\n", "Timer Started");
+                    VLOG(ZONE_IO, "%s\n", "Timer Started");
                     mStarted = true;
                     break;
             }

@@ -36,7 +36,7 @@ class PpuRegisters {
                     tileDataOffset = ((val & IOREG_LCDC_TILE_DATA_SEL_MASK) == IOREG_LCDC_TILE_DATA_SEL_8000)?0:OFFSET_9000;
                     winMapOffset = ((val & IOREG_LCDC_WIN_TILE_MAP_SEL_MASK) == IOREG_LCDC_WIN_TILE_MAP_SEL_9800)?OFFSET_9800:OFFSET_9C00;
                     LCDC = val;
-                    DLOG("LCDC write: 0x%02x\n", LCDC);
+                    DLOG(ZONE_PPU, "LCDC write: 0x%02x\n", LCDC);
                     break;
                 case IOREG_STAT:
                     STAT = (val & IOREG_STAT_INTRS_MASK) | (STAT & ~IOREG_STAT_INTRS_MASK);

@@ -4,7 +4,7 @@
 #include "logger.h"
 
 class ConsoleLogger : public Logger {
-    void logWrite(LogLevel level, const char *fmt, ...);
+    void logWrite(const char *fmt, va_list args);
 };
 
 #endif /* __CONSOLE_LOGGER_H__ */

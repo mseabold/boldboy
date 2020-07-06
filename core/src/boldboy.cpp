@@ -80,7 +80,7 @@ void Boldboy::waitForFrame() {
 }
 
 void Boldboy::getFrame(uint8_t frame[144][160]) {
-    //DLOG("%s\n", "Get Frame");
+    //DLOG(ZONE_CPU, "%s\n", "Get Frame");
     mPpu->getFrame(frame);
 }
 

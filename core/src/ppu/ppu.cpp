@@ -153,7 +153,7 @@ void Ppu::tick(uint8_t cycles) {
                     mLineXPos = -8;
                     mMode3DelayCycles = mRegs->SCX % 8;
                 }
-                //DLOG("%s\n", "Switch to XFER");
+                //DLOG(ZONE_PPU, "%s\n", "Switch to XFER");
                 break;
             case IOREG_STAT_MODE_3_DATA_XFER:
                 consumedCycles = 0;
@@ -189,8 +189,8 @@ void Ppu::tick(uint8_t cycles) {
                         /* No sprite pending, check if we should start one. */
                         if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLineXPos + 8) {
                             if(!mFetcher->spritePending()) {
-                                VLOG("Test String");
-                                VLOG("Load sprite at x (%d)\n", mLineXPos);
+                                VLOG(ZONE_PPU, "Test String");
+                                VLOG(ZONE_PPU, "Load sprite at x (%d)\n", mLineXPos);
                                 mFIFO->lock();
                                 mFetcher->startSprite(&mFoundObjs[mCurObj]);
                                 ++mCurObj;
@@ -204,7 +204,7 @@ void Ppu::tick(uint8_t cycles) {
 
                     //TODO This should probably move above the Sprite logic
                     if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLineXPos >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
-                        VLOG("Start Window at X (%u). Fifo has %u pixels.\n", mLineXPos, mFIFO->count());
+                        VLOG(ZONE_PPU, "Start Window at X (%u). Fifo has %u pixels.\n", mLineXPos, mFIFO->count());
                         mFetcher->setMode(Fetcher::fmWindow, mCurWinY);
                         mFIFO->clear(false);
                         // TODO Check the exact timing here between switching over.
@@ -220,7 +220,7 @@ void Ppu::tick(uint8_t cycles) {
 
                     if(mLineXPos >= 0) {
                         assert(pix != PIXELFIFO_INVALID_PIX);
-                        DLOG("Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLineXPos, pix);
+                        DLOG(ZONE_PPU, "Shifted out [%u][%u] = 0x%02x\n", mRegs->LY, mLineXPos, pix);
                         frameBuf[mRegs->LY][mLineXPos] = DMG_PALLETTE[pix];
                     }
 
@@ -230,7 +230,7 @@ void Ppu::tick(uint8_t cycles) {
                      * so enable the BG in the FIFO in order to start dropping scrolled pixels. */
                     //TODO Determine whether the fetch of the tile should START here, or if the tile
                     //     can already be fetched and just pending the FIFO to enable (current impl).
-                    VLOG("Check %d == %d\n", mLineXPos, -(mRegs->SCX % 8));
+                    VLOG(ZONE_PPU, "Check %d == %d\n", mLineXPos, -(mRegs->SCX % 8));
                     if(mLineXPos == -(mRegs->SCX % 8))
                         mFIFO->enableBG(true);
 
@@ -270,28 +270,28 @@ void Ppu::tick(uint8_t cycles) {
                             setLine(mRegs->LY+1);
                         } else {
 #if 0
-                            DLOG("%c",'+');
+                            DLOG(ZONE_PPU, "%c",'+');
                             for(vtile=0;vtile<160;vtile++)
-                                DLOG("%c", '-');
-                            DLOG("%s","+\n");
+                                DLOG(ZONE_PPU, "%c", '-');
+                            DLOG(ZONE_PPU, "%s","+\n");
                             for(vtile = 0;vtile < 144;++vtile) {
-                                DLOG("%c",'|');
+                                DLOG(ZONE_PPU, "%c",'|');
                                 for(htile =0;htile < 160;++htile) {
-                                    DLOG("%c", frameBuf[vtile][htile]?'*':' ');
+                                    DLOG(ZONE_PPU, "%c", frameBuf[vtile][htile]?'*':' ');
                                 }
-                                DLOG("%s", "|\n");
+                                DLOG(ZONE_PPU, "%s", "|\n");
                             }
-                            DLOG("%c",'+');
+                            DLOG(ZONE_PPU, "%c",'+');
                             for(vtile=0;vtile<160;vtile++)
-                                DLOG("%c", '-');
-                            DLOG("%c",'+');
-                            DLOG("%s", "\n");
+                                DLOG(ZONE_PPU, "%c", '-');
+                            DLOG(ZONE_PPU, "%c",'+');
+                            DLOG(ZONE_PPU, "%s", "\n");
 #endif
                             // Switch back to OAM earch and start the next frame
                             mCurWinY = 0;
                             setMode(IOREG_STAT_MODE_2_OAM_SEARCH);
                             setLine(0);
-                            VLOG("%s\n", "====== Start Frame");
+                            VLOG(ZONE_PPU, "%s\n", "====== Start Frame");
                         }
                 }
         }
