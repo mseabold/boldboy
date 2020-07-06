@@ -95,10 +95,10 @@ uint8_t Ppu::readAddr(uint16_t addr) {
     // Check if the read is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
         // OAM can only be accessed during blanking
-        if(MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
+        if(!mEnabled || MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
             return mOAM[addr-OAM_BASE];
     }
-    return 0;
+    return 0xff;
 }
 
 /* For now, the PPU will not be entirely tick-accurate. Instead of handling each individual tick
