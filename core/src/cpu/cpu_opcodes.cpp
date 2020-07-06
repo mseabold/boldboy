@@ -637,21 +637,11 @@ void Cpu::oph_JP_arHL(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_CALL_flag_a16(uint16_t p1, uint16_t p2) {
-    if(p2 == TEST_FLAG(p1)) {
-        mBranchTaken = true;
-        oph_CALL_a16(0,0);
-    } else {
-        mrPC->increment();
-        mrPC->increment();
-    }
+    procCallSubstate((p2 == TEST_FLAG(p1)));
 }
 
 void Cpu::oph_CALL_a16(uint16_t p1, uint16_t p2) {
-    uint16_t aVal;
-    aVal = mMmu->readAddr(mrPC->postIncrement());
-    aVal |= (mMmu->readAddr(mrPC->postIncrement()) << 8);
-    pushStack_16(mrPC->read());
-    mrPC->write(aVal);
+    procCallSubstate(true);
 }
 
 void Cpu::oph_RST_n(uint16_t p1, uint16_t p2) {
@@ -714,8 +704,19 @@ void Cpu::oph_LD_A_arC(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_ADD_SP_r8(uint16_t p1, uint16_t p2) {
+    if(mCurState == 0) {
+        mCycles = 4;
+        mCurState = 1;
+        return;
+    }
+
+    mCurState = 0;
+    mCycles = 12;
+
     uint16_t aVal = (int16_t)(int8_t)mMmu->readAddr(mrPC->postIncrement());
     uint16_t rVal = mrSP->read();
+
+    VLOG(ZONE_CPU, "Add SP r8! (0x%02x)\n", aVal);
 
     uint16_t r = aVal + rVal;
 

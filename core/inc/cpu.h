@@ -24,6 +24,9 @@
 #define CARRY_BITS(_a1, _a2, _r) (_a1 ^ _a2 ^ _r)
 #define CARRY_BITS_3(_a1, _a2, _a3, _r) (_a1 ^ _a2 ^ _a3 ^ _r)
 
+#define ADVANCE_STATE(_cycles) do { mCycles = _cycles; ++mCurState; } while(0)
+#define RESET_STATE(_cycles) do { mCycles = _cycles; mCurState = 0; } while(0)
+
 class Cpu
 {
 public:
@@ -91,7 +94,7 @@ private:
     uint8_t mCurState;
     uint8_t mCycles;
     uint8_t mBrCycles;
-    uint8_t mCache;
+    uint16_t mCache;
 
     Mmu *mMmu;
     InterruptController *mIC;
@@ -106,9 +109,12 @@ private:
     uint8_t sub(uint8_t p1, uint8_t p2, bool checkC);
     uint16_t popStack_16(void);
     void pushStack_16(uint16_t val);
+    uint8_t popStack8(void);
+    void pushStack8(uint8_t val);
     void and_A(uint8_t param);
     void xor_A(uint8_t param);
     void or_A(uint8_t param);
+    void procCallSubstate(bool branch);
 
     uint8_t rlc(uint8_t p1);
     uint8_t rrc(uint8_t p1);

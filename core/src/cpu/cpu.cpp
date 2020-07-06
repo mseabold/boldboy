@@ -186,21 +186,23 @@ uint8_t Cpu::sub(uint8_t p1, uint8_t p2, bool checkC) {
 }
 
 uint16_t Cpu::popStack_16(void) {
-    uint16_t val;
-
-    val = mMmu->readAddr(mrSP->read());
-    mrSP->increment();
-    val |= (mMmu->readAddr(mrSP->read()) << 8);
-    mrSP->increment();
+    uint16_t val = popStack8();
+    val |= (popStack8() << 8);
 
     return val;
 }
 
 void Cpu::pushStack_16(uint16_t val) {
-    mrSP->decrement();
-    mMmu->writeAddr(mrSP->read(), (uint8_t)(val >> 8));
-    mrSP->decrement();
-    mMmu->writeAddr(mrSP->read(), (uint8_t)(val & 0xFF));
+    pushStack8((uint8_t)(val >> 8));
+    pushStack8((uint8_t)(val & 0xff));
+}
+
+uint8_t Cpu::popStack8(void) {
+    return mMmu->readAddr(mrSP->postIncrement());
+}
+
+void Cpu::pushStack8(uint8_t val) {
+    mMmu->writeAddr(mrSP->decrement(), val);
 }
 
 void Cpu::and_A(uint8_t param) {
@@ -351,4 +353,39 @@ uint8_t Cpu::set(uint8_t p1) {
     p1 |= (1 << GET_BIT_FROM_OP(0xc0));
 
     return p1;
+}
+
+void Cpu::procCallSubstate(bool branch) {
+    uint16_t tmp;
+
+    switch(mCurState) {
+        case 0:
+            ADVANCE_STATE(4);
+            break;
+        case 1:
+            mCache = mMmu->readAddr(mrPC->postIncrement());
+            ADVANCE_STATE(4);
+            break;
+        case 2:
+            mCache |= (mMmu->readAddr(mrPC->postIncrement()) << 8);
+
+            if(branch)
+                ADVANCE_STATE(8);
+            else
+                RESET_STATE(4);
+
+            break;
+        case 3:
+            tmp = mCache;
+            mCache = mrPC->read();
+            mrPC->write(tmp);
+
+            pushStack8((uint8_t)(mCache >> 8));
+            ADVANCE_STATE(4);
+            break;
+        case 4:
+            pushStack8((uint8_t)(mCache & 0xff));
+            RESET_STATE(4);
+            break;
+    }
 }
