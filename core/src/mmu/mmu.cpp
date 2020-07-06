@@ -13,8 +13,11 @@ Mmu::Mmu(MemRegion *io, Ppu *ppu, OAMDMA *dma) {
     /* Initialize all of the memory regions. */
     RamRegion *iRam = new RamRegion(0xC000, 0x2000); // 8kB internal RAM at 0xC000
 
+    mDMA = dma;
+    mDMA->setRAM(iRam);
+
     /* Upper 8kB contains multiple regions, including IO and echoed iRAM */
-    UpperRegion *mUpper = new UpperRegion(iRam, io, ppu);
+    UpperRegion *mUpper = new UpperRegion(iRam, io, ppu, mDMA);
 
     mEmpty = new EmptyRegion();
 
@@ -39,9 +42,6 @@ Mmu::Mmu(MemRegion *io, Ppu *ppu, OAMDMA *dma) {
     mRegions[UPPER_REGION] = mUpper;
 
     mBootromEnabled = false;
-
-    mDMA = dma;
-    mDMA->setRAM(iRam);
 }
 
 Mmu::~Mmu() {

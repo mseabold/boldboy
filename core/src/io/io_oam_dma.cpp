@@ -9,6 +9,7 @@ OAMDMA::OAMDMA(MemRegion *VRAM, MemRegion *OAM) {
     mVRAM = VRAM;
     mOAM = OAM;
     mActive = false;
+    mRestarted = false;
     mStart = 0;
 }
 
@@ -16,7 +17,9 @@ OAMDMA::~OAMDMA() {
 }
 
 bool OAMDMA::isActive() {
-    return mActive;
+    bool ret = mActive && (mCycles <= 160*4 || mRestarted);
+    VLOG(ZONE_DMA, "DMA %s\n", ret?"Active":"Inactive");
+    return ret;
 }
 
 void OAMDMA::setCart(MemRegion *cart) {
@@ -28,10 +31,16 @@ void OAMDMA::setRAM(MemRegion *RAM) {
 }
 
 void OAMDMA::writeAddr(uint16_t addr, uint8_t val) {
-    if(addr == IOREG_DMA && !mActive) {
+    if(addr == IOREG_DMA) {
+        if(mActive) {
+            VLOG(ZONE_DMA, "DMA Restart\n");
+            mRestarted = true;
+        }
+
+        VLOG(ZONE_DMA, "DMA Start\n");
         mActive = true;
         mStart = val;
-        mCycles = 160*4; //XXX
+        mCycles = 162*4; //XXX
     }
 }
 
@@ -46,9 +55,12 @@ void OAMDMA::tick(uint8_t cycles) {
     if(!mActive)
         return;
 
+    DLOG(ZONE_DMA, "DMA Tick: ,%u, %u\n", cycles, mCycles);
+
     if(cycles >= mCycles ) {
         mCycles = 0;
         mActive = false;
+        mRestarted = false;
 
         uint16_t addr = (uint16_t)mStart << 8;
         MemRegion *region;
@@ -60,7 +72,7 @@ void OAMDMA::tick(uint8_t cycles) {
             region = mRAM;
 
         for(uint16_t i=0; i<160; ++i) {
-            VLOG(ZONE_DMA, "DMA 0x%04x to 0x%04x\n", addr + i, 0xfe00+i);
+            DLOG(ZONE_DMA, "DMA 0x%04x to 0x%04x\n", addr + i, 0xfe00+i);
             mOAM->writeAddr(0xfe00+i, region->readAddr(addr + i));
         }
 

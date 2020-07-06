@@ -7,10 +7,11 @@
 #define TO_ECHOED_ADDR_SPACE(_addr) (_addr - ECHOED_RAM_OFFSET)
 
 
-UpperRegion::UpperRegion(RamRegion *iRam, MemRegion *io, Ppu* ppu) {
+UpperRegion::UpperRegion(RamRegion *iRam, MemRegion *io, Ppu* ppu, OAMDMA *dma) {
     mEchoedRam = iRam;
     mIO = io;
     mPpu = ppu;
+    mDMA = dma;
 
     mUpperRam = new RamRegion(UPPER_RAM_START, 0x80);
 }
@@ -34,8 +35,8 @@ uint8_t UpperRegion::readAddr(uint16_t addr) {
         case OAM_START:
             /* Attempt to read this value from OAM. If it is
              * beyond the bounds of the OAM segment, the region
-             * will reject it. */
-            result = mPpu->readAddr(addr);
+             * will reject it. Also, block access while the DMA is active. */
+            result = mDMA->isActive()?0xFF:mPpu->readAddr(addr);
             break;
         /* I/O: 0xFF00 - 0xFF4C */
         /* UNUSED: 0xFF4D - 0xFF79 */

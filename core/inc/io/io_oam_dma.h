@@ -21,6 +21,7 @@ class OAMDMA : public MemRegion {
         MemRegion *mVRAM;
         MemRegion *mOAM;
         bool mActive;
+        bool mRestarted;
         uint8_t mStart;
         uint16_t mCycles;
 };

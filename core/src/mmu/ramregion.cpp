@@ -15,7 +15,7 @@ uint8_t RamRegion::readAddr(uint16_t addr) {
     if(REGION_CONTAINS(addr))
         return mRam[addr - mBaseAddr];
     else
-        return 0;
+        return 0xFF;
 }
 
 void RamRegion::writeAddr(uint16_t addr, uint8_t val) {
