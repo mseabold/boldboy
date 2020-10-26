@@ -39,5 +39,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+private slots:
+    void on_actionOpen_triggered();
 };
 #endif // BOLDBOY_H

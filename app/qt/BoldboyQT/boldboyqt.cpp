@@ -1,6 +1,7 @@
 #include "boldboyqt.h"
 #include "./ui_boldboyqt.h"
 #include <qnamespace.h>
+#include <qfiledialog.h>
 
 BoldboyQT::BoldboyQT(QWidget *parent)
     : QMainWindow(parent)
@@ -70,4 +71,11 @@ void BoldboyQT::keyReleaseEvent(QKeyEvent *event) {
         mTimer->setInterval(17);
     else
         emit keyPressed(event->key(), false);
+}
+
+void BoldboyQT::on_actionOpen_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this);
+    QByteArray fileNameBytes = fileName.toLocal8Bit();
+    loadRom(fileNameBytes.data());
 }
