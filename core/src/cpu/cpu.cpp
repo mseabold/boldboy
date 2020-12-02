@@ -31,6 +31,7 @@ Cpu::Cpu(Mmu *mmu, InterruptController *ic) : mMmu(mmu), mIC(ic)
     mBranchTaken = false;
     mCurState = 0;
     mIsCB = false;
+    mIsHalted = false;
 
     initOps();
 }
