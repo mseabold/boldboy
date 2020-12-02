@@ -26,6 +26,7 @@ Ppu::Ppu(InterruptController *ic) {
     mEnabled = false;
     mCurWinY = 0;
     mLineCycles = 0;
+    mOAMDMAInProgress = false;
 
     mRegs = new PpuRegisters();
     mFIFO = new PixelFIFO(mRegs);
@@ -74,7 +75,7 @@ void Ppu::writeAddr(uint16_t addr, uint8_t val) {
     // Check if the write is OAM
     else if(((addr & (0xFF00)) == 0xFE00) && (addr < OAM_TOP)) {
         // OAM can only be accessed during blanking
-        if(!mEnabled || MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
+        if(!mEnabled || mOAMDMAInProgress ||MODE == IOREG_STAT_MODE_0_HBLANK || MODE == IOREG_STAT_MODE_1_VBLANK)
             mOAM[addr-OAM_BASE] = val;
     }
 }
@@ -124,6 +125,7 @@ void Ppu::tick(uint8_t cycles) {
 
         switch(MODE) {
             case IOREG_STAT_MODE_2_OAM_SEARCH:
+                /* TODO: What happens to mode 2 if OAM DMA is in progress? What does the result OAM read return? */
                 if(mLineCycles + cycles >= OAM_CYCLES) {
                     mNumObjs = 0;
                     mCurObj = 0;
@@ -342,4 +344,21 @@ void Ppu::getFrame(uint8_t frame[144][160]) {
 
 Ppu::PpuMode Ppu::getMode() {
     return static_cast<PpuMode>(mRegs->STAT & IOREG_STAT_MODE_MASK);
+}
+
+void Ppu::startOAMDMA(void) {
+    mOAMDMAInProgress = true;
+}
+
+void Ppu::stopOAMDMA(void) {
+    mOAMDMAInProgress = false;
+}
+
+void Ppu::writeAddrDMA(uint16_t addr, uint8_t val) {
+    if(addr >= OAM_BASE && addr < (OAM_TOP))
+    {
+        /* OAM DMA appaers to have highest bus priority and will always write to OAM no matter what mode
+         * the PPU is in. */
+        mOAM[addr-OAM_BASE] = val;
+    }
 }

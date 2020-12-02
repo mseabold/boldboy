@@ -2,10 +2,11 @@
 #define __IO_OAM_DMA_H__
 
 #include "memregion.h"
+#include "ppu.h"
 
 class OAMDMA : public MemRegion {
     public:
-        OAMDMA(MemRegion *VRAM, MemRegion *OAM);
+        OAMDMA(Ppu* ppu);
         ~OAMDMA();
         bool isActive();
         void setCart(MemRegion *cart);
@@ -18,8 +19,7 @@ class OAMDMA : public MemRegion {
     private:
         MemRegion *mCart;
         MemRegion *mRAM;
-        MemRegion *mVRAM;
-        MemRegion *mOAM;
+        Ppu *mPpu;
         bool mActive;
         bool mRestarted;
         uint8_t mStart;

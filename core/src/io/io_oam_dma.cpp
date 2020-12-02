@@ -3,11 +3,10 @@
 #include <stddef.h>
 #include "logger.h"
 
-OAMDMA::OAMDMA(MemRegion *VRAM, MemRegion *OAM) {
+OAMDMA::OAMDMA(Ppu *ppu) {
     mCart = NULL;
     mRAM = NULL;
-    mVRAM = VRAM;
-    mOAM = OAM;
+    mPpu = ppu;
     mActive = false;
     mRestarted = false;
     mStart = 0;
@@ -37,8 +36,9 @@ void OAMDMA::writeAddr(uint16_t addr, uint8_t val) {
             mRestarted = true;
         }
 
-        VLOG(ZONE_DMA, "DMA Start\n");
+        VLOG(ZONE_DMA, "DMA Start 0x%02x\n", val);
         mActive = true;
+        mPpu->startOAMDMA();
         mStart = val;
         mCycles = 162*4; //XXX
     }
@@ -60,6 +60,7 @@ void OAMDMA::tick(uint8_t cycles) {
     if(cycles >= mCycles ) {
         mCycles = 0;
         mActive = false;
+        mPpu->stopOAMDMA();
         mRestarted = false;
 
         uint16_t addr = (uint16_t)mStart << 8;
@@ -67,14 +68,15 @@ void OAMDMA::tick(uint8_t cycles) {
         if(mStart < 0x80)
             region = mCart;
         else if(mStart < 0xa0)
-            region = mVRAM;
+            region = mPpu;
         else
             region = mRAM;
 
         for(uint16_t i=0; i<160; ++i) {
             DLOG(ZONE_DMA, "DMA 0x%04x to 0x%04x\n", addr + i, 0xfe00+i);
-            mOAM->writeAddr(0xfe00+i, region->readAddr(addr + i));
+            mPpu->writeAddrDMA(0xfe00+i, region->readAddr(addr + i));
         }
+        VLOG(ZONE_DMA, "DMA Done");
 
     } else {
         mCycles -= cycles;

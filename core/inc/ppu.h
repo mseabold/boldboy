@@ -26,6 +26,9 @@ class Ppu : public MemRegion {
         uint8_t readAddr(uint16_t addr);
         void tick(uint8_t cycles);
         void getFrame(uint8_t frame[144][160]);
+        void startOAMDMA(void);
+        void stopOAMDMA(void);
+        void writeAddrDMA(uint16_t addr, uint8_t val);
         PpuMode getMode();
     private:
         uint8_t mVRAM[0x2000];
@@ -53,6 +56,8 @@ class Ppu : public MemRegion {
 
         int16_t mLineXPos;
         uint8_t mMode3DelayCycles;
+
+        bool mOAMDMAInProgress;
 };
 
 #endif /* __PPU_H__ */

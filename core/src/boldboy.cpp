@@ -6,7 +6,7 @@ Boldboy::Boldboy() : Boldboy(false) {
 Boldboy::Boldboy(bool useBootrom) {
     mIC = new InterruptController();
     mPpu = new Ppu(mIC);
-    mDMA = new OAMDMA(mPpu, mPpu);
+    mDMA = new OAMDMA(mPpu);
     mJoypad = new IoJoypad(mIC);
     mIO = new IoController(mIC, mPpu, mDMA, mJoypad);
     mTimer = new IoTimer(mIC);
