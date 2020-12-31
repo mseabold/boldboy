@@ -17,6 +17,7 @@ void Fetcher::tick() {
     uint8_t x;
     uint8_t y;
     uint8_t count;
+    bool is8x16;
 
     FLOG(ZONE_PPU, "Fetcher: Tick Enter (%u, %u)\n", (unsigned int)mState, (unsigned int)mSpriteState);
 
@@ -102,25 +103,29 @@ void Fetcher::tick() {
                 NEXT_STATE(mSpriteState);
                 break;
             case fsReadHigh1:
+                is8x16 = ((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16);
+
                 // Selecting the Y line does not depend on whether the sprite is in 8 or 16 px height mode,
                 // Y is always based on an offset of 16
                 if(mSprite->yFlip)
                     y = mSprite->y - mRegs->LY - 1;
                 else
-                    y = 16 - (mSprite->y - mRegs->LY);
+                    y = 16 + mRegs->LY - mSprite->y;
 
-                mSpriteTileData[0] = mVRAM[mSpriteTileNum * (((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16)?32:16) + (y*2)];
+                mSpriteTileData[0] = mVRAM[(is8x16 ? (mSpriteTileNum & 0xfe) : mSpriteTileNum) * 16 + y * 2];
                 NEXT_STATE(mSpriteState);
                 break;
             case fsReadLow1:
+                is8x16 = ((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16);
+
                 // Selecting the Y line does not depend on whether the sprite is in 8 or 16 px height mode,
                 // Y is always based on an offset of 16
                 if(mSprite->yFlip)
                     y = mSprite->y - mRegs->LY - 1;
                 else
-                    y = 16 - (mSprite->y - mRegs->LY);
+                    y = 16 + mRegs->LY - mSprite->y;
 
-                mSpriteTileData[1] = mVRAM[mSpriteTileNum * (((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16)?32:16) + (y*2) + 1];
+                mSpriteTileData[1] = mVRAM[(is8x16 ? (mSpriteTileNum & 0xfe) : mSpriteTileNum) * 16 + y * 2 + 1];
 
                 mSpriteLine.load(mSpriteTileData, mSprite->OBP1?Pixel::ptSprite1:Pixel::ptSprite0, mSprite->belowBG?PIXEL_FLAGS_SPRITE_BELOW_BG:0, mSprite->xFlip);
                 mFIFO->loadMixSprite(mSpriteLine, mSprite);

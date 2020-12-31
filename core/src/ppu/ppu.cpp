@@ -116,6 +116,7 @@ void Ppu::tick(uint8_t cycles) {
     uint8_t *oamPtr;
     uint8_t oamY;
     OAMEntry temp;
+    bool is16_mode;
 
     if(!mEnabled)
         return;
@@ -132,8 +133,11 @@ void Ppu::tick(uint8_t cycles) {
 
                     for(oamPtr = mOAM; oamPtr < mOAM + 0xA0 && mNumObjs < MAX_NUM_OBJS; oamPtr += 4) {
                         oamY = oamPtr[0];
+                        DLOG(ZONE_PPU, "Sprite[%u] @ (%u, %u)\n", (oamPtr-mOAM)>>2, oamPtr[1]);
 
-                        if(oamY > 0 && mRegs->LY < oamY && (oamY - mRegs->LY - 1) < 16 && (oamY - mRegs->LY) >= 9) {
+                        is16_mode = ((mRegs->LCDC & IOREG_LCDC_OBJ_SIZE_MASK) == IOREG_LCDC_OBJ_SIZE_8_16);
+
+                        if(oamY <= mRegs->LY + 16 && oamY + (is16_mode?16:8) > mRegs->LY + 16) {
                             mFoundObjs[mNumObjs++] = OAMEntry(oamPtr, (oamPtr-mOAM)/4);
                         }
                     }
@@ -191,8 +195,7 @@ void Ppu::tick(uint8_t cycles) {
                         /* No sprite pending, check if we should start one. */
                         if((mRegs->LCDC & IOREG_LCDC_OBJ_DISPLAY_MASK) == IOREG_LCDC_OBJ_DISPLAY_ON && mCurObj < mNumObjs && mFoundObjs[mCurObj].x == mLineXPos + 8) {
                             if(!mFetcher->spritePending()) {
-                                VLOG(ZONE_PPU, "Test String");
-                                VLOG(ZONE_PPU, "Load sprite at x (%d)\n", mLineXPos);
+                                DLOG(ZONE_PPU, "Load sprite at x (%d), (%u, %u)\n", mLineXPos, mFoundObjs[mCurObj].y, mFoundObjs[mCurObj].x);
                                 mFIFO->lock();
                                 mFetcher->startSprite(&mFoundObjs[mCurObj]);
                                 ++mCurObj;
@@ -206,7 +209,7 @@ void Ppu::tick(uint8_t cycles) {
 
                     //TODO This should probably move above the Sprite logic
                     if((mRegs->LCDC & IOREG_LCDC_WIN_DISPLAY_MASK) == IOREG_LCDC_WIN_DISPLAY_ON && mLineXPos >= mRegs->WX - 7 && mRegs->LY >= mRegs->WY && mFetcher->getMode() != Fetcher::fmWindow) {
-                        VLOG(ZONE_PPU, "Start Window at X (%u). Fifo has %u pixels.\n", mLineXPos, mFIFO->count());
+                        DLOG(ZONE_PPU, "Start Window at X (%u). Fifo has %u pixels.\n", mLineXPos, mFIFO->count());
                         mFetcher->setMode(Fetcher::fmWindow, mCurWinY);
                         mFIFO->clear(false);
                         // TODO Check the exact timing here between switching over.
