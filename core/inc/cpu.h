@@ -27,6 +27,9 @@
 #define ADVANCE_STATE(_cycles) do { mCycles = _cycles; ++mCurState; } while(0)
 #define RESET_STATE(_cycles) do { mCycles = _cycles; mCurState = 0; } while(0)
 
+#define CPU_STATE_FLAGS_IME_ENABLE_PENDING 0x00000001
+#define CPU_STATE_FLAGS_IME_ENABLE_DELAY   0x00000002
+
 class Cpu
 {
 public:
@@ -95,6 +98,7 @@ private:
     uint8_t mCycles;
     uint8_t mBrCycles;
     uint16_t mCache;
+    uint32_t mStateFlags;
 
     Mmu *mMmu;
     InterruptController *mIC;

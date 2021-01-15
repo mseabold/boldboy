@@ -52,9 +52,8 @@ void Cpu::oph_Halt(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_EI(uint16_t p1, uint16_t p2) {
-    /* TODO: This needs to be delayed some amount of time that I am
-     * still unsure of, but for now just do it here. */
-    mIC->setEnabled(true);
+    if(!(mStateFlags & CPU_STATE_FLAGS_IME_ENABLE_PENDING))
+        mStateFlags |= (CPU_STATE_FLAGS_IME_ENABLE_PENDING | CPU_STATE_FLAGS_IME_ENABLE_DELAY);
 }
 
 void Cpu::oph_DI(uint16_t p1, uint16_t p2) {

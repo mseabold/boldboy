@@ -32,6 +32,7 @@ Cpu::Cpu(Mmu *mmu, InterruptController *ic) : mMmu(mmu), mIC(ic)
     mCurState = 0;
     mIsCB = false;
     mIsHalted = false;
+    mStateFlags = 0;
 
     initOps();
 }
@@ -58,9 +59,17 @@ uint8_t Cpu::tick() {
 
     mBranchTaken = false;
 
-    //TODO: Eventually some/all opcodes will need to be handled
-    //      in multiple ticks with a stored state. But the old adage:
-    //      Premature optimization is the root of evil
+    /* Check if there is a pending IME enable to be handled. */
+    if((mCurState == 0) && (mStateFlags & CPU_STATE_FLAGS_IME_ENABLE_PENDING))
+    {
+        if(mStateFlags & CPU_STATE_FLAGS_IME_ENABLE_DELAY)
+            mStateFlags &= ~CPU_STATE_FLAGS_IME_ENABLE_DELAY;
+        else
+        {
+            mIC->setEnabled(true);
+            mStateFlags &= ~CPU_STATE_FLAGS_IME_ENABLE_PENDING;
+        }
+    }
 
     // If there is an interrupt pending, switch to the ISR
     // handler, then let the next tick began handling it
