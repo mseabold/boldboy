@@ -268,7 +268,7 @@ void Ppu::tick(uint8_t cycles) {
                 break;
             case IOREG_STAT_MODE_1_VBLANK:
                     if(mLineCycles + cycles >= LINE_CYCLES) {
-                        consumedCycles = LINE_CYCLES-cycles;
+                        consumedCycles = LINE_CYCLES-mLineCycles;
 
                         if(mRegs->LY < 153) {
                             // Eat an entire line's worth of cycles for each VBlank line
