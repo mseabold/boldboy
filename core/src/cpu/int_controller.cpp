@@ -61,7 +61,7 @@ InterruptController::InterruptType InterruptController::getPending() {
         return itNone;
 
     for(i = 0; i < itNone; ++i) {
-        if(IRQ_TYPE_TO_BIT(i) & mIF)
+        if(IRQ_TYPE_TO_BIT(i) & mIF & mIE)
             return (InterruptType)i;
     }
 
