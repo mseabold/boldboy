@@ -43,3 +43,7 @@ target_include_directories(gbcore
     PUBLIC
         inc
 )
+
+if(ENABLE_TEST_HARNESS)
+    target_compile_definitions(gbcore PUBLIC ENABLE_TEST_HARNESS)
+endif()

@@ -28,6 +28,10 @@ class Boldboy {
         void buttonPressed(IoJoypad::Button button);
         void buttonReleased(IoJoypad::Button button);
 
+#ifdef ENABLE_TEST_HARNESS
+        Cpu *getCpu();
+#endif
+
     private:
         Cpu *mCpu;
         Mmu *mMmu;

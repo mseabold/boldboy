@@ -91,3 +91,9 @@ void Boldboy::buttonPressed(IoJoypad::Button button) {
 void Boldboy::buttonReleased(IoJoypad::Button button) {
     mJoypad->buttonReleased(button);
 }
+
+#ifdef ENABLE_TEST_HARNESS
+Cpu *Boldboy::getCpu() {
+    return mCpu;
+}
+#endif

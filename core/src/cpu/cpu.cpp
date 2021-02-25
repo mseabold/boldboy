@@ -34,6 +34,12 @@ Cpu::Cpu(Mmu *mmu, InterruptController *ic) : mMmu(mmu), mIC(ic)
     mIsHalted = false;
     mStateFlags = 0;
 
+#ifdef ENABLE_TEST_HARNESS
+    mMagicOpcode = 0;
+    mMagicOpcodeRun = false;
+    mMagicOpcodeValid = false;
+#endif
+
     initOps();
 }
 
@@ -109,6 +115,11 @@ uint8_t Cpu::tick() {
         }
 
         mCurOpcode = op;
+
+#ifdef ENABLE_TEST_HARNESS
+        if(mMagicOpcodeValid && mCurOpcode == mMagicOpcode)
+            mMagicOpcodeRun = true;
+#endif
 
         // Populate the intstruction cycles with full number. Some opcodes
         // may override this if the the opcode should be handled in multiple
@@ -399,3 +410,14 @@ void Cpu::procCallSubstate(bool branch) {
             break;
     }
 }
+
+#ifdef ENABLE_TEST_HARNESS
+void Cpu::setMagicOpcode(uint8_t opcode) {
+    mMagicOpcode = opcode;;
+    mMagicOpcodeValid = true;
+}
+
+bool Cpu::magicOpcodeRun() {
+    return mMagicOpcodeRun;
+}
+#endif

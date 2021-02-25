@@ -63,6 +63,11 @@ public:
     uint8_t tick();
     void disassemble(char *buffer, uint32_t bufLen);
 
+#ifdef ENABLE_TEST_HARNESS
+    void setMagicOpcode(uint8_t opcode);
+    bool magicOpcodeRun();
+#endif
+
     class Opcode {
         public:
             Opcode();
@@ -229,6 +234,12 @@ private:
     void oph_BIT_arHL(uint16_t p1, uint16_t p2);
     void oph_RES_arHL(uint16_t p1, uint16_t p2);
     void oph_SET_arHL(uint16_t p1, uint16_t p2);
+
+#ifdef ENABLE_TEST_HARNESS
+    uint8_t mMagicOpcode;
+    bool mMagicOpcodeRun;
+    bool mMagicOpcodeValid;
+#endif
 
 };
 
