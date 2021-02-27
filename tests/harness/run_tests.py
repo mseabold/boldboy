@@ -48,17 +48,22 @@ if __name__ == '__main__':
     parser.add_argument('test_config')
     parser.add_argument('tests_dir')
     parser.add_argument('-r','--report',default=os.devnull)
+    parser.add_argument('-m','--markdown', default=os.devnull)
 
     args = parser.parse_args()
 
-    with open(args.test_config, 'r') as config_file, open(args.report, 'w+') as report_file:
+    with open(args.test_config, 'r') as config_file, open(args.report, 'w+') as report_file, open(args.markdown, 'w+') as markdown_file:
         config = json.load(config_file)
 
         report_file.write(REPORT_HEADER)
+        markdown_file.write('## Test Results\n');
 
         for suite in config:
             print('Running Suite: {}'.format(suite['name']))
             report_file.write('<h2>{}</h2>\n<table>\n'.format(suite['name']))
+            markdown_file.write('### {}\n\n'.format(suite['name']))
+            markdown_file.write('|Test|Result|\n')
+            markdown_file.write('|----|------|\n')
 
             for test_name in suite['tests']:
                 test = '{}/{}/{}'.format(args.tests_dir, suite['directory'], test_name)
@@ -77,7 +82,15 @@ if __name__ == '__main__':
 
                 report_file.write('<td class="{}">{}</td></tr>\n'.format(status.lower(), status))
 
+                if status == "Pass":
+                    md_status = ":heavy_check_mark:"
+                else:
+                    md_status = ":x:"
+
+                markdown_file.write('|{}|{}|\n'.format(test_name, md_status))
+
             report_file.write('</table>\n')
+            markdown_file.write('\n')
 
         report_file.write(REPORT_FOOTER)
 
