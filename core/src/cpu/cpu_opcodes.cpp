@@ -585,14 +585,41 @@ void Cpu::oph_CP_d8(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_RET_flag(uint16_t p1, uint16_t p2) {
-    if(p2 == TEST_FLAG(p1)) {
-        mBranchTaken = true;
-        oph_RET(0,0);
+    switch(mCurState) {
+        case 0:
+            if(p2 == TEST_FLAG(p1)) {
+                // Consume the M-Cycles for decoding and flag checking,
+                // then move onto the PC pop state
+                ADVANCE_STATE(8);
+            } else {
+                RESET_STATE(8);
+            }
+            break;
+        default:
+            oph_RET(0, 0);
+            break;
     }
 }
 
 void Cpu::oph_RET(uint16_t p1, uint16_t p2) {
-    mrPC->write(popStack_16());
+    switch(mCurState)
+    {
+        case 0:
+            ADVANCE_STATE(4);
+            return;
+        case 1:
+            mCache = popStack8();
+            ADVANCE_STATE(4);
+            break;
+        case 2:
+            mCache |= popStack8() << 8;
+            ADVANCE_STATE(4);
+            break;
+        case 3:
+            mrPC->write(mCache);
+            RESET_STATE(4);
+            break;
+    }
 }
 
 void Cpu::oph_RETI(uint16_t p1, uint16_t p2) {
@@ -614,21 +641,34 @@ void Cpu::oph_PUSH_r16(uint16_t p1, uint16_t p2) {
 
 void Cpu::oph_JP_flag_a16(uint16_t p1, uint16_t p2) {
     if(p2 == TEST_FLAG(p1)) {
-        mBranchTaken = true;
         oph_JP_a16(0,0);
     } else {
+        //TODO should this be timed appropriately?
         mrPC->increment();
         mrPC->increment();
+        RESET_STATE(12);
     }
 }
 
 void Cpu::oph_JP_a16(uint16_t p1, uint16_t p2) {
-    uint16_t pcVal;
-
-    pcVal = mMmu->readAddr(mrPC->postIncrement());
-    pcVal |= (mMmu->readAddr(mrPC->postIncrement()) << 8);
-
-    mrPC->write(pcVal);
+    switch(mCurState)
+    {
+        case 0:
+            ADVANCE_STATE(4);
+            break;
+        case 1:
+            mCache = mMmu->readAddr(mrPC->postIncrement());
+            ADVANCE_STATE(4);
+            break;
+        case 2:
+            mCache |= mMmu->readAddr(mrPC->postIncrement()) << 8;
+            ADVANCE_STATE(4);
+            break;
+        case 3:
+            mrPC->write(mCache);
+            RESET_STATE(4);
+            break;
+    }
 }
 
 void Cpu::oph_JP_arHL(uint16_t p1, uint16_t p2) {
@@ -758,15 +798,28 @@ void Cpu::oph_LD_A_a16(uint16_t p1, uint16_t p2) {
 }
 
 void Cpu::oph_LD_HL_SP_p_r8(uint16_t p1, uint16_t p2) {
-    uint16_t aVal = (int16_t)(int8_t)mMmu->readAddr(mrPC->postIncrement());
-    uint16_t rVal = mrSP->read();
+    uint16_t rVal,r;
+    switch(mCurState)
+    {
+        case 0:
+            ADVANCE_STATE(4);
+            break;
+        case 1:
+            mCache = mMmu->readAddr(mrPC->postIncrement());
+            ADVANCE_STATE(4);
+            break;
+        case 2:
+            rVal = mrSP->read();
 
-    uint16_t r = aVal + rVal;
+            r = mCache + rVal;
 
-    CLEAR_FLAG(FLAG_Z | FLAG_N);
-    (CARRY_BITS(aVal, rVal, r) & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
-    (CARRY_BITS(aVal, rVal, r) & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
-    mrHL->write(r);
+            CLEAR_FLAG(FLAG_Z | FLAG_N);
+            (CARRY_BITS(mCache, rVal, r) & 0x10)?SET_FLAG(FLAG_H):CLEAR_FLAG(FLAG_H);
+            (CARRY_BITS(mCache, rVal, r) & 0x100)?SET_FLAG(FLAG_C):CLEAR_FLAG(FLAG_C);
+            mrHL->write(r);
+            RESET_STATE(4);
+            break;
+    }
 }
 
 void Cpu::oph_LD_SP_HL(uint16_t p1, uint16_t p2) {
